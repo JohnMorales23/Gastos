@@ -11,6 +11,7 @@ body{margin:0;background:#F6F4EF;color:#1B2430;font-family:system-ui,sans-serif}
 main{max-width:430px;margin:0 auto;padding:28px 20px;display:flex;flex-direction:column;gap:16px}
 h1{margin:0;font-size:26px}
 .f{display:flex;flex-direction:column;gap:16px}
+[hidden]{display:none!important}
 label{font-size:13px;font-weight:700;color:#5B6470;display:block;margin-bottom:6px}
 input,select{width:100%;box-sizing:border-box;height:52px;padding:0 16px;border:1px solid #CFCAC0;border-radius:12px;background:#fff;font-size:16px;color:#1B2430}
 #m{height:60px;font-size:28px;font-weight:700}
@@ -37,6 +38,7 @@ button:disabled{opacity:.5}
 </div>
 <div id="st"></div>
 <div id="pend"></div>
+<a href="#" id="rc" hidden style="font-size:13px;color:#5B6470">Cambiar configuración</a>
 </main>
 <script>
 const $ = id => document.getElementById(id), L = localStorage;
@@ -79,13 +81,14 @@ async function save() {
 
 function init() {
   const ok = L.u && L.k;
-  $('cfg').hidden = !!ok; $('form').hidden = !ok;
+  $('cfg').hidden = !!ok; $('form').hidden = !ok; $('rc').hidden = !ok;
   if (ok) flush();
 }
 (() => {
   const t = new Date(); t.setMinutes(t.getMinutes() - t.getTimezoneOffset());
   $('f').value = t.toISOString().slice(0, 10);
   $('go').onclick = save;
+  $('rc').onclick = e => { e.preventDefault(); if (confirm('¿Borrar la configuración de este dispositivo?')) { L.removeItem('u'); L.removeItem('k'); init(); } };
   $('sc').onclick = () => {
     const u = $('u').value.trim(), k = $('k0').value.trim();
     if (!u.startsWith('https://script.google.com/') || !k) return say('Revisa la dirección y la clave.');
