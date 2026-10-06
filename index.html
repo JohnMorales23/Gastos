@@ -6,155 +6,93 @@
 <meta name="apple-mobile-web-app-capable" content="yes">
 <meta name="theme-color" content="#F6F4EF">
 <title>Gastos</title>
-<script src="https://cdnjs.cloudflare.com/ajax/libs/jszip/3.10.1/jszip.min.js"></script>
 <style>
 body{margin:0;background:#F6F4EF;color:#1B2430;font-family:system-ui,sans-serif}
 main{max-width:430px;margin:0 auto;padding:28px 20px;display:flex;flex-direction:column;gap:16px}
 h1{margin:0;font-size:26px}
+.f{display:flex;flex-direction:column;gap:16px}
 label{font-size:13px;font-weight:700;color:#5B6470;display:block;margin-bottom:6px}
 input,select{width:100%;box-sizing:border-box;height:52px;padding:0 16px;border:1px solid #CFCAC0;border-radius:12px;background:#fff;font-size:16px;color:#1B2430}
 #m{height:60px;font-size:28px;font-weight:700}
 button{height:56px;border:0;border-radius:14px;background:#0E5A8A;color:#fff;font-size:17px;font-weight:700}
 button:disabled{opacity:.5}
-#st{min-height:22px;font-size:14px;color:#5B6470}
+#st,#pend{min-height:20px;font-size:14px;color:#5B6470}
 </style>
 </head>
 <body>
 <main>
 <h1>Nuevo gasto</h1>
-<button id="login" hidden>Conectar con Microsoft</button>
-<div id="form" hidden style="display:none;flex-direction:column;gap:16px">
+<div id="cfg" class="f" hidden>
+<p>Primera vez: pega los datos de configuración (solo una vez en este dispositivo).</p>
+<div><label for="u">Dirección del script (termina en /exec)</label><input id="u" autocomplete="off"></div>
+<div><label for="k0">Clave</label><input id="k0" autocomplete="off"></div>
+<button id="sc">Guardar configuración</button>
+</div>
+<div id="form" class="f" hidden>
 <div><label for="f">Fecha</label><input id="f" type="date"></div>
 <div><label for="c">Concepto</label><input id="c" autocomplete="off" placeholder="Ej. Tacos"></div>
 <div><label for="m">Monto</label><input id="m" inputmode="decimal" placeholder="0.00"></div>
 <div><label for="k">Categoría</label><select id="k"><option>Esencial</option><option>Mantener</option><option>Innecesario</option></select></div>
-<button id="go">Guardar en Excel</button>
+<button id="go">Guardar</button>
 </div>
 <div id="st"></div>
+<div id="pend"></div>
 </main>
 <script>
-// ====== CONFIGURA ESTO ======
-const CLIENT_ID = 'caf63b9f-ff4f-42a6-9389-eb3a2b4fd407';   // ID de aplicación (cliente) de Microsoft Entra
-const FILE_PATH = '/Documentos/Control_de_Gastos_PRUEBA.xlsx';   // ruta del archivo dentro de tu OneDrive
-// ============================
-const SHEET = 'Registro', FIRST = 5, LAST = 1004;
-const REDIR = location.origin + location.pathname;
-const AUTH = 'https://login.microsoftonline.com/consumers/oauth2/v2.0/';
-const SCOPE = 'Files.ReadWrite offline_access';
-const G = 'https://graph.microsoft.com/v1.0/me/drive/';
-const NS = 'http://schemas.openxmlformats.org/spreadsheetml/2006/main';
-const RNS = 'http://schemas.openxmlformats.org/officeDocument/2006/relationships';
-const $ = id => document.getElementById(id);
+const $ = id => document.getElementById(id), L = localStorage;
 const say = t => $('st').textContent = t;
+const q = () => JSON.parse(L.q || '[]');
 
-// ---- Inicio de sesión (OAuth con PKCE, cuentas personales) ----
-const b64 = b => btoa(String.fromCharCode(...new Uint8Array(b))).replace(/\+/g, '-').replace(/\//g, '_').replace(/=+$/, '');
-async function login() {
-  const v = b64(crypto.getRandomValues(new Uint8Array(32)));
-  const ch = b64(await crypto.subtle.digest('SHA-256', new TextEncoder().encode(v)));
-  localStorage.setItem('v', v);
-  location.href = AUTH + 'authorize?' + new URLSearchParams({ client_id: CLIENT_ID, response_type: 'code', redirect_uri: REDIR, scope: SCOPE, code_challenge: ch, code_challenge_method: 'S256' });
-}
-async function tokenReq(p) {
-  const r = await fetch(AUTH + 'token', { method: 'POST', body: new URLSearchParams({ client_id: CLIENT_ID, scope: SCOPE, redirect_uri: REDIR, ...p }) });
+async function send(g) {
+  const r = await fetch(L.u, { method: 'POST', headers: { 'Content-Type': 'text/plain;charset=utf-8' }, body: JSON.stringify({ k: L.k, ...g }) });
   const j = await r.json();
-  if (!j.access_token) throw new Error(j.error_description || 'Sin sesión');
-  localStorage.setItem('tk', JSON.stringify({ a: j.access_token, r: j.refresh_token, e: Date.now() + j.expires_in * 1000 - 60000 }));
-  return j.access_token;
-}
-async function token() {
-  const code = new URLSearchParams(location.search).get('code');
-  if (code) {
-    history.replaceState({}, '', REDIR);
-    try { return await tokenReq({ grant_type: 'authorization_code', code, code_verifier: localStorage.getItem('v') }); } catch (e) { say(e.message); return null; }
-  }
-  const t = JSON.parse(localStorage.getItem('tk') || 'null');
-  if (!t) return null;
-  if (Date.now() < t.e) return t.a;
-  try { return await tokenReq({ grant_type: 'refresh_token', refresh_token: t.r }); } catch (e) { return null; }
+  if (!j.ok) throw Object.assign(new Error(j.error), { fatal: true });
+  return j.row;
 }
 
-// ---- OneDrive ----
-async function g(path, tk, opt = {}) {
-  const r = await fetch(G + path, { ...opt, headers: { Authorization: 'Bearer ' + tk, ...(opt.headers || {}) } });
-  if (r.status === 423) throw new Error('El Excel está abierto en otro lugar. Ciérralo (computadora, navegador o celular), espera 2 minutos e intenta de nuevo.');
-  return r;
-}
-
-// ---- Edita solo A–D de la primera fila libre; no toca nada más ----
-async function addRow(buf, v) {
-  const z = await JSZip.loadAsync(buf), P = new DOMParser(), S = new XMLSerializer();
-  const xml = async n => P.parseFromString(await z.file(n).async('string'), 'application/xml');
-  const head = '<?xml version="1.0" encoding="UTF-8" standalone="yes"?>\n';
-  const wb = await xml('xl/workbook.xml'), rels = await xml('xl/_rels/workbook.xml.rels');
-  const sh = [...wb.getElementsByTagName('sheet')].find(s => s.getAttribute('name') === SHEET);
-  if (!sh) throw new Error('No encontré la hoja ' + SHEET);
-  const rid = sh.getAttributeNS(RNS, 'id');
-  const target = [...rels.getElementsByTagName('Relationship')].find(r => r.getAttribute('Id') === rid).getAttribute('Target');
-  const path = 'xl/' + target.replace(/^\/?(xl\/)?/, '');
-  const sd = await xml(path), data = sd.getElementsByTagNameNS(NS, 'sheetData')[0];
-  const cell = (row, col) => [...row.children].find(c => c.getAttribute('r') === col + row.getAttribute('r'));
-  const empty = c => !c || !c.children.length;
-  const rows = new Map([...data.children].map(r => [+r.getAttribute('r'), r]));
-  let n = FIRST;
-  while (n <= LAST && rows.has(n) && !empty(cell(rows.get(n), 'A'))) n++;
-  if (n > LAST) throw new Error('La hoja Registro está llena (fila ' + LAST + '). Hay que extender las fórmulas.');
-  let row = rows.get(n);
-  if (!row) {
-    row = sd.createElementNS(NS, 'row'); row.setAttribute('r', n);
-    data.insertBefore(row, [...data.children].find(r => +r.getAttribute('r') > n) || null);
+// Reintenta los gastos que quedaron pendientes por falta de conexión
+async function flush() {
+  let c = q();
+  while (c.length) {
+    try { await send(c[0]); } catch (e) { if (!e.fatal) break; }
+    c.shift(); L.q = JSON.stringify(c);
   }
-  [['A', 'n', v.fecha], ['B', 's', v.concepto], ['C', 's', v.cat], ['D', 'n', v.monto]].forEach(([col, ty, val]) => {
-    let c = cell(row, col);
-    if (!c) {
-      c = sd.createElementNS(NS, 'c'); c.setAttribute('r', col + n);
-      row.insertBefore(c, [...row.children].find(k => k.getAttribute('r').replace(/\d+/, '') > col) || null);
-    }
-    c.textContent = '';
-    if (ty === 's') {
-      c.setAttribute('t', 'inlineStr');
-      const is = sd.createElementNS(NS, 'is'), t = sd.createElementNS(NS, 't');
-      t.textContent = val; is.appendChild(t); c.appendChild(is);
-    } else {
-      c.removeAttribute('t');
-      const e = sd.createElementNS(NS, 'v'); e.textContent = val; c.appendChild(e);
-    }
-  });
-  const cp = wb.getElementsByTagNameNS(NS, 'calcPr')[0];
-  if (cp) cp.setAttribute('fullCalcOnLoad', '1'); // Excel recalcula los resúmenes al abrir
-  z.file(path, head + S.serializeToString(sd));
-  z.file('xl/workbook.xml', head + S.serializeToString(wb));
-  return { blob: await z.generateAsync({ type: 'blob', compression: 'DEFLATE' }), n };
+  $('pend').textContent = c.length ? c.length + ' gasto(s) pendiente(s) por enviar' : '';
 }
 
 async function save() {
-  const tk = await token();
-  if (!tk) return login();
-  const [y, m, d] = $('f').value.split('-').map(Number);
-  const monto = parseFloat($('m').value.replace(/[$,\s]/g, ''));
-  const concepto = $('c').value.trim();
-  if (!y || !concepto || !(monto > 0)) return say('Falta fecha, concepto o un monto válido.');
-  const v = { fecha: Date.UTC(y, m - 1, d) / 864e5 + 25569, concepto, cat: $('k').value, monto };
+  const monto = parseFloat($('m').value.replace(/[$,\s]/g, '')), concepto = $('c').value.trim(), fecha = $('f').value;
+  if (!fecha || !concepto || !(monto > 0)) return say('Falta fecha, concepto o un monto válido.');
+  const g = { fecha, concepto, cat: $('k').value, monto };
   $('go').disabled = true; say('Guardando…');
   try {
-    for (let i = 0; i < 3; i++) {
-      const meta = await (await g('root:' + encodeURI(FILE_PATH), tk)).json();
-      const buf = await (await g('items/' + meta.id + '/content', tk)).arrayBuffer();
-      const { blob, n } = await addRow(buf, v);
-      const r = await g('items/' + meta.id + '/content', tk, { method: 'PUT', headers: { 'If-Match': meta.eTag, 'Content-Type': 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet' }, body: blob });
-      if (r.status !== 412) { $('c').value = ''; $('m').value = ''; say('Guardado en la fila ' + n + '.'); return; }
-    }
-    say('El archivo cambió mientras guardaba. Intenta de nuevo.');
-  } catch (e) { say('Error: ' + e.message); }
-  finally { $('go').disabled = false; }
+    const row = await send(g);
+    say('Guardado en la fila ' + row + '.');
+  } catch (e) {
+    if (e.fatal) { say('Error: ' + e.message); $('go').disabled = false; return; }
+    L.q = JSON.stringify([...q(), g]);
+    say('Sin conexión: guardado en el celular, se enviará solo.');
+  }
+  $('c').value = ''; $('m').value = '';
+  $('go').disabled = false; flush();
 }
 
-(async () => {
+function init() {
+  const ok = L.u && L.k;
+  $('cfg').hidden = !!ok; $('form').hidden = !ok;
+  if (ok) flush();
+}
+(() => {
   const t = new Date(); t.setMinutes(t.getMinutes() - t.getTimezoneOffset());
   $('f').value = t.toISOString().slice(0, 10);
-  $('login').onclick = login; $('go').onclick = save;
-  const tk = await token();
-  if (tk) $('form').style.display = 'flex'; else $('login').hidden = false;
+  $('go').onclick = save;
+  $('sc').onclick = () => {
+    const u = $('u').value.trim(), k = $('k0').value.trim();
+    if (!u.startsWith('https://script.google.com/') || !k) return say('Revisa la dirección y la clave.');
+    L.u = u; L.k = k; say(''); init();
+  };
+  window.addEventListener('online', flush);
+  init();
 })();
 </script>
 </body>
