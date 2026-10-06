@@ -4,25 +4,31 @@
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width,initial-scale=1">
 <meta name="apple-mobile-web-app-capable" content="yes">
-<meta name="theme-color" content="#F6F4EF">
+<meta name="theme-color" content="#0B2545">
 <title>Gastos</title>
 <style>
-body{margin:0;background:#F6F4EF;color:#1B2430;font-family:system-ui,sans-serif}
-main{max-width:430px;margin:0 auto;padding:28px 20px;display:flex;flex-direction:column;gap:16px}
-h1{margin:0;font-size:26px}
-.f{display:flex;flex-direction:column;gap:16px}
+*{box-sizing:border-box}
+body{margin:0;background:#EEF2F8;color:#0B2545;font-family:system-ui,-apple-system,'Segoe UI',sans-serif}
+header{background:linear-gradient(135deg,#0B2545,#1D4E89);color:#fff;padding:32px 20px 60px}
+header div{max-width:430px;margin:0 auto}
+header h1{margin:0;font-size:24px;letter-spacing:.2px}
+header p{margin:6px 0 0;font-size:14px;color:#C9D8EE}
+main{max-width:430px;margin:-36px auto 0;padding:0 20px 28px;display:flex;flex-direction:column;gap:16px}
+.f{display:flex;flex-direction:column;gap:16px;background:#fff;border-radius:20px;padding:20px;border-top:4px solid #C9A227;box-shadow:0 10px 30px rgba(11,37,69,.14)}
+.f p{margin:0;font-size:14px;color:#3A5273}
 [hidden]{display:none!important}
-label{font-size:13px;font-weight:700;color:#5B6470;display:block;margin-bottom:6px}
-input,select{width:100%;box-sizing:border-box;height:52px;padding:0 16px;border:1px solid #CFCAC0;border-radius:12px;background:#fff;font-size:16px;color:#1B2430}
+label{font-size:12px;font-weight:700;letter-spacing:.6px;text-transform:uppercase;color:#1D4E89;display:block;margin-bottom:6px}
+input,select{width:100%;height:52px;padding:0 16px;border:1px solid #CBD6E6;border-radius:12px;background:#F8FAFD;font-size:16px;color:#0B2545}
+input:focus,select:focus{outline:none;border-color:#1D4E89;box-shadow:0 0 0 3px rgba(29,78,137,.18);background:#fff}
 #m{height:60px;font-size:28px;font-weight:700}
-button{height:56px;border:0;border-radius:14px;background:#0E5A8A;color:#fff;font-size:17px;font-weight:700}
+button{height:56px;border:0;border-radius:14px;background:linear-gradient(135deg,#0B2545,#1D4E89);color:#fff;font-size:17px;font-weight:700}
 button:disabled{opacity:.5}
-#st,#pend{min-height:20px;font-size:14px;color:#5B6470}
+#st,#pend{min-height:20px;font-size:14px;color:#3A5273;text-align:center}
 </style>
 </head>
 <body>
+<header><div><h1>Control de gastos</h1><p>Registro rápido</p></div></header>
 <main>
-<h1>Nuevo gasto</h1>
 <div id="cfg" class="f" hidden>
 <p>Primera vez: pega los datos de configuración (solo una vez en este dispositivo).</p>
 <div><label for="u">Dirección del script (termina en /exec)</label><input id="u" autocomplete="off"></div>
@@ -38,11 +44,11 @@ button:disabled{opacity:.5}
 </div>
 <div id="st"></div>
 <div id="pend"></div>
-<a href="#" id="rc" hidden style="font-size:13px;color:#5B6470">Cambiar configuración</a>
+<a href="#" id="rc" hidden style="font-size:13px;color:#1D4E89;align-self:center">Cambiar configuración</a>
 </main>
 <script>
 const $ = id => document.getElementById(id), L = localStorage;
-const say = t => $('st').textContent = t;
+const say = t => { $('st').textContent = t; $('st').style.color = /^(Error|Falta|Revisa)/.test(t) ? '#B3261E' : /^Guardado/.test(t) ? '#1B7F5C' : '#3A5273'; };
 const q = () => JSON.parse(L.q || '[]');
 
 async function send(g) {
