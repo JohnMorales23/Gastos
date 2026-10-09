@@ -2,24 +2,38 @@
 <html lang="es">
 <head>
 <meta charset="utf-8">
-<meta name="viewport" content="width=device-width,initial-scale=1">
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
 <meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-title" content="Gastos">
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+<link rel="apple-touch-icon" href="icon.png">
+<link rel="icon" href="icon.png">
 <meta name="theme-color" content="#0B2545">
 <title>Gastos</title>
 <style>
 *{box-sizing:border-box}
-body{margin:0;background:#EEF2F8;color:#0B2545;font-family:system-ui,-apple-system,'Segoe UI',sans-serif}
-header{background:linear-gradient(135deg,#0B2545,#1D4E89);color:#fff;padding:32px 20px 60px}
+html{-webkit-text-size-adjust:100%}
+body{margin:0;-webkit-tap-highlight-color:transparent;background:#EEF2F8;color:#0B2545;font-family:system-ui,-apple-system,'Segoe UI',sans-serif}
+header{background:linear-gradient(135deg,#0B2545,#1D4E89);color:#fff;padding:calc(32px + env(safe-area-inset-top)) 20px 60px}
 header div{max-width:430px;margin:0 auto}
 header h1{margin:0;font-size:24px;letter-spacing:.2px}
 header p{margin:6px 0 0;font-size:14px;color:#C9D8EE}
-main{max-width:430px;margin:-36px auto 0;padding:0 20px 28px;display:flex;flex-direction:column;gap:16px}
+main{max-width:430px;margin:-36px auto 0;padding:0 20px calc(28px + env(safe-area-inset-bottom));display:flex;flex-direction:column;gap:16px}
 .f{display:flex;flex-direction:column;gap:16px;background:#fff;border-radius:20px;padding:20px;border-top:4px solid #C9A227;box-shadow:0 10px 30px rgba(11,37,69,.14)}
 .f p{margin:0;font-size:14px;color:#3A5273}
 [hidden]{display:none!important}
 label{font-size:12px;font-weight:700;letter-spacing:.6px;text-transform:uppercase;color:#1D4E89;display:block;margin-bottom:6px}
-input,select{width:100%;height:52px;padding:0 16px;border:1px solid #CBD6E6;border-radius:12px;background:#F8FAFD;font-size:16px;color:#0B2545}
+input,select{-webkit-appearance:none;appearance:none;width:100%;min-width:0;height:52px;padding:0 16px;border:1px solid #CBD6E6;border-radius:12px;background:#F8FAFD;font-size:16px;color:#0B2545}
 input:focus,select:focus{outline:none;border-color:#1D4E89;box-shadow:0 0 0 3px rgba(29,78,137,.18);background:#fff}
+input[type=date]{display:block;text-align:left;min-height:52px}
+select{background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='8'%3E%3Cpath d='M1 1l5 5 5-5' fill='none' stroke='%231D4E89' stroke-width='2'/%3E%3C/svg%3E");background-repeat:no-repeat;background-position:right 16px center}
+#mic{width:52px;height:52px;padding:0;display:flex;align-items:center;justify-content:center;flex:none;background:#fff;border:1px solid #CBD6E6}
+#mic.on{background:#B3261E;border-color:#B3261E}
+#mic.on svg{stroke:#fff}
+.auto{display:flex;align-items:center;gap:8px;font-size:13px;color:#3A5273;margin-top:10px}
+.auto input{-webkit-appearance:auto;appearance:auto;width:20px;height:20px;padding:0;flex:none;accent-color:#1D4E89}
+button:active{transform:scale(.98)}
 #m{height:60px;font-size:28px;font-weight:700}
 button{height:56px;border:0;border-radius:14px;background:linear-gradient(135deg,#0B2545,#1D4E89);color:#fff;font-size:17px;font-weight:700}
 button:disabled{opacity:.5}
@@ -36,7 +50,9 @@ button:disabled{opacity:.5}
 <button id="sc">Guardar configuración</button>
 </div>
 <div id="form" class="f" hidden>
-<div><label for="ia">Dilo o escríbelo (IA)</label><div style="display:flex;gap:8px"><input id="ia" autocomplete="off" placeholder="Ej. ayer 180 en tacos"><button id="ib" style="width:110px;height:52px;font-size:15px">Llenar</button></div></div>
+<div><label for="ia">Dilo o escríbelo (IA)</label><div style="display:flex;gap:8px"><input id="ia" autocomplete="off" enterkeyhint="send" placeholder="ayer 180 tacos"><button id="mic" type="button" aria-label="Dictar" hidden><svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="#1D4E89" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="9" y="3" width="6" height="11" rx="3"/><path d="M5 11a7 7 0 0 0 14 0M12 18v3"/></svg></button><button id="ib" style="width:96px;height:52px;font-size:15px;flex:none">Enviar</button></div>
+<label class="auto" style="text-transform:none;letter-spacing:0;font-weight:400"><input id="au" type="checkbox" checked> Guardar directo, sin revisar</label>
+<p id="hint" style="margin-top:6px;font-size:12px;color:#6B7F9C">Para dictar toca el micrófono del teclado de tu celular.</p></div>
 <div><label for="f">Fecha</label><input id="f" type="date"></div>
 <div><label for="c">Concepto</label><input id="c" autocomplete="off" placeholder="Ej. Tacos"></div>
 <div><label for="m">Monto</label><input id="m" inputmode="decimal" placeholder="0.00"></div>
@@ -52,58 +68,79 @@ const $ = id => document.getElementById(id), L = localStorage;
 const say = t => { $('st').textContent = t; $('st').style.color = /^(Error|Falta|Revisa)/.test(t) ? '#B3261E' : /^Guardado/.test(t) ? '#1B7F5C' : '#3A5273'; };
 const q = () => JSON.parse(L.q || '[]');
 
-async function send(g) {
-  const r = await fetch(L.u, { method: 'POST', headers: { 'Content-Type': 'text/plain;charset=utf-8' }, body: JSON.stringify({ k: L.k, ...g }) });
+async function call(body) {
+  const r = await fetch(L.u, { method: 'POST', headers: { 'Content-Type': 'text/plain;charset=utf-8' }, body: JSON.stringify({ k: L.k, ...body }) });
   const j = await r.json();
   if (!j.ok) throw Object.assign(new Error(j.error), { fatal: true });
-  return j.row;
+  return j;
 }
+const send = async g => (await call(g)).row;
+const hoy = () => { const t = new Date(); t.setMinutes(t.getMinutes() - t.getTimezoneOffset()); return t.toISOString().slice(0, 10); };
 
-// Reintenta los gastos que quedaron pendientes por falta de conexión
+// Envía los gastos en cola (también los que quedaron sin conexión)
+let busy = false;
 async function flush() {
+  if (busy) return; busy = true;
   let c = q();
   while (c.length) {
-    try { await send(c[0]); } catch (e) { if (!e.fatal) break; }
+    try { const row = await send(c[0]); say('Guardado en la fila ' + row + '.'); }
+    catch (e) {
+      if (!e.fatal) break;
+      say('Error: ' + e.message + ' (' + c[0].concepto + ')');
+    }
     c.shift(); L.q = JSON.stringify(c);
   }
+  busy = false;
   $('pend').textContent = c.length ? c.length + ' gasto(s) pendiente(s) por enviar' : '';
 }
 
-async function save() {
+// Guardado inmediato: limpia el formulario al instante y envía en segundo plano
+function save() {
   const monto = parseFloat($('m').value.replace(/[$,\s]/g, '')), concepto = $('c').value.trim(), fecha = $('f').value;
   if (!fecha || !concepto || !(monto > 0)) return say('Falta fecha, concepto o un monto válido.');
-  const g = { fecha, concepto, cat: $('k').value, monto };
-  $('go').disabled = true; say('Guardando…');
-  try {
-    const row = await send(g);
-    say('Guardado en la fila ' + row + '.');
-  } catch (e) {
-    if (e.fatal) { say('Error: ' + e.message); $('go').disabled = false; return; }
-    L.q = JSON.stringify([...q(), g]);
-    say('Sin conexión: guardado en el celular, se enviará solo.');
-  }
-  $('c').value = ''; $('m').value = '';
-  $('go').disabled = false; flush();
+  L.q = JSON.stringify([...q(), { fecha, concepto, cat: $('k').value, monto }]);
+  $('c').value = ''; $('m').value = ''; $('f').value = hoy();
+  say('Guardando…'); flush();
 }
 
 async function ia() {
   const texto = $('ia').value.trim();
   if (!texto) return say('Escribe o dicta el gasto primero.');
-  const t = new Date(); t.setMinutes(t.getMinutes() - t.getTimezoneOffset());
-  $('ib').disabled = true; say('Interpretando…');
+  const directo = $('au').checked;
+  $('ib').disabled = true; say(directo ? 'Guardando…' : 'Interpretando…');
   try {
-    const r = await fetch(L.u, { method: 'POST', headers: { 'Content-Type': 'text/plain;charset=utf-8' }, body: JSON.stringify({ k: L.k, accion: 'interpretar', texto, hoy: t.toISOString().slice(0, 10) }) });
-    const j = await r.json();
-    if (!j.ok) throw new Error(j.error);
+    const j = await call({ accion: directo ? 'rapido' : 'interpretar', texto, hoy: hoy() });
     const g = j.gasto || {};
+    $('ia').value = '';
+    if (directo) { say('Guardado en la fila ' + j.row + ': ' + g.concepto + ' · $' + g.monto + ' · ' + g.cat); return; }
     if (/^\d{4}-\d{2}-\d{2}$/.test(g.fecha)) $('f').value = g.fecha;
     if (g.concepto) $('c').value = g.concepto;
     if (g.monto > 0) $('m').value = g.monto;
     if (['Esencial', 'Mantener', 'Innecesario'].includes(g.cat)) $('k').value = g.cat;
-    $('ia').value = '';
     say('Listo: revisa los datos y pulsa Guardar.');
-  } catch (e) { say('Error: ' + e.message); }
+  } catch (e) { say(e.fatal ? 'Error: ' + e.message : 'Error: no hay conexión. Intenta de nuevo.'); }
   finally { $('ib').disabled = false; }
+}
+
+// Dictado por voz (si el navegador lo permite)
+function mic() {
+  const SR = window.SpeechRecognition || window.webkitSpeechRecognition;
+  if (!SR) return;
+  $('mic').hidden = false; $('hint').hidden = true;
+  let rec = null;
+  $('mic').onclick = () => {
+    if (rec) { rec.stop(); return; }
+    rec = new SR(); rec.lang = 'es-MX'; rec.interimResults = false;
+    rec.onstart = () => { $('mic').classList.add('on'); say('Escuchando…'); };
+    rec.onresult = ev => { $('ia').value = ev.results[0][0].transcript; ia(); };
+    rec.onerror = ev => {
+      if (/not-allowed|service-not-allowed/.test(ev.error)) { $('mic').hidden = true; $('hint').hidden = false; say('Error: no hay permiso de micrófono. Usa el micrófono del teclado.'); }
+      else if (ev.error !== 'aborted' && ev.error !== 'no-speech') say('Error: no pude escucharte. Intenta otra vez.');
+      else say('');
+    };
+    rec.onend = () => { $('mic').classList.remove('on'); rec = null; };
+    try { rec.start(); } catch (e) { rec = null; }
+  };
 }
 
 function init() {
@@ -112,10 +149,13 @@ function init() {
   if (ok) flush();
 }
 (() => {
-  const t = new Date(); t.setMinutes(t.getMinutes() - t.getTimezoneOffset());
-  $('f').value = t.toISOString().slice(0, 10);
+  $('f').value = hoy();
   $('go').onclick = save;
   $('ib').onclick = ia;
+  $('ia').addEventListener('keydown', e => { if (e.key === 'Enter') { e.preventDefault(); ia(); } });
+  $('au').checked = L.au !== '0'; $('au').onchange = () => { L.au = $('au').checked ? '1' : '0'; };
+  mic();
+  document.addEventListener('visibilitychange', () => { if (!document.hidden && L.u) flush(); });
   $('rc').onclick = e => { e.preventDefault(); if (confirm('¿Borrar la configuración de este dispositivo?')) { L.removeItem('u'); L.removeItem('k'); init(); } };
   $('sc').onclick = () => {
     const u = $('u').value.trim(), k = $('k0').value.trim();
