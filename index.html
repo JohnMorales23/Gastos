@@ -113,13 +113,13 @@ function save() {
   say('Guardando…'); flush();
 }
 
-async function ia() {
-  const texto = $('ia').value.trim();
-  if (!texto) return say('Escribe o dicta el gasto primero.');
+async function ia(audio) {
+  const texto = audio ? '' : $('ia').value.trim();
+  if (!audio && !texto) return say('Escribe o dicta el gasto primero.');
   const directo = $('au').checked;
   $('ib').disabled = true; say(directo ? 'Guardando…' : 'Interpretando…');
   try {
-    const j = await call({ accion: directo ? 'rapido' : 'interpretar', texto, hoy: hoy() });
+    const j = await call({ accion: directo ? 'rapido' : 'interpretar', texto, audio, hoy: hoy() });
     const g = j.gasto || {};
     $('ia').value = '';
     if (directo) { say('Guardado en la fila ' + j.row + ': ' + g.concepto + ' · $' + g.monto + ' · ' + g.cat); return; }
@@ -133,21 +133,76 @@ async function ia() {
 }
 
 
-async function preguntar() {
-  const texto = $('qi').value.trim();
-  if (!texto) return say('Escribe tu pregunta.');
+async function preguntar(audio) {
+  const texto = audio ? '' : $('qi').value.trim();
+  if (!audio && !texto) return say('Escribe tu pregunta.');
   $('qb').disabled = true; say('Consultando tu Sheet…');
   try {
-    const j = await call({ accion: 'preguntar', texto, hoy: hoy() });
+    const j = await call({ accion: 'preguntar', texto, audio, hoy: hoy() });
     $('qr').textContent = j.respuesta; $('qr').hidden = false; say('');
   } catch (e) { say(e.fatal ? 'Error: ' + e.message : 'Error: no hay conexión. Intenta de nuevo.'); }
   finally { $('qb').disabled = false; }
 }
 
-// Dictado por voz (si el navegador lo permite)
+// ---- Voz ----
+const esIOS = /iPhone|iPad|iPod/.test(navigator.userAgent) || (navigator.platform === 'MacIntel' && navigator.maxTouchPoints > 1);
+
+// Convierte lo grabado a WAV de 16 kHz (formato que Gemini entiende siempre)
+function wav(chunks, rate) {
+  let n = 0; chunks.forEach(c => n += c.length);
+  if (n < rate * 0.4) return null; // menos de medio segundo: no hubo voz
+  const all = new Float32Array(n); let o = 0; chunks.forEach(c => { all.set(c, o); o += c.length; });
+  const ratio = rate / 16000, len = Math.floor(n / ratio), buf = new ArrayBuffer(44 + len * 2), v = new DataView(buf);
+  const w = (p, t) => { for (let i = 0; i < t.length; i++) v.setUint8(p + i, t.charCodeAt(i)); };
+  w(0, 'RIFF'); v.setUint32(4, 36 + len * 2, true); w(8, 'WAVEfmt '); v.setUint32(16, 16, true); v.setUint16(20, 1, true); v.setUint16(22, 1, true);
+  v.setUint32(24, 16000, true); v.setUint32(28, 32000, true); v.setUint16(32, 2, true); v.setUint16(34, 16, true); w(36, 'data'); v.setUint32(40, len * 2, true);
+  for (let i = 0; i < len; i++) {
+    const a = Math.floor(i * ratio), z = Math.max(a + 1, Math.floor((i + 1) * ratio)); let sum = 0;
+    for (let k = a; k < z && k < n; k++) sum += all[k];
+    v.setInt16(44 + i * 2, Math.max(-1, Math.min(1, sum / (z - a))) * 32767, true);
+  }
+  const u = new Uint8Array(buf); let bin = '';
+  for (let i = 0; i < u.length; i += 0x8000) bin += String.fromCharCode.apply(null, u.subarray(i, i + 0x8000));
+  return btoa(bin);
+}
+
+// Grabadora: funciona en iPhone (también con la app instalada). Gemini escucha el audio.
+function grabadora(btn, accion) {
+  let st = null;
+  btn.hidden = false;
+  const fin = () => {
+    if (!st) return; const x = st; st = null;
+    clearTimeout(x.t); btn.classList.remove('on');
+    try { x.proc.disconnect(); x.src.disconnect(); } catch (e) {}
+    x.stream.getTracks().forEach(t => t.stop());
+    const rate = x.ctx.sampleRate; try { x.ctx.close(); } catch (e) {}
+    const data = wav(x.chunks, rate);
+    if (!data) return say('Error: no se escuchó nada. Toca el micrófono y habla de nuevo.');
+    say('Procesando audio…'); accion({ mime: 'audio/wav', data });
+  };
+  btn.onclick = async () => {
+    if (st) return fin();
+    try {
+      const stream = await navigator.mediaDevices.getUserMedia({ audio: true });
+      const AC = window.AudioContext || window.webkitAudioContext, ctx = new AC();
+      if (ctx.state === 'suspended') await ctx.resume();
+      const src = ctx.createMediaStreamSource(stream), proc = ctx.createScriptProcessor(4096, 1, 1), chunks = [];
+      proc.onaudioprocess = e => chunks.push(new Float32Array(e.inputBuffer.getChannelData(0)));
+      src.connect(proc); proc.connect(ctx.destination);
+      st = { stream, ctx, src, proc, chunks, t: setTimeout(fin, 12000) };
+      btn.classList.add('on'); say('Grabando… toca el micrófono otra vez para terminar.');
+    } catch (e) { say('Error: no pude usar el micrófono. Revisa el permiso del navegador.'); }
+  };
+}
+
+// Dictado: iPhone → grabadora; Android/PC → reconocimiento de voz del navegador
 function mic(btn, input, accion, hint) {
   const SR = window.SpeechRecognition || window.webkitSpeechRecognition;
-  if (!SR) return;
+  const puedeGrabar = navigator.mediaDevices && navigator.mediaDevices.getUserMedia && (window.AudioContext || window.webkitAudioContext);
+  if (esIOS || !SR) {
+    if (puedeGrabar) { grabadora(btn, accion); if (hint) hint.hidden = true; }
+    return;
+  }
   btn.hidden = false; if (hint) hint.hidden = true;
   let rec = null;
   btn.onclick = () => {
@@ -173,13 +228,13 @@ function init() {
 (() => {
   $('f').value = hoy();
   $('go').onclick = save;
-  $('ib').onclick = ia;
+  $('ib').onclick = () => ia();
   $('ia').addEventListener('keydown', e => { if (e.key === 'Enter') { e.preventDefault(); ia(); } });
   $('au').checked = L.au !== '0'; $('au').onchange = () => { L.au = $('au').checked ? '1' : '0'; };
   mic($('mic'), $('ia'), ia, $('hint'));
   mic($('qmic'), $('qi'), preguntar);
   $('qt').onclick = () => { $('qp').hidden = !$('qp').hidden; if (!$('qp').hidden) $('qi').focus(); };
-  $('qb').onclick = preguntar;
+  $('qb').onclick = () => preguntar();
   $('qi').addEventListener('keydown', e => { if (e.key === 'Enter') { e.preventDefault(); preguntar(); } });
   document.querySelectorAll('.chips button').forEach(b => b.onclick = () => { $('qi').value = b.dataset.q; preguntar(); });
   document.addEventListener('visibilitychange', () => { if (!document.hidden && L.u) flush(); });
