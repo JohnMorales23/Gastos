@@ -36,6 +36,7 @@ button:disabled{opacity:.5}
 <button id="sc">Guardar configuración</button>
 </div>
 <div id="form" class="f" hidden>
+<div><label for="ia">Dilo o escríbelo (IA)</label><div style="display:flex;gap:8px"><input id="ia" autocomplete="off" placeholder="Ej. ayer 180 en tacos"><button id="ib" style="width:110px;height:52px;font-size:15px">Llenar</button></div></div>
 <div><label for="f">Fecha</label><input id="f" type="date"></div>
 <div><label for="c">Concepto</label><input id="c" autocomplete="off" placeholder="Ej. Tacos"></div>
 <div><label for="m">Monto</label><input id="m" inputmode="decimal" placeholder="0.00"></div>
@@ -85,6 +86,26 @@ async function save() {
   $('go').disabled = false; flush();
 }
 
+async function ia() {
+  const texto = $('ia').value.trim();
+  if (!texto) return say('Escribe o dicta el gasto primero.');
+  const t = new Date(); t.setMinutes(t.getMinutes() - t.getTimezoneOffset());
+  $('ib').disabled = true; say('Interpretando…');
+  try {
+    const r = await fetch(L.u, { method: 'POST', headers: { 'Content-Type': 'text/plain;charset=utf-8' }, body: JSON.stringify({ k: L.k, accion: 'interpretar', texto, hoy: t.toISOString().slice(0, 10) }) });
+    const j = await r.json();
+    if (!j.ok) throw new Error(j.error);
+    const g = j.gasto || {};
+    if (/^\d{4}-\d{2}-\d{2}$/.test(g.fecha)) $('f').value = g.fecha;
+    if (g.concepto) $('c').value = g.concepto;
+    if (g.monto > 0) $('m').value = g.monto;
+    if (['Esencial', 'Mantener', 'Innecesario'].includes(g.cat)) $('k').value = g.cat;
+    $('ia').value = '';
+    say('Listo: revisa los datos y pulsa Guardar.');
+  } catch (e) { say('Error: ' + e.message); }
+  finally { $('ib').disabled = false; }
+}
+
 function init() {
   const ok = L.u && L.k;
   $('cfg').hidden = !!ok; $('form').hidden = !ok; $('rc').hidden = !ok;
@@ -94,6 +115,7 @@ function init() {
   const t = new Date(); t.setMinutes(t.getMinutes() - t.getTimezoneOffset());
   $('f').value = t.toISOString().slice(0, 10);
   $('go').onclick = save;
+  $('ib').onclick = ia;
   $('rc').onclick = e => { e.preventDefault(); if (confirm('¿Borrar la configuración de este dispositivo?')) { L.removeItem('u'); L.removeItem('k'); init(); } };
   $('sc').onclick = () => {
     const u = $('u').value.trim(), k = $('k0').value.trim();
