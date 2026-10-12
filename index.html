@@ -5,122 +5,222 @@
 <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
 <meta name="apple-mobile-web-app-capable" content="yes">
 <meta name="mobile-web-app-capable" content="yes">
-<meta name="apple-mobile-web-app-title" content="Gastos">
-<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+<meta name="apple-mobile-web-app-title" content="JonKa">
+<meta name="apple-mobile-web-app-status-bar-style" content="default">
 <link rel="apple-touch-icon" href="icon.png">
-<link rel="icon" href="icon.png">
-<meta name="theme-color" content="#0B2545">
-<title>Gastos</title>
+<link rel="icon" href="icon-192.png">
+<link rel="manifest" href="manifest.json">
+<meta name="theme-color" content="#F7F3EC">
+<title>JonKa · Control de gastos</title>
 <style>
+:root{--bg:#F7F3EC;--card:#FBF8F2;--field:#FDFBF7;--line:#E7E0D3;--navy:#102541;--navy2:#192C49;--gold:#D6B482;--ink:#0F2441;--muted:#6C7889;--soft:#8A95A5;--ok:#1E6B4F;--bad:#B3261E}
 *{box-sizing:border-box}
 html{-webkit-text-size-adjust:100%}
-body{margin:0;-webkit-tap-highlight-color:transparent;background:#EEF2F8;color:#0B2545;font-family:system-ui,-apple-system,'Segoe UI',sans-serif}
-header{background:linear-gradient(135deg,#0B2545,#1D4E89);color:#fff;padding:calc(32px + env(safe-area-inset-top)) 20px 60px}
-header div{max-width:430px;margin:0 auto}
-header h1{margin:0;font-size:24px;letter-spacing:.2px}
-header p{margin:6px 0 0;font-size:14px;color:#C9D8EE}
-main{max-width:430px;margin:-36px auto 0;padding:0 20px calc(28px + env(safe-area-inset-bottom));display:flex;flex-direction:column;gap:16px}
-.f{display:flex;flex-direction:column;gap:16px;background:#fff;border-radius:20px;padding:20px;border-top:4px solid #C9A227;box-shadow:0 10px 30px rgba(11,37,69,.14)}
-.f p{margin:0;font-size:14px;color:#3A5273}
+body{margin:0;background:var(--bg);color:var(--ink);font-family:system-ui,-apple-system,'Segoe UI',Roboto,sans-serif;-webkit-tap-highlight-color:transparent}
 [hidden]{display:none!important}
-label{font-size:12px;font-weight:700;letter-spacing:.6px;text-transform:uppercase;color:#1D4E89;display:block;margin-bottom:6px}
-input,select{-webkit-appearance:none;appearance:none;width:100%;min-width:0;height:52px;padding:0 16px;border:1px solid #CBD6E6;border-radius:12px;background:#F8FAFD;font-size:16px;color:#0B2545}
-input:focus,select:focus{outline:none;border-color:#1D4E89;box-shadow:0 0 0 3px rgba(29,78,137,.18);background:#fff}
-input[type=date]{display:block;text-align:left;min-height:52px}
-select{background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='8'%3E%3Cpath d='M1 1l5 5 5-5' fill='none' stroke='%231D4E89' stroke-width='2'/%3E%3C/svg%3E");background-repeat:no-repeat;background-position:right 16px center}
-#mic,#qmic{width:52px;height:52px;padding:0;display:flex;align-items:center;justify-content:center;flex:none;background:#fff;border:1px solid #CBD6E6}
-#mic.on,#qmic.on{background:#B3261E;border-color:#B3261E}
-#mic.on svg,#qmic.on svg{stroke:#fff}
-.auto{display:flex;align-items:center;gap:8px;font-size:13px;color:#3A5273;margin-top:10px}
-.auto input{-webkit-appearance:auto;appearance:auto;width:20px;height:20px;padding:0;flex:none;accent-color:#1D4E89}
+button{font:inherit;border:0;cursor:pointer;color:inherit}
 button:active{transform:scale(.98)}
-.sec{background:#fff;color:#1D4E89;border:1px solid #CBD6E6;height:50px;font-size:15px}
-.chips{display:flex;gap:8px;flex-wrap:wrap}
-.chips button{height:36px;padding:0 14px;font-size:13px;font-weight:600;background:#EEF2F8;color:#1D4E89;border-radius:18px}
-#qr{white-space:pre-wrap;font-size:14px;line-height:1.5;color:#0B2545;background:#F8FAFD;border:1px solid #CBD6E6;border-radius:12px;padding:14px}
-#m{height:60px;font-size:28px;font-weight:700}
-button{height:56px;border:0;border-radius:14px;background:linear-gradient(135deg,#0B2545,#1D4E89);color:#fff;font-size:17px;font-weight:700}
 button:disabled{opacity:.5}
-#sm .tot{display:flex;justify-content:space-between;align-items:baseline}
-#sm .tot label{margin:0}
-#smt{font-size:28px;font-weight:800;letter-spacing:-.3px}
-.cats{display:flex;gap:8px}
-.cats div{flex:1;background:#F3F6FB;border-radius:12px;padding:8px 10px;font-size:12px;color:#3A5273}
-.cats b{display:block;font-size:14px;color:#0B2545;margin-top:2px}
-.bar{height:8px;background:#E3EAF4;border-radius:4px;overflow:hidden}
-.bar i{display:block;height:100%;border-radius:4px;background:#1B7F5C;width:0}
-.warn{margin:0;font-size:13px;color:#8A5A00;background:#FFF4D6;border-radius:10px;padding:10px 12px}
-.lnk{font-size:13px;color:#1D4E89;align-self:center;text-align:center}
-.row{display:flex;justify-content:space-between;align-items:center;gap:8px;padding:10px 0;border-bottom:1px solid #E3EAF4}
+header{text-align:center;padding:calc(14px + env(safe-area-inset-top)) 20px 6px}
+header img{display:block;margin:0 auto;height:62px;width:auto}
+header.sm img{height:44px}
+header h1{margin:10px 0 0;font-size:28px;font-weight:800;letter-spacing:-.4px}
+header.sm h1{font-size:22px;margin-top:6px}
+header p{margin:6px 0 0;font-size:16px;color:var(--muted)}
+main{max-width:430px;margin:0 auto;padding:14px 18px calc(110px + env(safe-area-inset-bottom));display:flex;flex-direction:column;gap:16px}
+.pg{display:flex;flex-direction:column;gap:16px}
+.card{background:var(--card);border:1px solid var(--line);border-radius:20px;padding:20px;box-shadow:0 8px 24px rgba(15,36,65,.06);display:flex;flex-direction:column;gap:14px}
+.card.gold{border-top:3px solid var(--gold)}
+.card h2{margin:0;font-size:22px;font-weight:800;letter-spacing:-.2px}
+.card p{margin:0;font-size:14px;color:var(--muted);line-height:1.45}
+label{display:block;font-size:12px;font-weight:700;letter-spacing:.7px;text-transform:uppercase;color:var(--soft);margin-bottom:6px}
+input,select{-webkit-appearance:none;appearance:none;width:100%;min-width:0;height:52px;padding:0 16px;border:1px solid var(--line);border-radius:12px;background:var(--field);font:inherit;font-size:16px;color:var(--ink)}
+input::placeholder{color:#8F99A8}
+input:focus,select:focus{outline:none;border-color:var(--navy);box-shadow:0 0 0 3px rgba(16,37,65,.12);background:#fff}
+input[type=date]{display:block;text-align:left;min-height:52px}
+select{background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='8'%3E%3Cpath d='M1 1l5 5 5-5' fill='none' stroke='%230F2441' stroke-width='2'/%3E%3C/svg%3E");background-repeat:no-repeat;background-position:right 16px center}
+.pri{height:56px;border-radius:14px;background:var(--navy);color:#fff;font-size:17px;font-weight:700;width:100%}
+.out{height:52px;border-radius:14px;background:var(--field);border:1px solid var(--line);color:var(--ink);font-size:16px;font-weight:700;width:100%;display:flex;align-items:center;justify-content:center;gap:10px}
+.icb{width:52px;height:52px;flex:none;border-radius:12px;display:flex;align-items:center;justify-content:center;padding:0;background:var(--field);border:1px solid var(--line)}
+.icb.dark{background:var(--navy2);border-color:var(--navy2)}
+.icb.on{background:var(--bad);border-color:var(--bad)}
+.ln{display:flex;gap:8px}
+.lnk{font-size:14px;color:var(--navy);text-align:center;text-decoration:underline;background:none;padding:6px}
+.chips{display:flex;gap:8px;flex-wrap:wrap}
+.chip{height:36px;padding:0 14px;font-size:13px;font-weight:700;background:#F0EADD;color:var(--navy);border-radius:18px}
+.mini{height:32px;padding:0 11px;font-size:13px;font-weight:700;border-radius:10px;background:#F0EADD;color:var(--navy)}
+.mini.del{color:var(--bad)}
+.warn{background:#FFF1D2;color:#7A5200;border-radius:12px;padding:12px 14px;font-size:13px;line-height:1.4}
+/* Tarjeta del mes */
+.mes{background:linear-gradient(160deg,#0E1F39,#16305A);color:#fff;border-radius:20px;padding:22px;border-top:2px solid rgba(214,180,130,.65);box-shadow:0 10px 28px rgba(15,36,65,.22)}
+.mes .top{display:flex;justify-content:space-between;align-items:flex-start}
+.mes .m1{font-size:26px;font-weight:800;color:var(--gold);letter-spacing:-.3px}
+.mes .m2{font-size:15px;color:#B9C4D6;margin-top:2px}
+.cal{position:relative;width:46px;height:46px;border-radius:50%;background:rgba(255,255,255,.1);display:flex;align-items:center;justify-content:center;flex:none}
+.cal input{position:absolute;inset:0;width:100%;height:100%;opacity:0;padding:0;border:0;cursor:pointer}
+#smt{font-size:44px;font-weight:800;letter-spacing:-1.2px;margin:12px 0 14px}
+.cs{display:flex;border-top:1px solid rgba(255,255,255,.18);padding-top:14px}
+.cs div{flex:1;padding:0 12px;border-left:1px solid rgba(255,255,255,.18);font-size:13px;color:#B9C4D6}
+.cs div:first-child{padding-left:0;border-left:0}
+.cs b{display:block;font-size:17px;color:#fff;margin-top:3px}
+#sma{margin-top:12px;font-size:13px;font-weight:700}
+/* Filas de gastos */
+.row{display:flex;justify-content:space-between;align-items:center;gap:8px;padding:11px 0;border-bottom:1px solid var(--line)}
 .row:last-child{border-bottom:0}
+.row.g{display:block}
+.g .top{display:flex;justify-content:space-between;align-items:baseline;gap:8px}
+.g .bot{display:flex;justify-content:space-between;align-items:center;gap:8px;margin-top:6px}
+.g .acts{display:flex;gap:6px}
 .rl{min-width:0}
-.rc1{font-size:15px;font-weight:600;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
-.rc2{font-size:12px;color:#6B7F9C;margin-top:2px}
-.rr{display:flex;align-items:center;gap:6px;flex:none}
-.rm{font-size:15px;font-weight:700;margin-right:2px}
-.mini{height:32px;padding:0 10px;font-size:13px;font-weight:600;border-radius:10px;background:#EEF2F8;color:#1D4E89}
-.mini.del{color:#B3261E}
-.two{display:flex;gap:8px}
-.two>*{flex:1}
-#st,#pend{min-height:20px;font-size:14px;color:#3A5273;text-align:center}
+.rc1{min-width:0;font-size:15px;font-weight:700;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.rc2{font-size:12px;color:var(--soft);margin-top:2px}
+.rm{font-size:15px;font-weight:800}
+.rr{display:flex;align-items:center;gap:8px;flex:none}
+.vacio{font-size:14px;color:var(--muted);padding:6px 0}
+/* Reportes */
+.bar{height:10px;background:#EAE3D5;border-radius:5px;overflow:hidden;margin-top:6px}
+.bar i{display:block;height:100%;border-radius:5px;width:0}
+.bl{display:flex;justify-content:space-between;font-size:14px;font-weight:700}
+.bl span{color:var(--muted);font-weight:600}
+#qr{white-space:pre-wrap;font-size:14px;line-height:1.55;background:var(--field);border:1px solid var(--line);border-radius:12px;padding:14px}
+.two{display:flex;gap:10px}
+.two>*{flex:1;min-width:0}
+.chk{display:flex;gap:12px;align-items:flex-start;font-size:15px;line-height:1.35;text-transform:none;letter-spacing:0;font-weight:600;color:var(--ink)}
+.chk input{-webkit-appearance:auto;appearance:auto;width:22px;height:22px;padding:0;margin:1px 0 0;flex:none;accent-color:var(--navy)}
+.chk small{display:block;font-weight:400;color:var(--muted);font-size:13px;margin-top:2px}
+/* Aviso flotante */
+#st{position:fixed;left:50%;transform:translateX(-50%);bottom:calc(84px + env(safe-area-inset-bottom));max-width:calc(100% - 32px);width:max-content;background:var(--navy);color:#fff;padding:11px 18px;border-radius:14px;font-size:14px;line-height:1.35;box-shadow:0 8px 24px rgba(15,36,65,.3);z-index:20;text-align:center}
+#st.bad{background:var(--bad)}
+#st.ok{background:var(--ok)}
+#pend{font-size:13px;color:var(--muted);text-align:center}
+/* Barra de pestañas */
+#tabs{position:fixed;left:0;right:0;bottom:0;display:flex;background:#FDF9F3;border-top:1px solid var(--line);padding-bottom:env(safe-area-inset-bottom);z-index:10}
+#tabs button{flex:1;background:none;height:66px;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:4px;color:var(--soft);font-size:12px;font-weight:600;position:relative}
+#tabs svg{width:26px;height:26px;fill:none;stroke:currentColor;stroke-width:1.8;stroke-linecap:round;stroke-linejoin:round}
+#tabs button.on{color:var(--navy);font-weight:800}
+#tabs button.on::after{content:"";position:absolute;bottom:4px;width:44px;height:3px;border-radius:2px;background:var(--gold)}
 </style>
 </head>
 <body>
-<header><div><h1>Control de gastos</h1><p>Registro rápido</p></div></header>
+<header id="hd"><img src="logo.png" alt="JonKa"><h1 id="ht">Control de gastos</h1><p id="hs">Tus finanzas, en orden.</p></header>
 <main>
-<div id="cfg" class="f" hidden>
+<!-- Primera vez -->
+<section id="cfg" class="card gold" hidden>
+<h2>Conectar mi hoja</h2>
 <p>Primera vez: pega los datos de configuración (solo una vez en este dispositivo).</p>
 <div><label for="u">Dirección del script (termina en /exec)</label><input id="u" autocomplete="off"></div>
 <div><label for="k0">Clave</label><input id="k0" autocomplete="off"></div>
-<button id="sc">Guardar configuración</button>
+<button id="sc" class="pri">Guardar configuración</button>
+</section>
+
+<!-- INICIO -->
+<section id="p-inicio" class="pg" hidden>
+<div class="mes">
+<div class="top"><div><div class="m1" id="smm1">Octubre 2026</div><div class="m2">Gastos del mes</div></div>
+<label class="cal" aria-label="Ver los gastos de un día" style="margin:0"><svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="#D6B482" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><rect x="3.5" y="5" width="17" height="15.5" rx="3"/><path d="M8 3v4M16 3v4M3.5 10h17"/></svg><input id="cal" type="date" aria-label="Elegir un día"></label></div>
+<div id="smt">$0.00</div>
+<div class="cs"><div>Esencial<b id="sme">$0.00</b></div><div>Mantener<b id="smm">$0.00</b></div><div>Innecesario<b id="smi">$0.00</b></div></div>
+<div id="sma" hidden></div>
 </div>
-<div id="sm" class="f" hidden>
-<div class="tot"><label>Este mes</label><span id="smt">$0.00</span></div>
-<div class="cats"><div>Esencial<b id="sme">$0.00</b></div><div>Mantener<b id="smm">$0.00</b></div><div>Innecesario<b id="smi">$0.00</b></div></div>
-<div id="smb" hidden><div id="smbt" style="font-size:13px;margin-bottom:6px;color:#3A5273"></div><div class="bar"><i id="smbf"></i></div></div>
-<p id="smw" class="warn" hidden></p>
-<a href="#" id="tp" class="lnk">Definir tope de Innecesario</a>
+<div id="smw" class="warn" hidden></div>
+<div class="card gold" id="form">
+<h2>Registrar gasto</h2>
+<div>
+<div class="ln"><input id="ia" autocomplete="off" enterkeyhint="send" placeholder="Ej. Ayer gasté $180 en tacos">
+<button id="ib" class="icb" type="button" aria-label="Enviar"><svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="#0F2441" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12h14M13 6l6 6-6 6"/></svg></button>
+<button id="mic" class="icb dark" type="button" aria-label="Dictar" hidden><svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="9" y="3" width="6" height="11" rx="3"/><path d="M5 11a7 7 0 0 0 14 0M12 18v3"/></svg></button></div>
+<p id="hint" style="margin-top:8px;font-size:12px">Para dictar toca el micrófono del teclado de tu celular.</p>
 </div>
-<div id="form" class="f" hidden>
-<div><label for="ia">Dilo o escríbelo (IA)</label><div style="display:flex;gap:8px"><input id="ia" autocomplete="off" enterkeyhint="send" placeholder="ayer 180 tacos"><button id="mic" type="button" aria-label="Dictar" hidden><svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="#1D4E89" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="9" y="3" width="6" height="11" rx="3"/><path d="M5 11a7 7 0 0 0 14 0M12 18v3"/></svg></button><button id="ib" style="width:96px;height:52px;font-size:15px;flex:none">Enviar</button></div>
-<label class="auto" style="text-transform:none;letter-spacing:0;font-weight:400"><input id="au" type="checkbox" checked> Guardar directo, sin revisar</label>
-<p id="hint" style="margin-top:6px;font-size:12px;color:#6B7F9C">Para dictar toca el micrófono del teclado de tu celular.</p></div>
-<button id="fb" type="button" class="sec">Foto del ticket</button>
+<button id="fb" type="button" class="out"><svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="#0F2441" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M4 8.5A1.5 1.5 0 0 1 5.5 7H8l1.2-2h5.6L16 7h2.5A1.5 1.5 0 0 1 20 8.5v9a1.5 1.5 0 0 1-1.5 1.5h-13A1.5 1.5 0 0 1 4 17.5z"/><circle cx="12" cy="13" r="3.4"/></svg>Escanear ticket</button>
 <input id="ph" type="file" accept="image/*" hidden>
 <div><label for="f">Fecha</label><input id="f" type="date"></div>
 <div><label for="c">Concepto</label><input id="c" autocomplete="off" placeholder="Ej. Tacos"></div>
-<div><label for="m">Monto</label><input id="m" inputmode="decimal" placeholder="0.00"></div>
+<div><label for="m">Monto</label><input id="m" inputmode="decimal" placeholder="$0.00"></div>
 <div><label for="k">Categoría</label><select id="k"><option>Esencial</option><option>Mantener</option><option>Innecesario</option></select></div>
-<button id="go">Guardar</button>
-<a href="#" id="cn" class="lnk" hidden>Cancelar edición</a>
+<button id="go" class="pri">Guardar gasto</button>
+<button id="cn" class="lnk" hidden>Cancelar edición</button>
 </div>
-<div id="ulp" class="f" hidden><div><label>Últimos gastos</label><div id="ul"></div></div></div>
-<button id="xt" class="sec" hidden>Gastos fijos</button>
-<div id="xp" class="f" hidden>
-<div><label>Se registran solos cada mes</label><div id="xl"></div></div>
-<div><label for="xc">Nuevo gasto fijo</label><input id="xc" autocomplete="off" placeholder="Ej. Netflix"></div>
-<div class="two"><div><label for="xm">Monto</label><input id="xm" inputmode="decimal" placeholder="0.00"></div><div><label for="xd">Día del mes</label><input id="xd" inputmode="numeric" placeholder="1 a 31"></div></div>
-<div><label for="xk">Categoría</label><select id="xk"><option>Esencial</option><option>Mantener</option><option>Innecesario</option></select></div>
-<button id="xa">Agregar gasto fijo</button>
+<div id="pend"></div>
+</section>
+
+<!-- MOVIMIENTOS -->
+<section id="p-mov" class="pg" hidden>
+<div class="card">
+<div><label for="mdia">Ver los gastos de un día</label><input id="mdia" type="date"></div>
+<div class="chips"><button class="chip" data-d="hoy">Hoy</button><button class="chip" data-d="ayer">Ayer</button><button class="chip" data-d="todo">Últimos</button></div>
+<div id="mres" hidden></div>
 </div>
-<button id="qt" class="sec" hidden>Preguntar a mis gastos</button>
-<div id="qp" class="f" hidden>
-<div><label for="qi">Pregunta sobre tu Sheet</label><div style="display:flex;gap:8px"><input id="qi" autocomplete="off" enterkeyhint="send" placeholder="¿en qué gasté el 29/09?" style="min-width:0"><button id="qmic" type="button" aria-label="Dictar" hidden><svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="#1D4E89" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="9" y="3" width="6" height="11" rx="3"/><path d="M5 11a7 7 0 0 0 14 0M12 18v3"/></svg></button><button id="qb" style="width:100px;height:52px;font-size:15px;flex:none">Preguntar</button></div></div>
-<div class="chips"><button data-q="¿en qué gasté hoy?">Hoy</button><button data-q="resumen de gastos de esta semana">Semana</button><button data-q="resumen de gastos de este mes">Este mes</button><button data-q="¿cuánto llevo en gastos innecesarios este mes?">Innecesarios</button></div>
+<div class="card gold"><h2 id="mt">Últimos gastos</h2><div id="ml"><div class="vacio">Cargando…</div></div></div>
+</section>
+
+<!-- REPORTES -->
+<section id="p-rep" class="pg" hidden>
+<div class="card gold"><h2 id="rt">Resumen del mes</h2><div id="rb"></div></div>
+<div class="card">
+<h2>Preguntar a mis gastos</h2>
+<div class="ln"><input id="qi" autocomplete="off" enterkeyhint="send" placeholder="¿En qué gasté el 29/09?">
+<button id="qb" class="icb" type="button" aria-label="Preguntar"><svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="#0F2441" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12h14M13 6l6 6-6 6"/></svg></button>
+<button id="qmic" class="icb dark" type="button" aria-label="Dictar" hidden><svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="9" y="3" width="6" height="11" rx="3"/><path d="M5 11a7 7 0 0 0 14 0M12 18v3"/></svg></button></div>
+<div class="chips"><button class="chip" data-q="¿en qué gasté hoy?">Hoy</button><button class="chip" data-q="resumen de gastos de esta semana">Semana</button><button class="chip" data-q="resumen de gastos de este mes">Este mes</button><button class="chip" data-q="¿cuánto llevo en gastos innecesarios este mes?">Innecesarios</button></div>
 <div id="qr" hidden></div>
 </div>
-<div id="st"></div>
-<div id="pend"></div>
-<a href="#" id="rc" hidden style="font-size:13px;color:#1D4E89;align-self:center">Cambiar configuración</a>
+</section>
+
+<!-- AJUSTES -->
+<section id="p-aju" class="pg" hidden>
+<div class="card gold">
+<h2>Gastos fijos</h2>
+<p>Se registran solos cada mes, en el día que elijas.</p>
+<div id="xl"></div>
+<div><label for="xc">Nuevo gasto fijo</label><input id="xc" autocomplete="off" placeholder="Ej. Netflix"></div>
+<div class="two"><div><label for="xm">Monto</label><input id="xm" inputmode="decimal" placeholder="$0.00"></div><div><label for="xd">Día del mes</label><input id="xd" inputmode="numeric" placeholder="1 a 31"></div></div>
+<div><label for="xk">Categoría</label><select id="xk"><option>Esencial</option><option>Mantener</option><option>Innecesario</option></select></div>
+<button id="xa" class="pri">Agregar gasto fijo</button>
+</div>
+<div class="card">
+<h2>Preferencias</h2>
+<label class="chk"><input id="au" type="checkbox" checked><span>Guardar directo con IA<small>Al escribir o dictar un gasto se guarda sin pedirte revisarlo.</small></span></label>
+<div><label for="tp">Tope mensual de gastos Innecesarios</label><div class="ln"><input id="tp" inputmode="decimal" placeholder="Ej. 3000"><button id="tpb" class="mini" style="height:52px;width:96px;flex:none;border-radius:12px">Guardar</button></div></div>
+</div>
+<div class="card">
+<h2>Conexión</h2>
+<p>Esta app está conectada a tu hoja de Google.</p>
+<button id="rc" class="out">Cambiar configuración</button>
+<p style="text-align:center;font-size:12px">JonKa · Control de gastos</p>
+</div>
+</section>
 </main>
+<div id="st" hidden role="status"></div>
+<nav id="tabs" hidden>
+<button data-t="inicio" class="on"><svg viewBox="0 0 24 24"><path d="M3.5 11 12 3.5 20.5 11V20a1 1 0 0 1-1 1H15v-6H9v6H4.5a1 1 0 0 1-1-1z"/></svg>Inicio</button>
+<button data-t="mov"><svg viewBox="0 0 24 24"><path d="M7 3h7l5 5v13H7z"/><path d="M14 3v5h5M10 13h6M10 17h6"/></svg>Movimientos</button>
+<button data-t="rep"><svg viewBox="0 0 24 24"><path d="M5 21v-8M11 21V6M17 21v-10M3 21h18"/></svg>Reportes</button>
+<button data-t="aju"><svg viewBox="0 0 24 24"><path d="M4 7h9M17 7h3M4 17h3M11 17h9"/><circle cx="15" cy="7" r="2"/><circle cx="9" cy="17" r="2"/></svg>Ajustes</button>
+</nav>
 <script>
 const $ = id => document.getElementById(id), L = localStorage;
-const say = t => { $('st').textContent = t; $('st').style.color = /^(Error|Falta|Revisa)/.test(t) ? '#B3261E' : /^(Guardado|Borrado|Fijo)/.test(t) ? '#1B7F5C' : '#3A5273'; };
-const errMsg = e => e.fatal ? 'Error: ' + e.message : 'Error: no hay conexión. Intenta de nuevo.';
-const money = n => '$' + Number(n).toLocaleString('es-MX', { minimumFractionDigits: 2, maximumFractionDigits: 2 });
-const ddmm = f => /^\d{4}-\d{2}-\d{2}$/.test(f) ? f.slice(8, 10) + '/' + f.slice(5, 7) : f;
-const el = (tag, cls, txt) => { const n = document.createElement(tag); if (cls) n.className = cls; if (txt !== undefined) n.textContent = txt; return n; };
+const MESES = ['Enero','Febrero','Marzo','Abril','Mayo','Junio','Julio','Agosto','Septiembre','Octubre','Noviembre','Diciembre'];
+const MES3 = ['ene','feb','mar','abr','may','jun','jul','ago','sep','oct','nov','dic'];
 const q = () => JSON.parse(L.q || '[]');
+const iso = d => { const t = new Date(d); t.setMinutes(t.getMinutes() - t.getTimezoneOffset()); return t.toISOString().slice(0, 10); };
+const hoy = () => iso(new Date());
+const ayer = () => { const d = new Date(); d.setDate(d.getDate() - 1); return iso(d); };
+const esFecha = f => /^\d{4}-\d{2}-\d{2}$/.test(f);
+const ddmm = f => esFecha(f) ? f.slice(8, 10) + '/' + f.slice(5, 7) : f;
+const larga = f => esFecha(f) ? Number(f.slice(8, 10)) + ' ' + MES3[Number(f.slice(5, 7)) - 1] + ' ' + f.slice(0, 4) : f;
+const money = n => '$' + Number(n).toLocaleString('es-MX', { minimumFractionDigits: 2, maximumFractionDigits: 2 });
+const errMsg = e => e.fatal ? 'Error: ' + e.message : 'Error: no hay conexión. Intenta de nuevo.';
+const el = (tag, cls, txt) => { const n = document.createElement(tag); if (cls) n.className = cls; if (txt !== undefined) n.textContent = txt; return n; };
+
+// Aviso flotante: los mensajes de progreso ("…") se quedan hasta el siguiente; los demás se van solos
+let stT = null;
+function say(t) {
+  const s = $('st'); clearTimeout(stT);
+  if (!t) { s.hidden = true; return; }
+  s.textContent = t; s.hidden = false;
+  s.className = /^(Error|Falta|Revisa)/.test(t) ? 'bad' : /^(Guardado|Borrado|Fijo)/.test(t) ? 'ok' : '';
+  if (!/…$/.test(t)) stT = setTimeout(() => { s.hidden = true; }, s.className === 'bad' ? 9000 : 5500);
+}
 
 async function call(body) {
   const r = await fetch(L.u, { method: 'POST', headers: { 'Content-Type': 'text/plain;charset=utf-8' }, body: JSON.stringify({ k: L.k, ...body }) });
@@ -129,9 +229,27 @@ async function call(body) {
   return j;
 }
 const send = async g => (await call(g)).row;
-const hoy = () => { const t = new Date(); t.setMinutes(t.getMinutes() - t.getTimezoneOffset()); return t.toISOString().slice(0, 10); };
 
-// Envía los gastos en cola (también los que quedaron sin conexión)
+// ---- Pestañas ----
+const TITULOS = {
+  inicio: ['Control de gastos', 'Tus finanzas, en orden.'],
+  mov: ['Movimientos', 'Tus gastos, día a día'],
+  rep: ['Reportes', 'Cómo vas este mes'],
+  aju: ['Ajustes', 'Gastos fijos y preferencias']
+};
+let tab = 'inicio';
+function setTab(t) {
+  tab = t;
+  ['inicio', 'mov', 'rep', 'aju'].forEach(x => { $('p-' + x).hidden = x !== t; });
+  document.querySelectorAll('#tabs button').forEach(b => b.classList.toggle('on', b.dataset.t === t));
+  $('ht').textContent = TITULOS[t][0]; $('hs').textContent = TITULOS[t][1]; $('hd').classList.toggle('sm', t !== 'inicio');
+  window.scrollTo(0, 0);
+  if (t === 'mov') movCargar();
+  if (t === 'rep') pintaReportes(leeRes());
+  if (t === 'aju') fijosCargar();
+}
+
+// ---- Envío de gastos (con cola sin conexión) ----
 let busy = false;
 async function flush() {
   if (busy) return; busy = true;
@@ -145,11 +263,10 @@ async function flush() {
     c.shift(); L.q = JSON.stringify(c);
   }
   busy = false;
-  if (enviados) resumen();
+  if (enviados) refrescar();
   $('pend').textContent = c.length ? c.length + ' gasto(s) pendiente(s) por enviar' : '';
 }
 
-// Guardado inmediato: limpia el formulario al instante y envía en segundo plano
 async function save() {
   const monto = parseFloat($('m').value.replace(/[$,\s]/g, '')), concepto = $('c').value.trim(), fecha = $('f').value;
   if (!fecha || !concepto || !(monto > 0)) return say('Falta fecha, concepto o un monto válido.');
@@ -157,7 +274,7 @@ async function save() {
     $('go').disabled = true; say('Guardando cambios…');
     try {
       await call({ accion: 'editar', row: editando.row, antes: { c: editando.c, m: editando.m }, fecha, concepto, cat: $('k').value, monto });
-      cancelaEdicion(); say('Guardado: cambios aplicados.'); resumen();
+      cancelaEdicion(); say('Guardado: cambios aplicados.'); refrescar();
     } catch (e) { say(errMsg(e)); }
     finally { $('go').disabled = false; }
     return;
@@ -175,17 +292,16 @@ async function ia(audio) {
   try {
     const j = await call({ accion: directo ? 'rapido' : 'interpretar', texto, audio, hoy: hoy() });
     const g = j.gasto || {};
-    $('ia').value = '';
-    if (directo) { say('Guardado en la fila ' + j.row + ': ' + g.concepto + ' · $' + g.monto + ' · ' + g.cat); resumen(); return; }
-    if (/^\d{4}-\d{2}-\d{2}$/.test(g.fecha)) $('f').value = g.fecha;
+    $('ia').value = ''; syncEnviar();
+    if (directo) { say('Guardado en la fila ' + j.row + ': ' + g.concepto + ' · $' + g.monto + ' · ' + g.cat); refrescar(); return; }
+    if (esFecha(g.fecha)) $('f').value = g.fecha;
     if (g.concepto) $('c').value = g.concepto;
     if (g.monto > 0) $('m').value = g.monto;
     if (['Esencial', 'Mantener', 'Innecesario'].includes(g.cat)) $('k').value = g.cat;
-    say(esFoto ? 'Listo: revisa los datos del ticket y pulsa Guardar.' : 'Listo: revisa los datos y pulsa Guardar.');
+    say(esFoto ? 'Listo: revisa los datos del ticket y pulsa Guardar gasto.' : 'Listo: revisa los datos y pulsa Guardar gasto.');
   } catch (e) { say(errMsg(e)); }
   finally { $('ib').disabled = false; }
 }
-
 
 async function preguntar(audio) {
   const texto = audio ? '' : $('qi').value.trim();
@@ -198,66 +314,115 @@ async function preguntar(audio) {
   finally { $('qb').disabled = false; }
 }
 
-// ---- Resumen del mes, últimos gastos, tope y avisos ----
+// ---- Resumen del mes ----
+const leeRes = () => { try { return JSON.parse(L.res || 'null'); } catch (e) { return null; } };
 let rbusy = false;
 async function resumen() {
   if (rbusy || !L.u) return; rbusy = true;
-  try { const j = await call({ accion: 'resumen', hoy: hoy() }); L.res = JSON.stringify(j); pintaResumen(j); }
+  try { const j = await call({ accion: 'resumen', hoy: hoy() }); j.mesDe = hoy().slice(0, 7); L.res = JSON.stringify(j); pintaResumen(j); }
   catch (e) {} finally { rbusy = false; }
 }
+function refrescar() { resumen(); if (tab === 'mov') movCargar(); }
 
 function pintaResumen(r) {
-  if (!r || !r.mes) return;
-  const pc = r.mes.porCat || {};
-  $('smt').textContent = money(r.mes.total);
+  const h = hoy();
+  $('smm1').textContent = MESES[Number(h.slice(5, 7)) - 1] + ' ' + h.slice(0, 4);
+  const valido = r && r.mes && r.mesDe === h.slice(0, 7); // un resumen guardado de otro mes no se muestra
+  const pc = valido ? (r.mes.porCat || {}) : {};
+  $('smt').textContent = money(valido ? r.mes.total : 0);
   $('sme').textContent = money(pc.Esencial || 0); $('smm').textContent = money(pc.Mantener || 0); $('smi').textContent = money(pc.Innecesario || 0);
-  const tope = Number(L.tope) || 0, inn = pc.Innecesario || 0;
-  $('smb').hidden = !(tope > 0);
-  if (tope > 0) {
-    const pct = inn / tope * 100, col = pct >= 100 ? '#B3261E' : pct >= 80 ? '#C98A00' : '#1B7F5C';
-    $('smbf').style.width = Math.min(100, pct) + '%'; $('smbf').style.background = col;
-    $('smbt').textContent = 'Innecesario: ' + money(inn) + ' de ' + money(tope) + ' (' + Math.round(pct) + '%)' + (pct >= 100 ? ' · ¡te pasaste del tope!' : pct >= 80 ? ' · vas cerca del tope' : '');
-    $('smbt').style.color = col;
+  const tope = Number(L.tope) || 0, inn = pc.Innecesario || 0, pct = tope > 0 ? inn / tope * 100 : 0;
+  $('sma').hidden = !(tope > 0 && pct >= 80);
+  if (tope > 0 && pct >= 80) {
+    $('sma').textContent = pct >= 100 ? 'Te pasaste del tope de Innecesario (' + money(tope) + ').' : 'Vas en ' + Math.round(pct) + '% de tu tope de Innecesario.';
+    $('sma').style.color = pct >= 100 ? '#FF9C92' : '#E9C98F';
   }
-  $('tp').textContent = tope > 0 ? 'Cambiar tope de Innecesario' : 'Definir tope de Innecesario';
-  const quedan = r.limite - r.ultimaFila;
+  const quedan = valido ? r.limite - r.ultimaFila : 999;
   $('smw').hidden = !(quedan <= 50);
   if (quedan <= 50) $('smw').textContent = quedan > 0 ? 'Quedan ' + quedan + ' filas en el Registro. Pronto hay que extender las fórmulas del Sheet.' : 'El Registro está lleno. Hay que extender las fórmulas del Sheet.';
-  const ul = $('ul'); ul.textContent = '';
-  (r.ultimos || []).forEach(x => {
-    const row = el('div', 'row'), l = el('div', 'rl'), rr = el('div', 'rr');
-    l.append(el('div', 'rc1', x.c), el('div', 'rc2', ddmm(x.f) + ' · ' + x.k));
-    const be = el('button', 'mini', 'Editar'), bd = el('button', 'mini del', 'Borrar');
-    be.onclick = () => editar(x); bd.onclick = () => borrar(x);
-    rr.append(el('div', 'rm', money(x.m)), be, bd); row.append(l, rr); ul.append(row);
-  });
-  $('sm').hidden = false; $('ulp').hidden = !(r.ultimos || []).length;
+  if (tab === 'rep') pintaReportes(r);
 }
+
+const COL = { Esencial: '#16305A', Mantener: '#D6B482', Innecesario: '#C0694B' };
+function pintaReportes(r) {
+  const h = hoy(), mes = MESES[Number(h.slice(5, 7)) - 1];
+  $('rt').textContent = 'Resumen de ' + mes;
+  const box = $('rb'); box.textContent = '';
+  const valido = r && r.mes && r.mesDe === h.slice(0, 7);
+  if (!valido || !(r.mes.total > 0)) { box.append(el('div', 'vacio', valido ? 'Aún no hay gastos este mes.' : 'Cargando…')); return; }
+  const tot = r.mes.total, pc = r.mes.porCat || {};
+  const t = el('div', 'bl'); t.append(el('div', '', 'Total del mes'), el('div', '', money(tot))); box.append(t);
+  ['Esencial', 'Mantener', 'Innecesario'].forEach(c => {
+    const v = pc[c] || 0, w = el('div'), l = el('div', 'bl'), b = el('div', 'bar'), i = el('i');
+    w.style.marginTop = '16px';
+    l.append(el('div', '', c), el('span', '', money(v) + ' · ' + Math.round(v / tot * 100) + '%'));
+    i.style.width = Math.round(v / tot * 100) + '%'; i.style.background = COL[c]; b.append(i); w.append(l, b); box.append(w);
+  });
+  const tope = Number(L.tope) || 0, inn = pc.Innecesario || 0;
+  const w = el('div'); w.style.marginTop = '22px';
+  if (tope > 0) {
+    const p = inn / tope * 100, col = p >= 100 ? '#B3261E' : p >= 80 ? '#C98A00' : '#1E6B4F', l = el('div', 'bl'), b = el('div', 'bar'), i = el('i');
+    l.append(el('div', '', 'Tope de Innecesario'), el('span', '', money(inn) + ' de ' + money(tope)));
+    i.style.width = Math.min(100, p) + '%'; i.style.background = col; b.append(i); w.append(l, b);
+    w.append(el('p', '', p >= 100 ? 'Te pasaste del tope.' : p >= 80 ? 'Vas cerca del tope.' : 'Vas dentro de tu tope.')); w.lastChild.style.marginTop = '6px';
+  } else w.append(el('p', '', 'Define un tope mensual para Innecesario en Ajustes y aquí verás cómo vas.'));
+  box.append(w);
+}
+
+// ---- Movimientos ----
+let filtroDia = '';
+function filaGasto(x) {
+  const row = el('div', 'row g'), top = el('div', 'top'), bot = el('div', 'bot'), acts = el('div', 'acts');
+  const be = el('button', 'mini', 'Editar'), bf = el('button', 'mini', 'Fijo'), bd = el('button', 'mini del', 'Borrar');
+  be.onclick = () => editar(x); bf.onclick = () => fijoDesde(x); bd.onclick = () => borrar(x);
+  top.append(el('div', 'rc1', x.c), el('div', 'rm', money(x.m)));
+  acts.append(be, bf, bd); bot.append(el('div', 'rc2', ddmm(x.f) + ' · ' + x.k), acts); row.append(top, bot);
+  return row;
+}
+async function movCargar() {
+  if (!L.u) return;
+  $('mdia').value = filtroDia;
+  try {
+    const j = await call({ accion: 'movimientos', desde: filtroDia, hasta: filtroDia, limite: filtroDia ? 200 : 30 });
+    $('mt').textContent = filtroDia ? 'Gastos del ' + larga(filtroDia) : 'Últimos gastos';
+    const rs = $('mres'); rs.textContent = '';
+    rs.hidden = !filtroDia;
+    if (filtroDia) {
+      const t = el('div', 'bl'); t.append(el('div', '', 'Total del día'), el('div', '', money(j.total))); rs.append(t);
+      const d = el('p', '', ['Esencial', 'Mantener', 'Innecesario'].filter(c => j.porCat[c]).map(c => c + ' ' + money(j.porCat[c])).join(' · ') || 'Sin gastos ese día.');
+      d.style.marginTop = '6px'; rs.append(d);
+    }
+    const ml = $('ml'); ml.textContent = '';
+    if (!j.items.length) ml.append(el('div', 'vacio', filtroDia ? 'No hay gastos registrados ese día.' : 'Aún no hay gastos.'));
+    j.items.forEach(x => ml.append(filaGasto(x)));
+  } catch (e) { say(errMsg(e)); }
+}
+function verDia(f) { filtroDia = f; setTab('mov'); }
 
 // ---- Editar y borrar ----
 let editando = null;
 function editar(x) {
   editando = { row: x.row, c: x.c, m: x.m };
-  $('f').value = /^\d{4}-\d{2}-\d{2}$/.test(x.f) ? x.f : hoy();
-  $('c').value = x.c; $('m').value = x.m; $('k').value = x.k;
+  setTab('inicio');
+  $('f').value = esFecha(x.f) ? x.f : hoy(); $('c').value = x.c; $('m').value = x.m; $('k').value = x.k;
   $('go').textContent = 'Guardar cambios'; $('cn').hidden = false;
-  window.scrollTo({ top: 0, behavior: 'smooth' }); say('Editando: cambia lo que necesites y pulsa Guardar cambios.');
+  $('form').scrollIntoView({ behavior: 'smooth', block: 'start' }); say('Editando: cambia lo que necesites y pulsa Guardar cambios.');
 }
 function cancelaEdicion() {
-  editando = null; $('go').textContent = 'Guardar'; $('cn').hidden = true;
+  editando = null; $('go').textContent = 'Guardar gasto'; $('cn').hidden = true;
   $('c').value = ''; $('m').value = ''; $('f').value = hoy(); say('');
 }
 async function borrar(x) {
   if (!confirm('¿Borrar "' + x.c + '" por ' + money(x.m) + '?')) return;
   say('Borrando…');
-  try { await call({ accion: 'borrar', row: x.row, antes: { c: x.c, m: x.m } }); say('Borrado: ' + x.c + '.'); resumen(); }
-  catch (e) { say(errMsg(e)); resumen(); }
+  try { await call({ accion: 'borrar', row: x.row, antes: { c: x.c, m: x.m } }); say('Borrado: ' + x.c + '.'); refrescar(); }
+  catch (e) { say(errMsg(e)); refrescar(); }
 }
 
 // ---- Gastos fijos ----
 function pintaFijos(l) {
   const box = $('xl'); box.textContent = '';
-  if (!l.length) { box.append(el('p', '', 'Aún no tienes gastos fijos.')); return; }
+  if (!l.length) { box.append(el('div', 'vacio', 'Aún no tienes gastos fijos.')); return; }
   l.forEach(x => {
     const row = el('div', 'row'), c = el('div', 'rl'), rr = el('div', 'rr'), b = el('button', 'mini del', 'Borrar');
     c.append(el('div', 'rc1', x.c), el('div', 'rc2', 'Día ' + x.dia + ' · ' + x.k));
@@ -279,6 +444,20 @@ async function fijoAgregar() {
 async function fijoBorrar(x) {
   if (!confirm('¿Quitar el gasto fijo "' + x.c + '"? Los ya registrados se quedan en el Sheet.')) return;
   try { pintaFijos((await call({ accion: 'fijo_borrar', id: x.id })).fijos); say('Fijo quitado.'); } catch (e) { say(errMsg(e)); }
+}
+// Convierte un gasto de la lista en gasto fijo mensual
+async function fijoDesde(x) {
+  const d0 = esFecha(x.f) ? parseInt(x.f.slice(8, 10), 10) : '';
+  const v = prompt('"' + x.c + '" por ' + money(x.m) + ' se registrará solo cada mes. ¿Qué día del mes?', d0);
+  if (v === null) return;
+  const dia = parseInt(v, 10);
+  if (!(dia >= 1 && dia <= 31)) return say('Falta un día válido del 1 al 31.');
+  say('Guardando gasto fijo…');
+  try {
+    const j = await call({ accion: 'fijo_agregar', concepto: x.c, monto: x.m, cat: x.k, dia, hoy: hoy(), omitirMes: x.f.slice(0, 7) === hoy().slice(0, 7) });
+    if (tab === 'aju') pintaFijos(j.fijos);
+    say('Fijo agregado: ' + x.c + ' el día ' + dia + ' de cada mes.');
+  } catch (e) { say(errMsg(e)); }
 }
 
 // ---- Foto del ticket ----
@@ -362,7 +541,7 @@ function mic(btn, input, accion, hint) {
     rec.onstart = () => { btn.classList.add('on'); say('Escuchando…'); };
     rec.onresult = ev => { input.value = ev.results[0][0].transcript; accion(); };
     rec.onerror = ev => {
-      if (/not-allowed|service-not-allowed/.test(ev.error)) { btn.hidden = true; if (hint) hint.hidden = false; say('Error: no hay permiso de micrófono. Usa el micrófono del teclado.'); }
+      if (/not-allowed|service-not-allowed/.test(ev.error)) { btn.hidden = true; syncEnviar(); if (hint) hint.hidden = false; say('Error: no hay permiso de micrófono. Usa el micrófono del teclado.'); }
       else if (ev.error !== 'aborted' && ev.error !== 'no-speech') say('Error: no pude escucharte. Intenta otra vez.');
       else say('');
     };
@@ -371,42 +550,52 @@ function mic(btn, input, accion, hint) {
   };
 }
 
+// El botón de enviar (flecha) solo aparece cuando hay texto, si el micrófono está disponible
+function syncEnviar() {
+  [['ia', 'ib', 'mic'], ['qi', 'qb', 'qmic']].forEach(([i, b, m]) => { $(b).hidden = !$(i).value.trim() && !$(m).hidden; });
+}
+
+// ---- Arranque ----
 function init() {
-  const ok = L.u && L.k;
-  $('cfg').hidden = !!ok; $('form').hidden = !ok; $('rc').hidden = !ok; $('qt').hidden = !ok; $('xt').hidden = !ok; if (!ok) { $('qp').hidden = true; $('xp').hidden = true; $('sm').hidden = true; $('ulp').hidden = true; }
-  if (ok) { try { pintaResumen(JSON.parse(L.res || 'null')); } catch (e) {} flush(); resumen(); }
+  const ok = !!(L.u && L.k);
+  $('cfg').hidden = ok; $('tabs').hidden = !ok;
+  if (!ok) { ['inicio', 'mov', 'rep', 'aju'].forEach(x => { $('p-' + x).hidden = true; }); $('hd').classList.remove('sm'); $('ht').textContent = TITULOS.inicio[0]; $('hs').textContent = TITULOS.inicio[1]; return; }
+  setTab(tab);
+  pintaResumen(leeRes()); flush(); resumen();
 }
 (() => {
   $('f').value = hoy();
   $('go').onclick = save;
+  $('cn').onclick = cancelaEdicion;
   $('ib').onclick = () => ia();
   $('ia').addEventListener('keydown', e => { if (e.key === 'Enter') { e.preventDefault(); ia(); } });
+  ['ia', 'qi'].forEach(i => $(i).addEventListener('input', syncEnviar));
   $('au').checked = L.au !== '0'; $('au').onchange = () => { L.au = $('au').checked ? '1' : '0'; };
   mic($('mic'), $('ia'), ia, $('hint'));
   mic($('qmic'), $('qi'), preguntar);
-  $('qt').onclick = () => { $('qp').hidden = !$('qp').hidden; if (!$('qp').hidden) $('qi').focus(); };
+  syncEnviar();
   $('qb').onclick = () => preguntar();
   $('qi').addEventListener('keydown', e => { if (e.key === 'Enter') { e.preventDefault(); preguntar(); } });
-  document.querySelectorAll('.chips button').forEach(b => b.onclick = () => { $('qi').value = b.dataset.q; preguntar(); });
-  document.addEventListener('visibilitychange', () => { if (!document.hidden && L.u) { flush(); resumen(); } });
-  $('cn').onclick = e => { e.preventDefault(); cancelaEdicion(); };
-  $('tp').onclick = e => {
-    e.preventDefault();
-    const v = prompt('Tope mensual para gastos Innecesarios (solo el número; déjalo vacío para quitarlo):', L.tope || '');
-    if (v === null) return;
-    const n = parseFloat(v.replace(/[$,\s]/g, ''));
-    if (n > 0) L.tope = String(n); else L.removeItem('tope');
-    try { pintaResumen(JSON.parse(L.res || 'null')); } catch (er) {}
-  };
-  $('xt').onclick = () => { $('xp').hidden = !$('xp').hidden; if (!$('xp').hidden) fijosCargar(); };
-  $('xa').onclick = fijoAgregar;
+  document.querySelectorAll('[data-q]').forEach(b => b.onclick = () => { $('qi').value = b.dataset.q; preguntar(); });
+  document.querySelectorAll('#tabs button').forEach(b => b.onclick = () => { if (b.dataset.t === 'mov' && tab !== 'mov') filtroDia = ''; setTab(b.dataset.t); });
+  $('cal').onchange = e => { const f = e.target.value; e.target.value = ''; if (esFecha(f)) verDia(f); };
+  $('mdia').onchange = e => { filtroDia = esFecha(e.target.value) ? e.target.value : ''; movCargar(); };
+  document.querySelectorAll('[data-d]').forEach(b => b.onclick = () => { filtroDia = b.dataset.d === 'hoy' ? hoy() : b.dataset.d === 'ayer' ? ayer() : ''; movCargar(); });
   $('fb').onclick = () => $('ph').click();
   $('ph').onchange = async e => {
     const f = e.target.files[0]; e.target.value = ''; if (!f) return;
     say('Preparando foto…');
     try { await ia({ mime: 'image/jpeg', data: await comprime(f) }); } catch (er) { say('Error: no pude leer la foto.'); }
   };
-  $('rc').onclick = e => { e.preventDefault(); if (confirm('¿Borrar la configuración de este dispositivo?')) { L.removeItem('u'); L.removeItem('k'); init(); } };
+  $('xa').onclick = fijoAgregar;
+  $('tp').value = L.tope || '';
+  $('tpb').onclick = () => {
+    const n = parseFloat($('tp').value.replace(/[$,\s]/g, ''));
+    if (n > 0) { L.tope = String(n); say('Guardado: tope de ' + money(n) + ' para Innecesario.'); } else { L.removeItem('tope'); say('Tope quitado.'); }
+    pintaResumen(leeRes());
+  };
+  document.addEventListener('visibilitychange', () => { if (!document.hidden && L.u) { flush(); resumen(); } });
+  $('rc').onclick = () => { if (confirm('¿Borrar la configuración de este dispositivo?')) { L.removeItem('u'); L.removeItem('k'); init(); } };
   $('sc').onclick = () => {
     const u = $('u').value.trim(), k = $('k0').value.trim();
     if (!u.startsWith('https://script.google.com/') || !k) return say('Revisa la dirección y la clave.');
