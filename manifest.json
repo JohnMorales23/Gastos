@@ -9,6 +9,29 @@
   "background_color": "#0E2248",
   "theme_color": "#F7F3EC",
   "lang": "es",
+  "shortcuts": [
+    {
+      "name": "Dictar gasto",
+      "short_name": "Dictar",
+      "description": "Registrar un gasto con la voz",
+      "url": "./?a=voz",
+      "icons": [{ "src": "icon-192.png", "sizes": "192x192", "type": "image/png" }]
+    },
+    {
+      "name": "Escanear ticket",
+      "short_name": "Ticket",
+      "description": "Registrar un gasto con foto del ticket",
+      "url": "./?a=ticket",
+      "icons": [{ "src": "icon-192.png", "sizes": "192x192", "type": "image/png" }]
+    },
+    {
+      "name": "Gastos de hoy",
+      "short_name": "Hoy",
+      "description": "Ver los gastos de hoy",
+      "url": "./?a=hoy",
+      "icons": [{ "src": "icon-192.png", "sizes": "192x192", "type": "image/png" }]
+    }
+  ],
   "icons": [
     {
       "src": "icon-192.png",

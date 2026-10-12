@@ -603,6 +603,20 @@ function init() {
   };
   window.addEventListener('online', flush);
   init();
+  // Accesos rápidos del icono (Android): ?a=voz | ticket | hoy
+  try {
+    const a = new URLSearchParams(location.search).get('a');
+    if (a && L.u && L.k) {
+      history.replaceState(null, '', location.pathname);
+      if (a === 'hoy') verDia(hoy());
+      else {
+        setTab('inicio');
+        if (a === 'voz' && !$('mic').hidden) setTimeout(() => $('mic').click(), 400);
+        else if (a === 'voz') $('ia').focus();
+        else if (a === 'ticket') say('Toca "Escanear ticket" para tomar la foto.');
+      }
+    }
+  } catch (e) {}
 })();
 </script>
 </body>
