@@ -219,7 +219,8 @@ input[type=search]{-webkit-appearance:none;appearance:none}
 <h2>Preferencias</h2>
 <label class="chk"><input id="au" type="checkbox" checked><span>Guardar directo con IA<small>Al escribir o dictar un gasto se guarda sin pedirte revisarlo.</small></span></label>
 <div><label for="yo">Mi inicial (para saber quién registró)</label><input id="yo" maxlength="2" autocomplete="off" placeholder="Ej. J"></div>
-<div><label for="tc">Tipo de cambio del dólar (opcional)</label><input id="tc" inputmode="decimal" placeholder="Ej. 18.50"><p style="margin-top:6px;font-size:12px">Con esto puedes decir "20 dólares de Uber" y se guarda en pesos.</p></div>
+<div><label for="tc">Dólar a pesos</label><input id="tc" inputmode="decimal" placeholder="Ej. 18.50"><p id="tcs" style="margin-top:6px;font-size:12px"></p></div>
+<label class="chk"><input id="tca" type="checkbox" checked><span>Buscar el tipo de cambio de cada día<small>Al decir "20 dólares de Uber" se usa el tipo de cambio de la fecha del gasto (referencia internacional; puede diferir un poco de tu banco). Si lo desmarcas, se usa el que escribas arriba.</small></span></label>
 <div><label for="tpE">Tope mensual Esencial</label><input id="tpE" inputmode="decimal" placeholder="Sin tope"></div>
 <div><label for="tpM">Tope mensual Mantener</label><input id="tpM" inputmode="decimal" placeholder="Sin tope"></div>
 <div><label for="tpI">Tope mensual Innecesario</label><input id="tpI" inputmode="decimal" placeholder="Sin tope"></div>
@@ -310,7 +311,7 @@ function avisoGuardado(c, m, j, cat) {
 }
 
 async function call(body) {
-  const extra = {}; if (L.yo) extra.quien = L.yo; if (Number(L.tc) > 0) extra.tc = Number(L.tc);
+  const extra = {}; if (L.yo) extra.quien = L.yo; if (Number(L.tc) > 0) extra.tc = Number(L.tc); extra.tcAuto = L.tca !== '0';
   const r = await fetch(L.u, { method: 'POST', headers: { 'Content-Type': 'text/plain;charset=utf-8' }, body: JSON.stringify({ k: L.k, ...extra, ...body }) });
   const j = await r.json();
   if (!j.ok) throw Object.assign(new Error(j.error), { fatal: true });
@@ -676,11 +677,26 @@ async function exportarPDF() {
   } catch (e) { say(errMsg(e)); }
 }
 
+// ---- Tipo de cambio automático ----
+async function tcHoy() {
+  $('tcs').textContent = 'Buscando el tipo de cambio de hoy…';
+  try {
+    const j = await call({ accion: 'tipo_cambio', fecha: hoy() });
+    if (j.tc > 0) {
+      if (L.tca === '0') return; // el usuario lo cambió a manual mientras buscaba
+      L.tc = String(j.tc); $('tc').value = j.tc.toFixed(4);
+      $('tcs').textContent = 'Hoy: $' + j.tc.toFixed(4) + ' por dólar (se actualiza solo). Cada gasto usa el de su fecha.';
+    } else $('tcs').textContent = 'No pude consultarlo ahora. Si falla, se usa el último guardado aquí.';
+  } catch (e) { $('tcs').textContent = 'No pude consultarlo ahora. Si falla, se usa el último guardado aquí.'; }
+}
+
 // ---- Ajustes ----
 function pintaAjustes() {
   const T = topes();
   $('tpE').value = T.Esencial > 0 ? T.Esencial : ''; $('tpM').value = T.Mantener > 0 ? T.Mantener : ''; $('tpI').value = T.Innecesario > 0 ? T.Innecesario : '';
   $('yo').value = L.yo || ''; $('tc').value = L.tc || ''; $('tema').value = L.tema || '';
+  $('tca').checked = L.tca !== '0';
+  if ($('tca').checked) tcHoy(); else $('tcs').textContent = 'Se usará el tipo de cambio que escribas aquí.';
   if (!$('xmes').value) $('xmes').value = hoy().slice(0, 7);
   pintaSeg();
 }
@@ -864,6 +880,7 @@ function init() {
   $('ga').onclick = metaAgregar; $('ab').onclick = ahorro; $('xcsv').onclick = exportarCSV; $('xpdf').onclick = exportarPDF;
   $('yo').onchange = () => { const v = $('yo').value.replace(/[^A-Za-zÁÉÍÓÚÑáéíóúñ]/g, '').slice(0, 2).toUpperCase(); $('yo').value = v; if (v) L.yo = v; else L.removeItem('yo'); say(v ? 'Guardado: tu inicial es ' + v + '.' : 'Guardado: sin inicial.'); pintaPersonas(); };
   $('tc').onchange = () => { const n = parseFloat($('tc').value.replace(/[$,\s]/g, '')); if (n > 0) { L.tc = String(n); say('Guardado: dólar a ' + money(n) + '.'); } else { L.removeItem('tc'); $('tc').value = ''; say('Guardado: sin tipo de cambio.'); } };
+  $('tca').onchange = () => { if ($('tca').checked) { L.removeItem('tca'); say('Guardado: tipo de cambio automático por día.'); tcHoy(); } else { L.tca = '0'; $('tcs').textContent = 'Se usará el tipo de cambio que escribas aquí.'; say('Guardado: tipo de cambio manual.'); } };
   $('tema').onchange = () => { if ($('tema').value) L.tema = $('tema').value; else L.removeItem('tema'); aplicarTema(); if (tab === 'rep') pintaReportes(leeRes()); };
   // bloqueo
   [1, 2, 3, 4, 5, 6, 7, 8, 9, '', 0, 'x'].forEach(k => { if (k === '') { $('lkp').append(el('span')); return; } const b = el('button', '', k === 'x' ? '⌫' : String(k)); b.type = 'button'; b.onclick = () => lkTecla(String(k)); $('lkp').append(b); });
