@@ -729,7 +729,7 @@ async function bioActivar() {
       challenge: crypto.getRandomValues(new Uint8Array(32)), pubKeyCredParams: [{ type: 'public-key', alg: -7 }, { type: 'public-key', alg: -257 }],
       authenticatorSelection: { authenticatorAttachment: 'platform', userVerification: 'required', residentKey: 'discouraged' }, timeout: 60000, attestation: 'none' } });
     L.cred = b64(c.rawId); pintaSeg(); say('Guardado: ya puedes entrar con Face ID / huella.');
-  } catch (e) { say('Error: no se pudo activar. Revisa que el teléfono tenga Face ID o huella configurados.'); }
+  } catch (e) { say('Error: no se pudo activar Face ID / huella (' + (e && e.name || 'desconocido') + '). Revisa que el teléfono lo tenga configurado y sigue usando el PIN.'); }
 }
 async function bioEntrar() {
   try {
@@ -742,10 +742,10 @@ async function pintaSeg() {
   const on = lockActivo();
   $('sgp').textContent = on ? 'Cambiar PIN' : 'Activar bloqueo con PIN';
   $('sgo').hidden = !on;
-  $('sgi').textContent = on ? 'Bloqueo activo: se pide al abrir la app y al volver después de 1 minuto.' : 'Pide un PIN al abrir la app, y Face ID o huella si lo activas.';
+  $('sgi').textContent = on ? 'Bloqueo activo: se pide al abrir la app y al volver después de 1 minuto.' : 'Pide un PIN al abrir la app. Para usar Face ID o huella, primero activa el PIN y luego el botón de abajo.';
   $('sgb').textContent = L.cred ? 'Quitar Face ID / huella' : 'Activar Face ID / huella';
-  $('sgb').hidden = true;
-  if (on && await bioDisp()) $('sgb').hidden = false;
+  $('sgb').hidden = false;
+  if (!(await bioDisp())) $('sgi').textContent += ' Aviso: este teléfono o navegador no ofrece Face ID / huella en esta app; se usa solo el PIN.';
 }
 
 // ---- Foto del ticket ----
@@ -868,7 +868,7 @@ function init() {
   // bloqueo
   [1, 2, 3, 4, 5, 6, 7, 8, 9, '', 0, 'x'].forEach(k => { if (k === '') { $('lkp').append(el('span')); return; } const b = el('button', '', k === 'x' ? '⌫' : String(k)); b.type = 'button'; b.onclick = () => lkTecla(String(k)); $('lkp').append(b); });
   $('sgp').onclick = () => lkMostrar('nuevo');
-  $('sgb').onclick = () => { if (L.cred) { L.removeItem('cred'); pintaSeg(); say('Guardado: Face ID / huella quitado.'); } else bioActivar(); };
+  $('sgb').onclick = () => { if (!lockActivo()) return say('Revisa: primero activa el bloqueo con PIN.'); if (L.cred) { L.removeItem('cred'); pintaSeg(); say('Guardado: Face ID / huella quitado.'); } else bioActivar(); };
   $('sgo').onclick = () => { if (confirm('¿Quitar el bloqueo de esta app?')) { ['pin', 'lock', 'cred'].forEach(x => L.removeItem(x)); pintaSeg(); say('Guardado: bloqueo quitado.'); } };
   $('lkc').onclick = lkCerrar; $('lkb').onclick = bioEntrar;
   $('lko').onclick = () => { if (confirm('Se borrará la configuración de este teléfono y tendrás que pegar otra vez la dirección y la clave. ¿Continuar?')) { ['pin', 'lock', 'cred', 'u', 'k', 'res'].forEach(x => L.removeItem(x)); location.reload(); } };
