@@ -25,8 +25,8 @@ button{font:inherit;border:0;cursor:pointer;color:inherit}
 button:active{transform:scale(.98)}
 button:disabled{opacity:.5}
 header{text-align:center;padding:calc(14px + env(safe-area-inset-top)) 20px 6px}
-header img{display:block;margin:0 auto;height:96px;width:auto;border-radius:18px}
-header.sm img{height:60px}
+header img{display:block;margin:0 auto;height:110px;width:auto;filter:drop-shadow(0 1px 1.5px rgba(70,45,0,.35))}
+header.sm img{height:64px}
 header h1{margin:10px 0 0;font-size:28px;font-weight:800;letter-spacing:-.4px}
 header.sm h1{font-size:22px;margin-top:6px}
 header p{margin:6px 0 0;font-size:16px;color:var(--muted)}
@@ -131,7 +131,7 @@ input[type=search]{-webkit-appearance:none;appearance:none}
 #lkb{width:min(280px,80%)}
 /* Bloqueo */
 #lock{position:fixed;inset:0;z-index:100;background:var(--bg);display:flex;flex-direction:column;align-items:center;justify-content:center;gap:14px;padding:20px}
-#lock img{height:120px;width:auto;border-radius:22px}
+#lock img{height:140px;width:auto;filter:drop-shadow(0 1px 1.5px rgba(70,45,0,.35))}
 #lkt{margin:0;font-size:20px;font-weight:800;text-align:center}
 #lkd{display:flex;gap:12px;height:18px}
 #lkd i{width:14px;height:14px;border-radius:50%;border:2px solid var(--navy)}
@@ -145,7 +145,7 @@ input[type=search]{-webkit-appearance:none;appearance:none}
 </style>
 </head>
 <body>
-<header id="hd"><img src="logo.png?v=2" alt="JonKa"><h1 id="ht">Control de gastos</h1><p id="hs">Tus finanzas, en orden.</p></header>
+<header id="hd"><img src="logo.png?v=3" alt="JonKa"><h1 id="ht">Control de gastos</h1><p id="hs">Tus finanzas, en orden.</p></header>
 <main>
 <!-- Primera vez -->
 <section id="cfg" class="card gold" hidden>
@@ -291,7 +291,7 @@ input[type=search]{-webkit-appearance:none;appearance:none}
 <p><b>3. En Apps Script (Code.gs):</b> cambia <code>ULTIMA = 1003</code> por <code>ULTIMA = 3003</code> y publica una Nueva versión.</p>
 <button id="ayx" class="pri" type="button" style="margin-top:8px">Entendido</button></div></div>
 <div id="imp"></div>
-<div id="lock" hidden><img src="logo.png?v=2" alt="JonKa"><h2 id="lkt"></h2><div id="lkd"></div><div id="lkp"></div><button id="lkb" class="pri" hidden>Usar Face ID / huella</button><button id="lku" class="lnk" hidden>Usar PIN</button><button id="lkc" class="lnk" hidden>Cancelar</button><button id="lko" class="lnk">Olvidé mi PIN</button></div>
+<div id="lock" hidden><img src="logo.png?v=3" alt="JonKa"><h2 id="lkt"></h2><div id="lkd"></div><div id="lkp"></div><button id="lkb" class="pri" hidden>Usar Face ID / huella</button><button id="lku" class="lnk" hidden>Usar PIN</button><button id="lkc" class="lnk" hidden>Cancelar</button><button id="lko" class="lnk">Olvidé mi PIN</button></div>
 <nav id="tabs" hidden>
 <button data-t="inicio" class="on"><svg viewBox="0 0 24 24"><path d="M3.5 11 12 3.5 20.5 11V20a1 1 0 0 1-1 1H15v-6H9v6H4.5a1 1 0 0 1-1-1z"/></svg>Inicio</button>
 <button data-t="mov"><svg viewBox="0 0 24 24"><path d="M7 3h7l5 5v13H7z"/><path d="M14 3v5h5M10 13h6M10 17h6"/></svg>Movimientos</button>
@@ -578,11 +578,11 @@ function pintaMapa(r) {
   for (let d = 1; d <= dias; d++) {
     const f = y + '-' + String(m).padStart(2, '0') + '-' + String(d).padStart(2, '0'), v = pd[f] || 0, b = el('button', 'hc', String(d));
     b.type = 'button';
-    if (v > 0) { const a = .18 + .77 * (v / max); b.style.background = 'rgba(214,180,130,' + a.toFixed(2) + ')'; if (a > .55) b.style.color = '#0F2441'; b.title = money(v); b.onclick = () => verDia(f); } else b.disabled = true;
+    if (v > 0) { const t = Math.pow(v / max, .8); b.style.background = 'hsl(' + Math.round(58 - 58 * t) + ',' + Math.round(90 + 5 * t) + '%,' + Math.round(80 - 32 * t) + '%)'; b.style.color = t > .62 ? '#fff' : '#0F2441'; b.title = money(v); b.onclick = () => verDia(f); } else b.disabled = true;
     if (f === hoy()) b.classList.add('hoy');
     g.append(b);
   }
-  const p = el('p', '', 'Más oscuro = más gasto. Toca un día para ver sus gastos.'); p.style.marginTop = '10px';
+  const p = el('p', '', 'De amarillo (poco) a rojo (mucho). Toca un día para ver sus gastos.'); p.style.marginTop = '10px';
   box.append(g, p);
 }
 
