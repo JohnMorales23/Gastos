@@ -7,9 +7,9 @@
 <meta name="mobile-web-app-capable" content="yes">
 <meta name="apple-mobile-web-app-title" content="JonKa">
 <meta name="apple-mobile-web-app-status-bar-style" content="default">
-<link rel="apple-touch-icon" href="icon.png">
-<link rel="icon" href="icon-192.png">
-<link rel="manifest" href="manifest.json">
+<link rel="apple-touch-icon" href="icon.png?v=2">
+<link rel="icon" href="icon-192.png?v=2">
+<link rel="manifest" href="manifest.json?v=2">
 <meta name="theme-color" content="#F7F3EC">
 <script>try{var t=localStorage.tema;if(t==="dark"||t==="light")document.documentElement.dataset.tema=t}catch(e){}</script>
 <title>JonKa · Control de gastos</title>
@@ -25,8 +25,8 @@ button{font:inherit;border:0;cursor:pointer;color:inherit}
 button:active{transform:scale(.98)}
 button:disabled{opacity:.5}
 header{text-align:center;padding:calc(14px + env(safe-area-inset-top)) 20px 6px}
-header img{display:block;margin:0 auto;height:62px;width:auto}
-header.sm img{height:44px}
+header img{display:block;margin:0 auto;height:96px;width:auto;border-radius:18px}
+header.sm img{height:60px}
 header h1{margin:10px 0 0;font-size:28px;font-weight:800;letter-spacing:-.4px}
 header.sm h1{font-size:22px;margin-top:6px}
 header p{margin:6px 0 0;font-size:16px;color:var(--muted)}
@@ -107,8 +107,6 @@ select{background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/
 select{color-scheme:light dark}
 :root[data-tema=dark] select{background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='8'%3E%3Cpath d='M1 1l5 5 5-5' fill='none' stroke='%23EEF2F8' stroke-width='2'/%3E%3C/svg%3E")}
 @media (prefers-color-scheme:dark){:root:not([data-tema=light]) select{background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='8'%3E%3Cpath d='M1 1l5 5 5-5' fill='none' stroke='%23EEF2F8' stroke-width='2'/%3E%3C/svg%3E")}}
-:root[data-tema=dark] header img,:root[data-tema=dark] #lock img{filter:brightness(0) invert(1)}
-@media (prefers-color-scheme:dark){:root:not([data-tema=light]) header img,:root:not([data-tema=light]) #lock img{filter:brightness(0) invert(1)}}
 input[type=search]{-webkit-appearance:none;appearance:none}
 /* Comparativo */
 .gr{display:flex;gap:8px;height:140px}
@@ -116,9 +114,24 @@ input[type=search]{-webkit-appearance:none;appearance:none}
 .bw{flex:1;width:100%;display:flex;align-items:flex-end}
 .bw i{display:block;width:100%;background:var(--gold);opacity:.55;border-radius:6px 6px 2px 2px}
 .bw i.act{opacity:1;background:var(--navy)}
+/* Análisis */
+.sub{margin-top:8px;font-size:13px;color:#B9C4D6}
+.lst{margin:6px 0 0;padding-left:18px;font-size:14px;line-height:1.55}
+.heat{display:grid;grid-template-columns:repeat(7,1fr);gap:6px}
+.hh{text-align:center;font-size:11px;font-weight:700;color:var(--soft)}
+.hc{height:40px;border-radius:10px;background:var(--chip);font-size:13px;font-weight:700;color:var(--ink);padding:0}
+.hc.e{background:transparent;pointer-events:none}
+.hc:disabled{opacity:.55}
+.hc.hoy{outline:2px solid var(--navy);outline-offset:1px}
+#tkv,#ay{position:fixed;inset:0;z-index:90;background:rgba(8,16,30,.92);display:flex;flex-direction:column;align-items:center;justify-content:center;gap:14px;padding:20px}
+#tkv img{max-width:100%;max-height:75vh;border-radius:12px;background:#fff}
+#ay>div{background:var(--card);border-radius:18px;padding:20px;max-width:430px;max-height:80vh;overflow:auto;font-size:14px;line-height:1.5}
+#ay h2{margin:0 0 8px;font-size:20px}
+#ay code{background:var(--chip);padding:1px 6px;border-radius:6px;font-size:13px}
+#lkb{width:min(280px,80%)}
 /* Bloqueo */
 #lock{position:fixed;inset:0;z-index:100;background:var(--bg);display:flex;flex-direction:column;align-items:center;justify-content:center;gap:14px;padding:20px}
-#lock img{height:54px;width:auto}
+#lock img{height:120px;width:auto;border-radius:22px}
 #lkt{margin:0;font-size:20px;font-weight:800;text-align:center}
 #lkd{display:flex;gap:12px;height:18px}
 #lkd i{width:14px;height:14px;border-radius:50%;border:2px solid var(--navy)}
@@ -132,7 +145,7 @@ input[type=search]{-webkit-appearance:none;appearance:none}
 </style>
 </head>
 <body>
-<header id="hd"><img src="logo.png" alt="JonKa"><h1 id="ht">Control de gastos</h1><p id="hs">Tus finanzas, en orden.</p></header>
+<header id="hd"><img src="logo.png?v=2" alt="JonKa"><h1 id="ht">Control de gastos</h1><p id="hs">Tus finanzas, en orden.</p></header>
 <main>
 <!-- Primera vez -->
 <section id="cfg" class="card gold" hidden>
@@ -151,10 +164,14 @@ input[type=search]{-webkit-appearance:none;appearance:none}
 <div id="smt">$0.00</div>
 <div class="cs"><div>Esencial<b id="sme">$0.00</b></div><div>Mantener<b id="smm">$0.00</b></div><div>Innecesario<b id="smi">$0.00</b></div></div>
 <div id="sma" hidden></div>
+<div id="sml" class="sub" hidden></div><div id="spr" class="sub" hidden></div>
 </div>
-<div id="smw" class="warn" hidden></div>
+<div id="saa" class="warn" hidden></div>
+<div id="scb" class="warn" hidden><span id="scbt"></span> <button id="scbb" class="mini" type="button">Ver cierre</button></div>
+<div id="smw" class="warn" hidden><span id="smwt"></span> <button id="smwb" class="mini" type="button">Cómo extenderlas</button></div>
 <div class="card gold" id="form">
 <h2>Registrar gasto</h2>
+<div id="vj" class="warn" hidden><span>Modo viaje: los montos se toman en dólares y se guardan en pesos.</span> <button id="vjb" class="mini" type="button">Desactivar</button></div>
 <div>
 <div class="ln"><input id="ia" autocomplete="off" enterkeyhint="send" placeholder="Ej. Ayer gasté $180 en tacos">
 <button id="ib" class="icb" type="button" aria-label="Enviar"><svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12h14M13 6l6 6-6 6"/></svg></button>
@@ -163,12 +180,15 @@ input[type=search]{-webkit-appearance:none;appearance:none}
 </div>
 <button id="fb" type="button" class="out"><svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M4 8.5A1.5 1.5 0 0 1 5.5 7H8l1.2-2h5.6L16 7h2.5A1.5 1.5 0 0 1 20 8.5v9a1.5 1.5 0 0 1-1.5 1.5h-13A1.5 1.5 0 0 1 4 17.5z"/><circle cx="12" cy="13" r="3.4"/></svg>Escanear ticket</button>
 <input id="ph" type="file" accept="image/*" hidden>
+<div id="pt" class="warn" hidden><span id="ptt"></span> <button id="ptb" class="mini" type="button">Guardar dividido</button></div>
+<div id="fqw" hidden><label>Frecuentes</label><div class="chips" id="fq"></div></div>
 <div><label for="f">Fecha</label><input id="f" type="date"></div>
 <div><label for="c">Concepto</label><input id="c" autocomplete="off" placeholder="Ej. Tacos"></div>
 <div><label for="m">Monto</label><input id="m" inputmode="decimal" placeholder="$0.00"></div>
 <div><label for="k">Categoría</label><select id="k"><option>Esencial</option><option>Mantener</option><option>Innecesario</option></select></div>
 <button id="go" class="pri">Guardar gasto</button>
 <button id="cn" class="lnk" hidden>Cancelar edición</button>
+<button id="tkb" type="button" class="out" hidden>Ver foto del ticket</button>
 </div>
 <div id="pend"></div>
 </section>
@@ -188,6 +208,10 @@ input[type=search]{-webkit-appearance:none;appearance:none}
 <!-- REPORTES -->
 <section id="p-rep" class="pg" hidden>
 <div class="card gold"><h2 id="rt">Resumen del mes</h2><div id="rb"></div></div>
+<div class="card" id="pyc" hidden><h2>Proyección del mes</h2><div id="pyb"></div></div>
+<div class="card" id="mpc" hidden><h2>Mapa del mes</h2><div id="mpb"></div></div>
+<div class="card" id="clc"><h2 id="clt">Cierre de mes</h2><div><label for="cmes">Mes</label><input id="cmes" type="month"></div><div id="clb"><div class="vacio">Cargando…</div></div></div>
+<div class="card" id="hzc" hidden><h2>Gastos hormiga</h2><div id="hzb"></div></div>
 <div class="card" id="rcard" hidden><h2>Últimos 6 meses</h2><div id="rcmp"></div></div>
 <div class="card" id="pcard" hidden><h2>Quién registró (este mes)</h2><div id="rper"></div></div>
 <div class="card"><h2>Metas de ahorro</h2><div id="gl"></div>
@@ -218,6 +242,7 @@ input[type=search]{-webkit-appearance:none;appearance:none}
 <div class="card">
 <h2>Preferencias</h2>
 <label class="chk"><input id="au" type="checkbox" checked><span>Guardar directo con IA<small>Al escribir o dictar un gasto se guarda sin pedirte revisarlo.</small></span></label>
+<div><label for="ing">Ingreso mensual</label><div class="ln"><input id="ing" inputmode="decimal" placeholder="Ej. 25000"><button id="ingb" class="mini" type="button" style="height:52px;width:96px;flex:none;border-radius:12px">Guardar</button></div><p style="margin-top:6px;font-size:12px">Es la misma celda de tu hoja (Resumen Mensual, E3): si la cambias aquí o allá, se actualiza en los dos lados.</p></div>
 <div><label for="yo">Mi inicial (para saber quién registró)</label><input id="yo" maxlength="2" autocomplete="off" placeholder="Ej. J"></div>
 <div><label for="tc">Dólar a pesos</label><input id="tc" inputmode="decimal" placeholder="Ej. 18.50"><p id="tcs" style="margin-top:6px;font-size:12px"></p></div>
 <label class="chk"><input id="tca" type="checkbox" checked><span>Buscar el tipo de cambio de cada día<small>Al decir "20 dólares de Uber" se usa el tipo de cambio de la fecha del gasto (referencia internacional; puede diferir un poco de tu banco). Si lo desmarcas, se usa el que escribas arriba.</small></span></label>
@@ -225,8 +250,17 @@ input[type=search]{-webkit-appearance:none;appearance:none}
 <div><label for="tpM">Tope mensual Mantener</label><input id="tpM" inputmode="decimal" placeholder="Sin tope"></div>
 <div><label for="tpI">Tope mensual Innecesario</label><input id="tpI" inputmode="decimal" placeholder="Sin tope"></div>
 <button id="tpb" class="out">Guardar topes</button>
+<button id="tps" class="lnk" type="button">Sugerir topes según mis últimos 3 meses</button>
+<label class="chk"><input id="vjc" type="checkbox"><span>Modo viaje<small>Los montos que captures se toman en dólares y se guardan en pesos.</small></span></label>
+<div><label for="vjh">Termina el (opcional)</label><input id="vjh" type="date"></div>
 <div><label for="tema">Apariencia</label><select id="tema"><option value="">Automática</option><option value="light">Clara</option><option value="dark">Oscura</option></select></div>
 </div>
+</div>
+<div class="card">
+<h2>Respaldos</h2>
+<p>Se crea uno solo cada día 1. Aquí puedes crear otro ahora o volver a uno anterior (solo los gastos, columnas A a D).</p>
+<div class="two"><button id="rb1" class="out" type="button">Crear ahora</button><button id="rb2" class="out" type="button">Ver respaldos</button></div>
+<div id="rbl"></div>
 </div>
 <div class="card">
 <h2>Exportar</h2>
@@ -250,8 +284,14 @@ input[type=search]{-webkit-appearance:none;appearance:none}
 </section>
 </main>
 <div id="st" hidden role="status"></div>
+<div id="tkv" hidden><img id="tki" alt="Foto del ticket"><button id="tkx" class="pri" type="button" style="max-width:280px">Cerrar</button></div>
+<div id="ay" hidden><div><h2>Cómo extender el Registro</h2>
+<p><b>1. En Registro:</b> baja hasta la última fila y toca "Agregar 1000 filas más abajo" (hazlo 3 veces).</p>
+<p><b>2. En Resumen Mensual:</b> Edición > Buscar y reemplazar. Buscar <code>$1003</code>, reemplazar con <code>$3003</code>, buscar en "Esta hoja" y marca "Buscar también dentro de las fórmulas". Reemplazar todo.</p>
+<p><b>3. En Apps Script (Code.gs):</b> cambia <code>ULTIMA = 1003</code> por <code>ULTIMA = 3003</code> y publica una Nueva versión.</p>
+<button id="ayx" class="pri" type="button" style="margin-top:8px">Entendido</button></div></div>
 <div id="imp"></div>
-<div id="lock" hidden><img src="logo.png" alt="JonKa"><h2 id="lkt"></h2><div id="lkd"></div><div id="lkp"></div><button id="lkb" class="lnk" hidden>Usar Face ID / huella</button><button id="lkc" class="lnk" hidden>Cancelar</button><button id="lko" class="lnk">Olvidé mi PIN</button></div>
+<div id="lock" hidden><img src="logo.png?v=2" alt="JonKa"><h2 id="lkt"></h2><div id="lkd"></div><div id="lkp"></div><button id="lkb" class="pri" hidden>Usar Face ID / huella</button><button id="lku" class="lnk" hidden>Usar PIN</button><button id="lkc" class="lnk" hidden>Cancelar</button><button id="lko" class="lnk">Olvidé mi PIN</button></div>
 <nav id="tabs" hidden>
 <button data-t="inicio" class="on"><svg viewBox="0 0 24 24"><path d="M3.5 11 12 3.5 20.5 11V20a1 1 0 0 1-1 1H15v-6H9v6H4.5a1 1 0 0 1-1-1z"/></svg>Inicio</button>
 <button data-t="mov"><svg viewBox="0 0 24 24"><path d="M7 3h7l5 5v13H7z"/><path d="M14 3v5h5M10 13h6M10 17h6"/></svg>Movimientos</button>
@@ -303,7 +343,8 @@ function aviso(t, undo) {
 }
 function avisoGuardado(c, m, j, cat) {
   const nom = sinQuien(c);
-  aviso((j.dup ? 'Guardado, pero ojo: ya había "' + nom + '" por ' + money(m) + ' ese día. ' : 'Guardado: ' + nom + ' · ' + money(m) + (cat ? ' · ' + cat : '') + '. '),
+  aviso((j.dup ? 'Guardado, pero ojo: ya había "' + nom + '" por ' + money(m) + ' ese día. ' : 'Guardado: ' + nom + ' · ' + money(m) + (cat ? ' · ' + cat : '') + '. ') +
+    (j.inusual ? 'Ojo: es mucho más de lo normal para "' + nom + '" (normal ≈ ' + money(j.inusual) + ').' : ''),
     async () => {
       try { await call({ accion: 'borrar', row: j.row, antes: { c, m } }); say('Borrado: ' + nom + '.'); refrescar(); }
       catch (e) { say(errMsg(e)); refrescar(); }
@@ -311,7 +352,7 @@ function avisoGuardado(c, m, j, cat) {
 }
 
 async function call(body) {
-  const extra = {}; if (L.yo) extra.quien = L.yo; if (Number(L.tc) > 0) extra.tc = Number(L.tc); extra.tcAuto = L.tca !== '0';
+  const extra = {}; if (viajeActivo()) extra.monedaBase = 'USD'; if (L.yo) extra.quien = L.yo; if (Number(L.tc) > 0) extra.tc = Number(L.tc); extra.tcAuto = L.tca !== '0';
   const r = await fetch(L.u, { method: 'POST', headers: { 'Content-Type': 'text/plain;charset=utf-8' }, body: JSON.stringify({ k: L.k, ...extra, ...body }) });
   const j = await r.json();
   if (!j.ok) throw Object.assign(new Error(j.error), { fatal: true });
@@ -334,12 +375,13 @@ function setTab(t) {
   $('ht').textContent = TITULOS[t][0]; $('hs').textContent = TITULOS[t][1]; $('hd').classList.toggle('sm', t !== 'inicio');
   window.scrollTo(0, 0);
   if (t === 'mov') { pintaPersonas(); movCargar(); }
-  if (t === 'rep') pintaReportes(leeRes());
+  if (t === 'rep') { pintaReportes(leeRes()); cierreCargar(); }
   if (t === 'aju') { pintaAjustes(); fijosCargar(); }
+  if (t === 'inicio') pintaViaje();
 }
 
 // ---- Envío de gastos (con cola sin conexión) ----
-let busy = false;
+let busy = false, fotoActual = '', partesPend = null, tkData = null;
 async function flush() {
   if (busy) return; busy = true;
   let c = q(), enviados = 0;
@@ -368,8 +410,27 @@ async function save() {
     finally { $('go').disabled = false; }
     return;
   }
-  L.q = JSON.stringify([...q(), { fecha, concepto, cat: $('k').value, monto }]);
+  const item = { fecha, concepto, cat: $('k').value, monto };
+  if (viajeActivo()) item.usd = true;
+  if (fotoActual) { item.foto = { data: fotoActual }; fotoActual = ''; }
+  partesPend = null; $('pt').hidden = true;
+  L.q = JSON.stringify([...q(), item]);
   $('c').value = ''; $('m').value = ''; $('f').value = hoy();
+  say('Guardando…'); flush();
+}
+
+function pintaPartes(g) {
+  partesPend = null; $('pt').hidden = true;
+  if (!g || !Array.isArray(g.partes) || g.partes.length < 2) return;
+  partesPend = { fecha: esFecha(g.fecha) ? g.fecha : hoy(), concepto: g.concepto || 'Ticket', partes: g.partes };
+  $('ptt').textContent = 'Este ticket mezcla categorías: ' + g.partes.map(p => p.concepto + ' ' + money(p.monto) + ' (' + p.cat + ')').join(' · ') + '.';
+  $('pt').hidden = false;
+}
+function guardarDividido() {
+  if (!partesPend) return;
+  const p = partesPend, foto = fotoActual ? { data: fotoActual } : null;
+  L.q = JSON.stringify([...q(), ...p.partes.map(x => { const it = { fecha: p.fecha, concepto: p.concepto + ' - ' + x.concepto, cat: x.cat, monto: x.monto }; if (foto) it.foto = foto; return it; })]);
+  partesPend = null; fotoActual = ''; $('pt').hidden = true; $('c').value = ''; $('m').value = ''; $('f').value = hoy();
   say('Guardando…'); flush();
 }
 
@@ -383,6 +444,7 @@ async function ia(audio) {
     const g = j.gasto || {};
     $('ia').value = ''; syncEnviar();
     if (directo) { avisoGuardado(g.concepto, g.monto, j, g.cat); refrescar(); return; }
+    if (esFoto) { fotoActual = audio.data; pintaPartes(g); } else pintaPartes(null);
     if (esFecha(g.fecha)) $('f').value = g.fecha;
     if (g.concepto) $('c').value = g.concepto;
     if (g.monto > 0) $('m').value = g.monto;
@@ -410,6 +472,10 @@ function topes() {
   if (!CATS3.some(k => Number(t[k]) > 0) && Number(L.tope) > 0) t.Innecesario = Number(L.tope); // tope antiguo de este teléfono
   return t;
 }
+const viajeActivo = () => L.viaje === '1' && (!L.viajeHasta || hoy() <= L.viajeHasta);
+const ingresoDe = r => Number(r && r.config && r.config.ingreso) || 0;
+function diasInfo() { const h = hoy(), y = Number(h.slice(0, 4)), m = Number(h.slice(5, 7)); return { y, m, dia: Number(h.slice(8, 10)), dias: new Date(y, m, 0).getDate() }; }
+const proyeccion = tot => { const { dia, dias } = diasInfo(); return dia >= 3 && tot > 0 ? tot / dia * dias : 0; };
 function setConfig(cfg) { const r = leeRes() || {}; r.config = cfg; L.res = JSON.stringify(r); pintaResumen(r); pintaAjustes(); }
 let rbusy = false;
 async function resumen() {
@@ -438,9 +504,21 @@ function pintaResumen(r) {
     $('sma').textContent = al.map(x => x.p >= 100 ? 'Te pasaste del tope de ' + x.k + ' (' + money(x.t) + ').' : x.k + ' va en ' + Math.round(x.p) + '% de su tope.').join(' ');
     $('sma').style.color = al[0].p >= 100 ? '#FF9C92' : '#E9C98F';
   }
+  const ing = ingresoDe(r), tot = valido ? r.mes.total : 0, pr = proyeccion(tot);
+  $('sml').hidden = !(valido && ing > 0);
+  if (valido && ing > 0) $('sml').textContent = ing - tot >= 0 ? 'Te quedan ' + money(ing - tot) + ' de tu ingreso de ' + money(ing) + '.' : 'Ya pasaste tu ingreso de ' + money(ing) + ' por ' + money(tot - ing) + '.';
+  $('spr').hidden = !(valido && pr > 0);
+  if (valido && pr > 0) $('spr').textContent = 'A este ritmo cerrarás el mes en ' + money(pr) + '.';
+  const ah = Number(r && r.anioHoja), ay = Number(h.slice(0, 4));
+  $('saa').hidden = !(ah >= 2000 && ah !== ay);
+  if (ah >= 2000 && ah !== ay) $('saa').textContent = 'Tu hoja Resumen Mensual sigue en el año ' + ah + '. Cámbialo a ' + ay + ' en la celda B3 para que los totales del año sumen bien.';
+  const ant = r && r.meses && r.meses[4], diaMes = Number(h.slice(8, 10));
+  $('scb').hidden = !(valido && diaMes <= 7 && ant && ant.total > 0);
+  if (valido && diaMes <= 7 && ant && ant.total > 0) $('scbt').textContent = 'Ya puedes ver el cierre de ' + MESES[(Number(h.slice(5, 7)) + 10) % 12].toLowerCase() + '.';
+  pintaFrecuentes(r);
   const quedan = valido ? r.limite - r.ultimaFila : 999;
   $('smw').hidden = !(quedan <= 50);
-  if (quedan <= 50) $('smw').textContent = quedan > 0 ? 'Quedan ' + quedan + ' filas en el Registro. Pronto hay que extender las fórmulas del Sheet.' : 'El Registro está lleno. Hay que extender las fórmulas del Sheet.';
+  if (quedan <= 50) $('smwt').textContent = quedan > 0 ? 'Quedan ' + quedan + ' filas en el Registro. Pronto hay que extenderlo.' : 'El Registro está lleno. Hay que extenderlo.';
   if (tab === 'rep') pintaReportes(r);
 }
 
@@ -455,10 +533,12 @@ function pintaReportes(r) {
   $('rt').textContent = 'Resumen de ' + mes;
   const box = $('rb'); box.textContent = '';
   const valido = r && r.mes && r.mesDe === h.slice(0, 7);
-  pintaMetas(r); pintaComparativo(valido ? r : null); pintaPersonas(valido ? r : null);
+  pintaMetas(r); pintaComparativo(valido ? r : null); pintaPersonas(valido ? r : null); pintaProyeccion(valido ? r : null); pintaMapa(valido ? r : null); pintaHormiga(valido ? r : null);
   if (!valido || !(r.mes.total > 0)) { box.append(el('div', 'vacio', valido ? 'Aún no hay gastos este mes.' : 'Cargando…')); return; }
   const tot = r.mes.total, pc = r.mes.porCat || {}, C = COL();
   const t = el('div', 'bl'); t.append(el('div', '', 'Total del mes'), el('div', '', money(tot))); box.append(t);
+  const ingr = ingresoDe(r);
+  if (ingr > 0) { const w0 = barra('Gastado de tu ingreso', money(tot) + ' de ' + money(ingr), tot / ingr * 100, tot > ingr ? '#B3261E' : tot / ingr >= .8 ? '#C98A00' : '#1E6B4F'); w0.style.marginTop = '14px'; box.append(w0); }
   CATS3.forEach(c => { const v = pc[c] || 0, w = barra(c, money(v) + ' · ' + Math.round(v / tot * 100) + '%', v / tot * 100, C[c]); w.style.marginTop = '16px'; box.append(w); });
   const T = topes(), con = CATS3.filter(k => Number(T[k]) > 0), w = el('div'); w.style.marginTop = '22px';
   if (con.length) {
@@ -469,6 +549,68 @@ function pintaReportes(r) {
     });
   } else w.append(el('p', '', 'Define topes mensuales en Ajustes y aquí verás cómo vas.'));
   box.append(w);
+}
+
+function pintaProyeccion(r) {
+  const card = $('pyc'), box = $('pyb'); box.textContent = '';
+  card.hidden = !(r && r.mes && r.mes.total > 0);
+  if (card.hidden) return;
+  const { dia, dias } = diasInfo(), tot = r.mes.total, ing = ingresoDe(r), resta = dias - dia + 1, pr = proyeccion(tot), T = topes(), pc = r.mes.porCat || {};
+  const linea = (t, fuerte) => { const p = el('p', '', t); p.style.margin = '8px 0 0'; if (fuerte) { p.style.color = 'var(--ink)'; p.style.fontWeight = '700'; } box.append(p); };
+  if (pr > 0) linea('A este ritmo cerrarás el mes en ' + money(pr) + ' (llevas ' + money(tot) + ' en ' + dia + ' días).', true);
+  else linea('Llevas ' + money(tot) + '. La proyección aparece desde el día 3.');
+  if (ing > 0) {
+    const q = ing - tot;
+    linea(q >= 0 ? 'Te quedan ' + money(q) + ' de tu ingreso de ' + money(ing) + ', unos ' + money(q / resta) + ' por día.' : 'Ya gastaste ' + money(-q) + ' más que tu ingreso de ' + money(ing) + '.');
+    if (pr > 0) linea(pr <= ing ? 'Al ritmo actual te sobrarían ' + money(ing - pr) + '.' : 'Al ritmo actual te pasarías ' + money(pr - ing) + ' de tu ingreso.');
+  } else linea('Anota tu ingreso mensual en Ajustes para ver cuánto te queda.');
+  CATS3.filter(k => Number(T[k]) > 0).forEach(k => { const q = T[k] - (pc[k] || 0); linea(q >= 0 ? k + ': te quedan ' + money(q) + ' del tope, unos ' + money(q / resta) + ' por día.' : k + ': ya te pasaste del tope por ' + money(-q) + '.'); });
+}
+
+function pintaMapa(r) {
+  const card = $('mpc'), box = $('mpb'); box.textContent = '';
+  const pd = (r && r.porDia) || {}, max = Math.max(0, ...Object.values(pd));
+  card.hidden = !(r && max > 0);
+  if (card.hidden) return;
+  const { y, m, dias } = diasInfo(), lead = (new Date(y, m - 1, 1).getDay() + 6) % 7, g = el('div', 'heat');
+  ['L', 'M', 'M', 'J', 'V', 'S', 'D'].forEach(x => g.append(el('small', 'hh', x)));
+  for (let i = 0; i < lead; i++) g.append(el('span', 'hc e'));
+  for (let d = 1; d <= dias; d++) {
+    const f = y + '-' + String(m).padStart(2, '0') + '-' + String(d).padStart(2, '0'), v = pd[f] || 0, b = el('button', 'hc', String(d));
+    b.type = 'button';
+    if (v > 0) { const a = .18 + .77 * (v / max); b.style.background = 'rgba(214,180,130,' + a.toFixed(2) + ')'; if (a > .55) b.style.color = '#0F2441'; b.title = money(v); b.onclick = () => verDia(f); } else b.disabled = true;
+    if (f === hoy()) b.classList.add('hoy');
+    g.append(b);
+  }
+  const p = el('p', '', 'Más oscuro = más gasto. Toca un día para ver sus gastos.'); p.style.marginTop = '10px';
+  box.append(g, p);
+}
+
+function pintaHormiga(r) {
+  const card = $('hzc'), box = $('hzb'); box.textContent = '';
+  const h = r && r.hormiga;
+  card.hidden = !(h && h.items && h.items.length);
+  if (card.hidden) return;
+  const t = el('div', 'bl'); t.append(el('div', '', 'Suman este mes'), el('div', '', money(h.total))); box.append(t);
+  h.items.forEach(x => { const row = el('div', 'row'); row.append(el('div', 'rc1', x.c + ' · ' + x.n + ' veces'), el('div', 'rm', money(x.m))); box.append(row); });
+  const p = el('p', '', 'Gastos de ' + money(h.max) + ' o menos que se repiten tres veces o más. Son chicos, pero se acumulan.'); p.style.marginTop = '8px'; box.append(p);
+}
+
+async function cierreCargar() {
+  if (!L.u) return;
+  try { pintaCierre(await call({ accion: 'cierre', hoy: hoy(), mes: $('cmes').value || undefined })); } catch (e) {}
+}
+function pintaCierre(j) {
+  const box = $('clb'); box.textContent = '';
+  $('clt').textContent = 'Cierre de ' + (j.nombre || 'mes');
+  if (!$('cmes').value) $('cmes').value = j.mes;
+  if (j.vacio) { box.append(el('div', 'vacio', 'No hay gastos registrados en ese mes.')); return; }
+  const t = el('div', 'bl'); t.append(el('div', '', 'Total'), el('div', '', money(j.total))); box.append(t);
+  const d = el('p', '', j.n + ' gastos · ' + CATS3.filter(c => j.porCat[c]).map(c => c + ' ' + money(j.porCat[c])).join(' · ') + (j.anterior ? ' · mes anterior ' + money(j.anterior) : '')); d.style.marginTop = '6px'; box.append(d);
+  [['Lo mejor', j.mejor], ['Lo peor', j.peor]].forEach(([tt, l]) => {
+    if (!l || !l.length) return;
+    const h = el('div', 'bl', tt); h.style.marginTop = '14px'; const ul = el('ul', 'lst'); l.forEach(x => ul.append(el('li', '', x))); box.append(h, ul);
+  });
 }
 
 function pintaComparativo(r) {
@@ -577,17 +719,41 @@ async function movCargar() {
 }
 function verDia(f) { filtroDia = f; setTab('mov'); }
 
+// ---- Foto del ticket guardada en Drive ----
+async function ticketCheck(x) {
+  $('tkb').hidden = true; tkData = null;
+  try { const j = await call({ accion: 'ticket_ver', fecha: x.f, c: x.c, m: x.m }); if (editando && editando.row === x.row && j.data) { tkData = j; $('tkb').hidden = false; } } catch (e) {}
+}
+
+// ---- Modo viaje, frecuentes ----
+function pintaViaje() {
+  if (L.viaje === '1' && L.viajeHasta && hoy() > L.viajeHasta) { L.removeItem('viaje'); L.removeItem('viajeHasta'); } // terminó el viaje
+  const on = viajeActivo();
+  $('vj').hidden = !on || !!editando;
+  const lb = document.querySelector('label[for=m]'); if (lb) lb.textContent = on && !editando ? 'Monto (USD)' : 'Monto';
+}
+function pintaFrecuentes(r) {
+  const box = $('fq'); box.textContent = '';
+  const l = (r && r.frecuentes) || [];
+  $('fqw').hidden = !l.length || !!editando;
+  l.forEach(x => {
+    const b = el('button', 'chip', x.c); b.type = 'button';
+    b.onclick = () => { $('f').value = hoy(); $('c').value = x.c; $('m').value = x.m; $('k').value = x.k; $('m').focus(); $('m').select(); say('Listo: ajusta el monto si cambió y pulsa Guardar gasto.'); };
+    box.append(b);
+  });
+}
+
 // ---- Editar y borrar ----
 let editando = null;
 function editar(x) {
   editando = { row: x.row, c: x.c, m: x.m, q: quienDe(x.c) };
   setTab('inicio');
   $('f').value = esFecha(x.f) ? x.f : hoy(); $('c').value = sinQuien(x.c); $('m').value = x.m; $('k').value = x.k;
-  $('go').textContent = 'Guardar cambios'; $('cn').hidden = false;
+  $('go').textContent = 'Guardar cambios'; $('cn').hidden = false; pintaViaje(); pintaFrecuentes(leeRes()); ticketCheck(x);
   $('form').scrollIntoView({ behavior: 'smooth', block: 'start' }); say('Editando: cambia lo que necesites y pulsa Guardar cambios.');
 }
 function cancelaEdicion() {
-  editando = null; $('go').textContent = 'Guardar gasto'; $('cn').hidden = true;
+  editando = null; $('go').textContent = 'Guardar gasto'; $('cn').hidden = true; $('tkb').hidden = true; tkData = null; pintaViaje(); pintaFrecuentes(leeRes());
   $('c').value = ''; $('m').value = ''; $('f').value = hoy(); say('');
 }
 async function borrar(x) {
@@ -690,12 +856,36 @@ async function tcHoy() {
   } catch (e) { $('tcs').textContent = 'No pude consultarlo ahora. Si falla, se usa el último guardado aquí.'; }
 }
 
+// ---- Respaldos ----
+async function respaldosCargar() { try { pintaRespaldos((await call({ accion: 'respaldos' })).respaldos); } catch (e) { say(errMsg(e)); } }
+function pintaRespaldos(l) {
+  const box = $('rbl'); box.textContent = '';
+  if (!l.length) { box.append(el('div', 'vacio', 'Aún no hay respaldos.')); return; }
+  l.forEach(x => {
+    const row = el('div', 'row'), c = el('div', 'rl'), b = el('button', 'mini', 'Restaurar');
+    c.append(el('div', 'rc1', x.n), el('div', 'rc2', x.f)); b.onclick = () => respaldoRestaurar(x); row.append(c, b); box.append(row);
+  });
+}
+async function respaldoAhora() {
+  say('Creando respaldo…');
+  try { pintaRespaldos((await call({ accion: 'respaldo_ahora' })).respaldos); say('Guardado: respaldo creado en tu Drive.'); } catch (e) { say(errMsg(e)); }
+}
+async function respaldoRestaurar(x) {
+  const t = prompt('Vas a reemplazar los gastos actuales (columnas A a D de Registro) por los de este respaldo:\n' + x.n + '\nAntes se guarda una copia del estado de hoy.\n\nEscribe RESTAURAR para continuar.', '');
+  if (t === null) return;
+  if (t.trim() !== 'RESTAURAR') return say('Revisa: escribe RESTAURAR tal cual para confirmar.');
+  say('Restaurando…');
+  try { const j = await call({ accion: 'respaldo_restaurar', id: x.id, confirmar: 'RESTAURAR' }); say('Guardado: restaurado con ' + j.filas + ' gasto(s).'); refrescar(); respaldosCargar(); } catch (e) { say(errMsg(e)); }
+}
+
 // ---- Ajustes ----
 function pintaAjustes() {
   const T = topes();
   $('tpE').value = T.Esencial > 0 ? T.Esencial : ''; $('tpM').value = T.Mantener > 0 ? T.Mantener : ''; $('tpI').value = T.Innecesario > 0 ? T.Innecesario : '';
   $('yo').value = L.yo || ''; $('tc').value = L.tc || ''; $('tema').value = L.tema || '';
   $('tca').checked = L.tca !== '0';
+  { const r0 = leeRes(); $('ing').value = ingresoDe(r0) > 0 ? ingresoDe(r0) : ''; }
+  $('vjc').checked = L.viaje === '1'; $('vjh').value = L.viajeHasta || '';
   if ($('tca').checked) tcHoy(); else $('tcs').textContent = 'Se usará el tipo de cambio que escribas aquí.';
   if (!$('xmes').value) $('xmes').value = hoy().slice(0, 7);
   pintaSeg();
@@ -713,12 +903,22 @@ async function hashPin(p) {
 }
 let lkModo = '', lkBuf = '', lkTmp = '', lkFallos = 0, lkHasta = 0, ocultoDesde = 0, noBloquear = false;
 function lkPuntos() { const d = $('lkd'); d.textContent = ''; for (let i = 0; i < 6; i++) d.append(el('i', i < lkBuf.length ? 'f' : '')); }
-function lkMostrar(modo, msg) {
+// Primero se pide Face ID / huella; el teclado del PIN solo aparece al tocar "Usar PIN"
+function lkVista(pin, bio) {
+  $('lkd').hidden = $('lkp').hidden = !pin;
+  $('lkb').hidden = !bio; $('lkb').className = pin ? 'lnk' : 'pri';
+  $('lku').hidden = pin || lkModo !== 'abrir';
+  $('lko').hidden = !pin || lkModo !== 'abrir';
+}
+async function lkMostrar(modo, msg) {
   lkModo = modo; lkBuf = ''; lkPuntos();
   $('lock').hidden = false; document.body.style.overflow = 'hidden';
-  $('lkt').textContent = msg || (modo === 'abrir' ? 'Ingresa tu PIN' : modo === 'nuevo' ? 'Crea un PIN de 6 dígitos' : 'Repite tu PIN');
-  $('lkc').hidden = modo === 'abrir'; $('lko').hidden = modo !== 'abrir'; $('lkb').hidden = true;
-  if (modo === 'abrir' && L.cred) bioDisp().then(ok => { $('lkb').hidden = !(ok && lkModo === 'abrir'); });
+  $('lkc').hidden = modo === 'abrir';
+  const bio = modo === 'abrir' && !!L.cred && await bioDisp();
+  if (lkModo !== modo) return; // cambió de pantalla mientras esperaba
+  lkVista(modo !== 'abrir' || !bio, bio);
+  $('lkt').textContent = msg || (modo === 'abrir' ? (bio ? 'Desbloquea con Face ID / huella' : 'Ingresa tu PIN') : modo === 'nuevo' ? 'Crea un PIN de 6 dígitos' : 'Repite tu PIN');
+  if (bio) bioEntrar(); // lo pide enseguida; si el teléfono no lo deja, queda el botón
 }
 function lkCerrar() { $('lock').hidden = true; lkModo = ''; lkBuf = ''; document.body.style.overflow = ''; }
 async function lkTecla(t) {
@@ -752,13 +952,13 @@ async function bioEntrar() {
     await navigator.credentials.get({ publicKey: { challenge: crypto.getRandomValues(new Uint8Array(32)), userVerification: 'required', timeout: 60000,
       allowCredentials: [{ type: 'public-key', id: unb64(L.cred), transports: ['internal'] }] } });
     lkFallos = 0; lkCerrar();
-  } catch (e) { $('lkt').textContent = 'No se pudo verificar. Usa tu PIN.'; }
+  } catch (e) { if (lkModo === 'abrir') $('lkt').textContent = 'No se pudo verificar. Toca el botón o usa tu PIN.'; }
 }
 async function pintaSeg() {
   const on = lockActivo();
   $('sgp').textContent = on ? 'Cambiar PIN' : 'Activar bloqueo con PIN';
   $('sgo').hidden = !on;
-  $('sgi').textContent = on ? 'Bloqueo activo: se pide al abrir la app y al volver después de 1 minuto.' : 'Pide un PIN al abrir la app. Para usar Face ID o huella, primero activa el PIN y luego el botón de abajo.';
+  $('sgi').textContent = on ? (L.cred ? 'Bloqueo activo: al abrir la app se pide primero Face ID / huella, y el PIN queda de respaldo (botón "Usar PIN"). También al volver después de 1 minuto.' : 'Bloqueo activo: se pide el PIN al abrir la app y al volver después de 1 minuto. Activa Face ID / huella abajo para que sea lo primero.') : 'Pide un PIN al abrir la app. Para usar Face ID o huella, primero activa el PIN y luego el botón de abajo.';
   $('sgb').textContent = L.cred ? 'Quitar Face ID / huella' : 'Activar Face ID / huella';
   $('sgb').hidden = false;
   if (!(await bioDisp())) $('sgi').textContent += ' Aviso: este teléfono o navegador no ofrece Face ID / huella en esta app; se usa solo el PIN.';
@@ -877,6 +1077,28 @@ function init() {
   aplicarTema(); matchMedia('(prefers-color-scheme: dark)').addEventListener('change', () => { aplicarTema(); if (tab === 'rep') pintaReportes(leeRes()); });
   const deb = (f, ms) => { let t; return () => { clearTimeout(t); t = setTimeout(f, ms); }; };
   $('mq').addEventListener('input', deb(movCargar, 350)); $('mk').onchange = movCargar; $('mp').onchange = movCargar;
+  $('ptb').onclick = guardarDividido;
+  $('tkb').onclick = () => { if (!tkData) return; $('tki').src = 'data:' + tkData.mime + ';base64,' + tkData.data; $('tkv').hidden = false; };
+  $('tkx').onclick = () => { $('tkv').hidden = true; $('tki').removeAttribute('src'); };
+  $('smwb').onclick = () => { $('ay').hidden = false; }; $('ayx').onclick = () => { $('ay').hidden = true; };
+  $('scbb').onclick = () => setTab('rep'); $('cmes').onchange = cierreCargar;
+  $('vjb').onclick = () => { L.removeItem('viaje'); pintaViaje(); pintaAjustes(); say('Guardado: modo viaje desactivado.'); };
+  $('vjc').onchange = () => { if ($('vjc').checked) L.viaje = '1'; else L.removeItem('viaje'); pintaViaje(); say($('vjc').checked ? 'Guardado: modo viaje activado.' : 'Guardado: modo viaje desactivado.'); };
+  $('vjh').onchange = () => { if (esFecha($('vjh').value)) L.viajeHasta = $('vjh').value; else L.removeItem('viajeHasta'); pintaViaje(); };
+  $('rb1').onclick = respaldoAhora; $('rb2').onclick = respaldosCargar;
+  $('ingb').onclick = async () => {
+    const n = parseFloat($('ing').value.replace(/[$,\s]/g, ''));
+    if (!(n > 0)) return say('Falta un ingreso mensual válido.');
+    $('ingb').disabled = true;
+    try { setConfig((await call({ accion: 'config_ingreso', ingreso: n })).config); say('Guardado: ingreso de ' + money(n) + ' (también en tu hoja, Resumen Mensual E3).'); }
+    catch (e) { say(errMsg(e)); } finally { $('ingb').disabled = false; }
+  };
+  $('tps').onclick = () => {
+    const r = leeRes(), ms = r && r.meses ? r.meses.slice(2, 5).filter(x => x.total > 0) : [];
+    if (!ms.length) return say('Revisa: aún no hay meses completos con gastos para sugerir topes.');
+    ['E', 'M', 'I'].forEach((l, i) => { const v = Math.round(ms.reduce((a, x) => a + ((x.porCat || {})[CATS3[i]] || 0), 0) / ms.length / 100) * 100; $('tp' + l).value = v > 0 ? v : ''; });
+    say('Listo: sugerí topes con tu promedio de ' + ms.length + ' mes(es). Revisa y pulsa Guardar topes.');
+  };
   $('ga').onclick = metaAgregar; $('ab').onclick = ahorro; $('xcsv').onclick = exportarCSV; $('xpdf').onclick = exportarPDF;
   $('yo').onchange = () => { const v = $('yo').value.replace(/[^A-Za-zÁÉÍÓÚÑáéíóúñ]/g, '').slice(0, 2).toUpperCase(); $('yo').value = v; if (v) L.yo = v; else L.removeItem('yo'); say(v ? 'Guardado: tu inicial es ' + v + '.' : 'Guardado: sin inicial.'); pintaPersonas(); };
   $('tc').onchange = () => { const n = parseFloat($('tc').value.replace(/[$,\s]/g, '')); if (n > 0) { L.tc = String(n); say('Guardado: dólar a ' + money(n) + '.'); } else { L.removeItem('tc'); $('tc').value = ''; say('Guardado: sin tipo de cambio.'); } };
@@ -888,13 +1110,15 @@ function init() {
   $('sgb').onclick = () => { if (!lockActivo()) return say('Revisa: primero activa el bloqueo con PIN.'); if (L.cred) { L.removeItem('cred'); pintaSeg(); say('Guardado: Face ID / huella quitado.'); } else bioActivar(); };
   $('sgo').onclick = () => { if (confirm('¿Quitar el bloqueo de esta app?')) { ['pin', 'lock', 'cred'].forEach(x => L.removeItem(x)); pintaSeg(); say('Guardado: bloqueo quitado.'); } };
   $('lkc').onclick = lkCerrar; $('lkb').onclick = bioEntrar;
+  $('lku').onclick = () => { lkVista(true, !!L.cred); $('lkt').textContent = 'Ingresa tu PIN'; };
   $('lko').onclick = () => { if (confirm('Se borrará la configuración de este teléfono y tendrás que pegar otra vez la dirección y la clave. ¿Continuar?')) { ['pin', 'lock', 'cred', 'u', 'k', 'res'].forEach(x => L.removeItem(x)); location.reload(); } };
   document.addEventListener('visibilitychange', () => {
     if (document.hidden) { ocultoDesde = Date.now(); return; }
     if (noBloquear) { noBloquear = false; return; }
     if (lockActivo() && !lkModo && ocultoDesde && Date.now() - ocultoDesde > 60000) lkMostrar('abrir');
   });
-  if (lockActivo()) { lkMostrar('abrir'); if (!esIOS && L.cred) bioDisp().then(ok => { if (ok) bioEntrar(); }); }
+  if (lockActivo()) lkMostrar('abrir');
+  pintaViaje();
   $('au').checked = L.au !== '0'; $('au').onchange = () => { L.au = $('au').checked ? '1' : '0'; };
   mic($('mic'), $('ia'), ia, $('hint'));
   mic($('qmic'), $('qi'), preguntar);
