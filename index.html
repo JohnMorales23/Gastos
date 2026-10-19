@@ -9,7 +9,7 @@
 <meta name="apple-mobile-web-app-status-bar-style" content="default">
 <link rel="apple-touch-icon" href="icon.png?v=2">
 <link rel="icon" href="icon-192.png?v=2">
-<link rel="manifest" href="manifest.json?v=2">
+<link rel="manifest" href="manifest.json?v=3">
 <meta name="theme-color" content="#F7F3EC">
 <script>try{var t=localStorage.tema;if(t==="dark"||t==="light")document.documentElement.dataset.tema=t}catch(e){}</script>
 <title>JonKa · Control de gastos</title>
@@ -142,10 +142,26 @@ input[type=search]{-webkit-appearance:none;appearance:none}
 /* Impresión / PDF */
 #imp{display:none}
 @media print{body>*:not(#imp){display:none!important}#imp{display:block;padding:12px;color:#000;background:#fff;font-family:system-ui,sans-serif}#imp h1{font-size:22px;margin:0 0 4px}#imp p{margin:2px 0 10px;font-size:13px}#imp table{width:100%;border-collapse:collapse;font-size:12px}#imp th,#imp td{border-bottom:1px solid #ccc;padding:5px 4px;text-align:left}#imp td.n,#imp th.n{text-align:right}}
+/* Movimiento suave */
+@keyframes subir{from{opacity:0;transform:translateY(8px)}to{opacity:1;transform:none}}
+@keyframes brillo{to{background-position:-200% 0}}
+@keyframes splashOut{to{opacity:0;visibility:hidden}}
+.pg.in{animation:subir .28s ease both}
+.pg.in .row{animation:subir .25s ease both}
+button{transition:transform .12s ease,opacity .2s}
+.sk{height:44px;border-radius:12px;margin:8px 0;background:linear-gradient(90deg,var(--chip) 25%,var(--line) 50%,var(--chip) 75%);background-size:200% 100%;animation:brillo 1.2s linear infinite}
+header{position:relative}
+#pv{position:absolute;right:16px;top:calc(14px + env(safe-area-inset-top));width:40px;height:40px;border-radius:50%;background:var(--chip);display:flex;align-items:center;justify-content:center;padding:0}
+#pv svg{width:22px;height:22px;fill:none;stroke:var(--navy);stroke-width:1.8;stroke-linecap:round;stroke-linejoin:round}
+#splash{position:fixed;inset:0;z-index:200;background:var(--bg);display:flex;align-items:center;justify-content:center;transition:opacity .35s ease;animation:splashOut .4s ease 2s forwards}
+#splash img{height:170px;width:auto;filter:drop-shadow(0 1px 1.5px rgba(70,45,0,.35));animation:subir .5s ease both}
+#splash.fin{opacity:0;pointer-events:none}
+@media (prefers-reduced-motion:reduce){*{animation:none!important;transition:none!important}}
 </style>
 </head>
 <body>
-<header id="hd"><img src="logo.png?v=3" alt="JonKa"><h1 id="ht">Control de gastos</h1><p id="hs">Tus finanzas, en orden.</p></header>
+<div id="splash"><img src="logo.png?v=3" alt=""></div>
+<header id="hd"><button id="pv" type="button" aria-label="Ocultar o mostrar montos" hidden><svg viewBox="0 0 24 24"><path d="M2 12s3.5-7 10-7 10 7 10 7-3.5 7-10 7S2 12 2 12z"/><circle cx="12" cy="12" r="3"/><path id="pvx" d="M4 20L20 4"/></svg></button><img src="logo.png?v=3" alt="JonKa"><h1 id="ht">Control de gastos</h1><p id="hs">Tus finanzas, en orden.</p></header>
 <main>
 <!-- Primera vez -->
 <section id="cfg" class="card gold" hidden>
@@ -309,7 +325,45 @@ const ayer = () => { const d = new Date(); d.setDate(d.getDate() - 1); return is
 const esFecha = f => /^\d{4}-\d{2}-\d{2}$/.test(f);
 const ddmm = f => esFecha(f) ? f.slice(8, 10) + '/' + f.slice(5, 7) : f;
 const larga = f => esFecha(f) ? Number(f.slice(8, 10)) + ' ' + MES3[Number(f.slice(5, 7)) - 1] + ' ' + f.slice(0, 4) : f;
-const money = n => '$' + Number(n).toLocaleString('es-MX', { minimumFractionDigits: 2, maximumFractionDigits: 2 });
+const moneyReal = n => '$' + Number(n).toLocaleString('es-MX', { minimumFractionDigits: 2, maximumFractionDigits: 2 });
+const priv = () => L.priv === '1';
+const money = n => priv() ? '$•••••' : moneyReal(n);
+const nuevoId = () => Date.now().toString(36) + Math.random().toString(36).slice(2, 8);
+const leeMov = () => { try { return JSON.parse(L.mov || 'null'); } catch (e) { return null; } };
+const leeFij = () => { try { return JSON.parse(L.fij || 'null'); } catch (e) { return null; } };
+function skeleton(box, n) { box.textContent = ''; for (let i = 0; i < n; i++) box.append(el('div', 'sk')); }
+
+// Memoria local: concepto -> categoría, aprendida de lo que ya registraste (para guardar sin IA)
+const normC = s => sinQuien(String(s)).replace(/\s*\(usd [\d.,]+\)\s*$/i, '').toLowerCase().normalize('NFD').replace(/[\u0300-\u036f]/g, '').replace(/[^a-z0-9 ]/g, ' ').replace(/\s+/g, ' ').trim();
+const leeCM = () => { try { return JSON.parse(L.cm || '{}') || {}; } catch (e) { return {}; } };
+function aprende(lista) {
+  const m = leeCM(); let n = 0;
+  lista.forEach(([c, k]) => { const x = normC(c); if (x && CATS3.includes(k) && m[x] !== k) { m[x] = k; n++; } });
+  if (!n) return;
+  const ks = Object.keys(m); if (ks.length > 500) ks.slice(0, ks.length - 500).forEach(x => delete m[x]);
+  try { L.cm = JSON.stringify(m); } catch (e) {}
+}
+// "Tacos 150", "150 tacos", "tacos $150 ayer": solo si el concepto ya lo has registrado antes; si no, se usa la IA
+function parseLocal(t) {
+  t = String(t).trim().replace(/\s+/g, ' ');
+  let fecha = hoy();
+  const dm = /(?:^|\s)(hoy|ayer|antier|anteayer)(?=\s|$)/i.exec(t);
+  if (dm) {
+    const w = dm[1].toLowerCase();
+    if (w === 'ayer') fecha = ayer(); else if (w !== 'hoy') { const d = new Date(); d.setDate(d.getDate() - 2); fecha = iso(d); }
+    t = (t.slice(0, dm.index) + ' ' + t.slice(dm.index + dm[0].length)).trim().replace(/\s+/g, ' ');
+  }
+  const NUM = '\\$?\\s?(\\d{1,3}(?:,\\d{3})+|\\d+)(?:\\.(\\d{1,2}))?';
+  let m = new RegExp('^(.+?)\\s+(?:por\\s+)?' + NUM + '\\s*(?:pesos|mxn)?$', 'i').exec(t), c, ent, dec;
+  if (m) { c = m[1]; ent = m[2]; dec = m[3]; }
+  else { m = new RegExp('^' + NUM + '\\s*(?:pesos|mxn)?\\s+(?:de\\s+|en\\s+)?(.+)$', 'i').exec(t); if (!m) return null; ent = m[1]; dec = m[2]; c = m[3]; }
+  const monto = Number(ent.replace(/,/g, '') + (dec ? '.' + dec : ''));
+  c = c.replace(/\s+(por|de|en)$/i, '').trim();
+  if (!(monto > 0) || monto >= 1e6 || !c || /\d/.test(c) || c.split(' ').length > 4) return null;
+  const k = leeCM()[normC(c)];
+  if (!k) return null;
+  return { fecha, concepto: c.charAt(0).toUpperCase() + c.slice(1), cat: k, monto };
+}
 const errMsg = e => e.fatal ? 'Error: ' + e.message : 'Error: no hay conexión. Intenta de nuevo.';
 const RE_Q = /\s·\s?([A-Za-zÁÉÍÓÚÑáéíóúñ]{1,2})$/;
 const quienDe = c => { const m = RE_Q.exec(String(c)); return m ? m[1].toUpperCase() : ''; };
@@ -367,13 +421,14 @@ const TITULOS = {
   rep: ['Reportes', 'Cómo vas este mes'],
   aju: ['Ajustes', 'Gastos fijos y preferencias']
 };
-let tab = 'inicio';
+let tab = 'inicio', inT = null;
 function setTab(t) {
   tab = t;
   ['inicio', 'mov', 'rep', 'aju'].forEach(x => { $('p-' + x).hidden = x !== t; });
   document.querySelectorAll('#tabs button').forEach(b => b.classList.toggle('on', b.dataset.t === t));
   $('ht').textContent = TITULOS[t][0]; $('hs').textContent = TITULOS[t][1]; $('hd').classList.toggle('sm', t !== 'inicio');
   window.scrollTo(0, 0);
+  const pn = $('p-' + t); pn.classList.remove('in'); void pn.offsetWidth; pn.classList.add('in'); clearTimeout(inT); inT = setTimeout(() => pn.classList.remove('in'), 700);
   if (t === 'mov') { pintaPersonas(); movCargar(); }
   if (t === 'rep') { pintaReportes(leeRes()); cierreCargar(); }
   if (t === 'aju') { pintaAjustes(); fijosCargar(); }
@@ -384,18 +439,63 @@ function setTab(t) {
 let busy = false, fotoActual = '', partesPend = null, tkData = null;
 async function flush() {
   if (busy) return; busy = true;
-  let c = q(), enviados = 0;
+  let c = q(), enviados = 0, fallos = 0;
   while (c.length) {
     try { const j = await send(c[0]); enviados++; avisoGuardado(c[0].concepto, c[0].monto, j, c[0].cat); }
     catch (e) {
-      if (!e.fatal) break;
-      say('Error: ' + e.message + ' (' + c[0].concepto + ')');
+      if (!e.fatal) { if (!navigator.onLine) say('Sin conexión: el gasto se enviará solo cuando vuelva.'); break; }
+      fallos++; say('Error: ' + e.message + ' (' + c[0].concepto + ')');
     }
     c.shift(); L.q = JSON.stringify(c);
   }
   busy = false;
-  if (enviados) refrescar();
+  if (enviados || fallos) refrescar();
   $('pend').textContent = c.length ? c.length + ' gasto(s) pendiente(s) por enviar' : '';
+}
+
+// Guarda la cola en el teléfono; si no cabe (fotos grandes), quita fotos antes que perder el gasto
+function guardaQ(c) {
+  try { L.q = JSON.stringify(c); return true; } catch (e) {}
+  c.forEach((x, i) => { if (x.foto && i < c.length - 1) delete x.foto; });
+  try { L.q = JSON.stringify(c); return true; } catch (e) {}
+  c.forEach(x => { delete x.foto; });
+  try { L.q = JSON.stringify(c); say('Aviso: poco espacio; el gasto se guardó sin la foto.'); return true; } catch (e) { return false; }
+}
+function encola(items) {
+  if (guardaQ([...q(), ...items])) return true;
+  say('Error: no hay espacio en el teléfono para guardar el gasto. Conéctate e intenta de nuevo.'); return false;
+}
+// Suma un gasto a un resumen (para mostrarlo al instante, antes de que Google responda)
+function suma(r, it) {
+  if (!r || !r.mes || it.usd || !(it.monto > 0)) return;
+  const rd = n => Math.round(n * 100) / 100, ym = String(it.fecha).slice(0, 7);
+  if (ym === r.mesDe) {
+    r.mes.total = rd(r.mes.total + it.monto); r.mes.n = (r.mes.n || 0) + 1;
+    r.mes.porCat = r.mes.porCat || {}; r.mes.porCat[it.cat] = rd((r.mes.porCat[it.cat] || 0) + it.monto);
+    r.porDia = r.porDia || {}; r.porDia[it.fecha] = rd((r.porDia[it.fecha] || 0) + it.monto);
+  }
+  const u = r.meses && r.meses.find(x => x.m === ym);
+  if (u) { u.total = rd(u.total + it.monto); u.porCat = u.porCat || {}; u.porCat[it.cat] = rd((u.porCat[it.cat] || 0) + it.monto); }
+  if (r.ultimaFila != null) r.ultimaFila++;
+}
+function aplicaLocal(it) {
+  const r = leeRes();
+  if (r && r.mesDe === hoy().slice(0, 7) && !it.usd) { suma(r, it); try { L.res = JSON.stringify(r); } catch (e) {} pintaResumen(r); }
+  const m = leeMov();
+  if (m && Array.isArray(m.items)) {
+    m.items.unshift({ row: 0, f: it.fecha, c: L.yo ? it.concepto + ' · ' + L.yo : it.concepto, k: it.cat, m: it.monto, pend: 1 });
+    m.items = m.items.slice(0, 30); m.n = (m.n || 0) + 1;
+    try { L.mov = JSON.stringify(m); } catch (e) {}
+    if (tab === 'mov' && !hayFiltro()) pintaMov(m);
+  }
+}
+// Guardado instantáneo: se anota en el teléfono, se confirma al momento y se envía en segundo plano
+function agregaGasto(it) {
+  if (viajeActivo()) it.usd = true;
+  if (!encola([it])) return false;
+  aplicaLocal(it); aprende([[it.concepto, it.cat]]);
+  aviso('Guardado: ' + it.concepto + ' · ' + money(it.monto) + ' · ' + it.cat + '.');
+  flush(); return true;
 }
 
 async function save() {
@@ -405,18 +505,17 @@ async function save() {
     $('go').disabled = true; say('Guardando cambios…');
     try {
       await call({ accion: 'editar', quien: editando.q, row: editando.row, antes: { c: editando.c, m: editando.m }, fecha, concepto, cat: $('k').value, monto });
+      aprende([[concepto, $('k').value]]);
       cancelaEdicion(); say('Guardado: cambios aplicados.'); refrescar();
     } catch (e) { say(errMsg(e)); }
     finally { $('go').disabled = false; }
     return;
   }
-  const item = { fecha, concepto, cat: $('k').value, monto };
-  if (viajeActivo()) item.usd = true;
-  if (fotoActual) { item.foto = { data: fotoActual }; fotoActual = ''; }
-  partesPend = null; $('pt').hidden = true;
-  L.q = JSON.stringify([...q(), item]);
+  const item = { id: nuevoId(), fecha, concepto, cat: $('k').value, monto };
+  if (fotoActual) item.foto = { data: fotoActual };
+  if (!agregaGasto(item)) return;
+  fotoActual = ''; partesPend = null; $('pt').hidden = true;
   $('c').value = ''; $('m').value = ''; $('f').value = hoy();
-  say('Guardando…'); flush();
 }
 
 function pintaPartes(g) {
@@ -429,19 +528,29 @@ function pintaPartes(g) {
 function guardarDividido() {
   if (!partesPend) return;
   const p = partesPend, foto = fotoActual ? { data: fotoActual } : null;
-  L.q = JSON.stringify([...q(), ...p.partes.map(x => { const it = { fecha: p.fecha, concepto: p.concepto + ' - ' + x.concepto, cat: x.cat, monto: x.monto }; if (foto) it.foto = foto; return it; })]);
+  const items = p.partes.map(x => { const it = { id: nuevoId(), fecha: p.fecha, concepto: p.concepto + ' - ' + x.concepto, cat: x.cat, monto: x.monto }; if (foto) it.foto = foto; return it; });
+  if (!encola(items)) return;
+  items.forEach(it => { aplicaLocal(it); aprende([[it.concepto, it.cat]]); });
   partesPend = null; fotoActual = ''; $('pt').hidden = true; $('c').value = ''; $('m').value = ''; $('f').value = hoy();
-  say('Guardando…'); flush();
+  aviso('Guardado: ' + items.length + ' gastos del ticket.'); flush();
 }
 
 async function ia(audio) {
   const texto = audio ? '' : $('ia').value.trim();
   if (!audio && !texto) return say('Escribe o dicta el gasto primero.');
   const esFoto = !!audio && audio.mime.indexOf('image/') === 0, directo = $('au').checked && !esFoto;
+  const loc = audio ? null : parseLocal(texto); // gasto simple de algo que ya registraste: sin IA, al instante
+  if (loc) {
+    $('ia').value = ''; syncEnviar();
+    if (directo) { agregaGasto({ id: nuevoId(), ...loc }); return; }
+    pintaPartes(null); $('f').value = loc.fecha; $('c').value = loc.concepto; $('m').value = loc.monto; $('k').value = loc.cat;
+    return say('Listo: revisa los datos y pulsa Guardar gasto.');
+  }
   $('ib').disabled = true; say(esFoto ? 'Leyendo ticket…' : directo ? 'Guardando…' : 'Interpretando…');
   try {
     const j = await call({ accion: directo ? 'rapido' : 'interpretar', texto, audio, hoy: hoy() });
     const g = j.gasto || {};
+    if (!esFoto && g.concepto && g.cat) aprende([[g.concepto, g.cat]]);
     $('ia').value = ''; syncEnviar();
     if (directo) { avisoGuardado(g.concepto, g.monto, j, g.cat); refrescar(); return; }
     if (esFoto) { fotoActual = audio.data; pintaPartes(g); } else pintaPartes(null);
@@ -477,26 +586,48 @@ const ingresoDe = r => Number(r && r.config && r.config.ingreso) || 0;
 function diasInfo() { const h = hoy(), y = Number(h.slice(0, 4)), m = Number(h.slice(5, 7)); return { y, m, dia: Number(h.slice(8, 10)), dias: new Date(y, m, 0).getDate() }; }
 const proyeccion = tot => { const { dia, dias } = diasInfo(); return dia >= 3 && tot > 0 ? tot / dia * dias : 0; };
 function setConfig(cfg) { const r = leeRes() || {}; r.config = cfg; L.res = JSON.stringify(r); pintaResumen(r); pintaAjustes(); }
-let rbusy = false;
+let rbusy = false, sinInicio = false;
+const hayFiltro = () => !!(filtroDia || $('mq').value.trim() || $('mk').value || $('mp').value);
 async function resumen() {
-  if (rbusy || !L.u) return; rbusy = true;
+  if (rbusy || busy || !L.u) return; rbusy = true; // si se está enviando, al terminar se refresca solo
   try {
-    const j = await call({ accion: 'resumen', hoy: hoy() }); j.mesDe = hoy().slice(0, 7);
+    const hh = hoy();
+    let j;
+    try { j = await call({ accion: sinInicio ? 'resumen' : 'inicio', hoy: hh }); }
+    catch (e) { if (!sinInicio && e.fatal && /Datos inv/i.test(e.message)) { sinInicio = true; j = await call({ accion: 'resumen', hoy: hh }); } else throw e; } // Code.gs viejo
+    j.mesDe = hh.slice(0, 7);
+    const movs = j.movs, fij = j.fijos; delete j.movs; delete j.fijos;
     if (Number(L.tope) > 0 && j.config && !CATS3.some(k => j.config.topes[k] > 0)) { // pasa el tope antiguo de este teléfono al servidor
       try { j.config = (await call({ accion: 'config_topes', topes: { Innecesario: Number(L.tope) } })).config; L.removeItem('tope'); } catch (e) {}
     }
-    L.res = JSON.stringify(j); pintaResumen(j); pintaPersonas();
+    aprende((movs && movs.items ? movs.items.slice().reverse().map(x => [x.c, x.k]) : []).concat((j.frecuentes || []).map(x => [x.c, x.k])));
+    q().forEach(it => suma(j, it)); // lo que aún no se ha enviado se sigue viendo
+    L.res = JSON.stringify(j);
+    if (movs) { try { L.mov = JSON.stringify(movs); L.movT = String(Date.now()); } catch (e) {} }
+    if (fij) { try { L.fij = JSON.stringify(fij); } catch (e) {} }
+    pintaResumen(j); pintaPersonas();
+    if (movs && tab === 'mov' && !hayFiltro()) pintaMov(movs);
+    if (fij && tab === 'aju') pintaFijos(fij);
+    if (j.anioCambiado) aviso('Tu hoja pasó al año ' + j.anioCambiado.a + '. Antes guardé un respaldo.');
   }
   catch (e) {} finally { rbusy = false; }
 }
-function refrescar() { resumen(); if (tab === 'mov') movCargar(); }
+function refrescar() { resumen(); if (tab === 'mov' && hayFiltro()) movCargar(true); }
 
+let cuentaT = 0;
+function contar(n, v) { // el total del mes sube suavemente hasta su valor
+  const a = Number(n.dataset.v || 0); n.dataset.v = v;
+  if (priv() || a === v || document.hidden || matchMedia('(prefers-reduced-motion:reduce)').matches) { n.textContent = money(v); return; }
+  const t0 = performance.now(); cancelAnimationFrame(cuentaT);
+  const paso = t => { const k = Math.min(1, (t - t0) / 450), e = 1 - Math.pow(1 - k, 3); n.textContent = money(k < 1 ? a + (v - a) * e : v); if (k < 1) cuentaT = requestAnimationFrame(paso); };
+  cuentaT = requestAnimationFrame(paso);
+}
 function pintaResumen(r) {
   const h = hoy();
   $('smm1').textContent = MESES[Number(h.slice(5, 7)) - 1] + ' ' + h.slice(0, 4);
   const valido = r && r.mes && r.mesDe === h.slice(0, 7); // un resumen guardado de otro mes no se muestra
   const pc = valido ? (r.mes.porCat || {}) : {};
-  $('smt').textContent = money(valido ? r.mes.total : 0);
+  contar($('smt'), valido ? r.mes.total : 0);
   $('sme').textContent = money(pc.Esencial || 0); $('smm').textContent = money(pc.Mantener || 0); $('smi').textContent = money(pc.Innecesario || 0);
   const T = topes(), al = CATS3.filter(k => Number(T[k]) > 0).map(k => ({ k, t: T[k], p: (pc[k] || 0) / T[k] * 100 })).filter(x => x.p >= 80).sort((x, y) => y.p - x.p);
   $('sma').hidden = !al.length;
@@ -517,8 +648,11 @@ function pintaResumen(r) {
   if (valido && diaMes <= 7 && ant && ant.total > 0) $('scbt').textContent = 'Ya puedes ver el cierre de ' + MESES[(Number(h.slice(5, 7)) + 10) % 12].toLowerCase() + '.';
   pintaFrecuentes(r);
   const quedan = valido ? r.limite - r.ultimaFila : 999;
-  $('smw').hidden = !(quedan <= 50);
-  if (quedan <= 50) $('smwt').textContent = quedan > 0 ? 'Quedan ' + quedan + ' filas en el Registro. Pronto hay que extenderlo.' : 'El Registro está lleno. Hay que extenderlo.';
+  $('smw').hidden = !(quedan <= 120);
+  if (quedan <= 120) {
+    const rit = valido && diaMes >= 5 && r.mes.n > 0 ? r.mes.n / diaMes * 30 : 0;
+    $('smwt').textContent = quedan > 0 ? 'Quedan ' + quedan + ' filas en el Registro' + (rit > 0 ? ' (a tu ritmo alcanzan para unos ' + Math.max(1, Math.floor(quedan / rit)) + ' mes(es))' : '') + '. Pronto hay que extenderlo.' : 'El Registro está lleno. Hay que extenderlo.';
+  }
   if (tab === 'rep') pintaReportes(r);
 }
 
@@ -526,7 +660,7 @@ const COL = () => oscuro() ? { Esencial: '#7FA0DB', Mantener: '#D6B482', Inneces
 function barra(titulo, der, pct, color) {
   const w = el('div'), l = el('div', 'bl'), b = el('div', 'bar'), i = el('i');
   l.append(el('div', '', titulo), el('span', '', der));
-  i.style.width = Math.max(0, Math.min(100, pct)) + '%'; i.style.background = color; b.append(i); w.append(l, b); return w;
+  const w100 = Math.max(0, Math.min(100, pct)) + '%'; i.style.background = color; i.style.transition = 'width .65s cubic-bezier(.2,.7,.2,1)'; requestAnimationFrame(() => requestAnimationFrame(() => { i.style.width = w100; })); b.append(i); w.append(l, b); return w;
 }
 function pintaReportes(r) {
   const h = hoy(), mes = MESES[Number(h.slice(5, 7)) - 1];
@@ -694,27 +828,37 @@ function filaGasto(x) {
   const be = el('button', 'mini', 'Editar'), bf = el('button', 'mini', 'Fijo'), bd = el('button', 'mini del', 'Borrar');
   be.onclick = () => editar(x); bf.onclick = () => fijoDesde(x); bd.onclick = () => borrar(x);
   top.append(el('div', 'rc1', sinQuien(x.c)), el('div', 'rm', money(x.m)));
-  acts.append(be, bf, bd); bot.append(el('div', 'rc2', ddmm(x.f) + ' · ' + x.k + (quienDe(x.c) ? ' · ' + quienDe(x.c) : '')), acts); row.append(top, bot);
+  if (x.pend) acts.append(el('span', 'rc2', 'Enviando…')); else acts.append(be, bf, bd); bot.append(el('div', 'rc2', ddmm(x.f) + ' · ' + x.k + (quienDe(x.c) ? ' · ' + quienDe(x.c) : '')), acts); row.append(top, bot);
   return row;
 }
-async function movCargar() {
+function pintaMov(j) {
+  const f = { q: $('mq').value.trim(), cat: $('mk').value, de: $('mp').value }, buscando = !!(f.q || f.cat || f.de), activo = !!filtroDia || buscando;
+  $('mdia').value = filtroDia;
+  $('mt').textContent = filtroDia && !buscando ? 'Gastos del ' + larga(filtroDia) : activo ? 'Resultados' : 'Últimos gastos';
+  const rs = $('mres'); rs.textContent = '';
+  rs.hidden = !activo;
+  if (activo) {
+    const t = el('div', 'bl'); t.append(el('div', '', filtroDia && !buscando ? 'Total del día' : 'Total (' + j.n + ')'), el('div', '', money(j.total))); rs.append(t);
+    const d = el('p', '', CATS3.filter(c => j.porCat[c]).map(c => c + ' ' + money(j.porCat[c])).join(' · ') || 'Sin gastos con ese filtro.');
+    d.style.marginTop = '6px'; rs.append(d);
+  }
+  const ml = $('ml'); ml.textContent = '';
+  if (!j.items.length) ml.append(el('div', 'vacio', activo ? 'No hay gastos con ese filtro.' : 'Aún no hay gastos.'));
+  j.items.forEach(x => ml.append(filaGasto(x)));
+  if (j.n > j.items.length) ml.append(el('div', 'vacio', 'Mostrando ' + j.items.length + ' de ' + j.n + '. Afina la búsqueda para ver el resto.'));
+}
+async function movCargar(forzar) {
   if (!L.u) return;
   $('mdia').value = filtroDia;
-  const f = { q: $('mq').value.trim(), cat: $('mk').value, de: $('mp').value }, buscando = !!(f.q || f.cat || f.de), activo = !!filtroDia || buscando;
+  const sin = !hayFiltro(), c = leeMov();
+  if (sin && c && Array.isArray(c.items)) {
+    pintaMov(c); // se ve al instante lo último que se guardó
+    if (forzar !== true && !q().length && Date.now() - (Number(L.movT) || 0) < 15000) return; // acaba de actualizarse junto con el resumen
+  } else if (!$('ml').children.length || $('ml').querySelector('.sk') || !sin) { if (sin) skeleton($('ml'), 4); }
   try {
-    const j = await call({ accion: 'movimientos', desde: filtroDia, hasta: filtroDia, q: f.q, cat: f.cat, de: f.de, limite: activo ? 300 : 30 });
-    $('mt').textContent = filtroDia && !buscando ? 'Gastos del ' + larga(filtroDia) : activo ? 'Resultados' : 'Últimos gastos';
-    const rs = $('mres'); rs.textContent = '';
-    rs.hidden = !activo;
-    if (activo) {
-      const t = el('div', 'bl'); t.append(el('div', '', filtroDia && !buscando ? 'Total del día' : 'Total (' + j.n + ')'), el('div', '', money(j.total))); rs.append(t);
-      const d = el('p', '', CATS3.filter(c => j.porCat[c]).map(c => c + ' ' + money(j.porCat[c])).join(' · ') || 'Sin gastos con ese filtro.');
-      d.style.marginTop = '6px'; rs.append(d);
-    }
-    const ml = $('ml'); ml.textContent = '';
-    if (!j.items.length) ml.append(el('div', 'vacio', activo ? 'No hay gastos con ese filtro.' : 'Aún no hay gastos.'));
-    j.items.forEach(x => ml.append(filaGasto(x)));
-    if (j.n > j.items.length) ml.append(el('div', 'vacio', 'Mostrando ' + j.items.length + ' de ' + j.n + '. Afina la búsqueda para ver el resto.'));
+    const j = await call({ accion: 'movimientos', desde: filtroDia, hasta: filtroDia, q: $('mq').value.trim(), cat: $('mk').value, de: $('mp').value, limite: hayFiltro() ? 300 : 30 });
+    if (sin) { try { L.mov = JSON.stringify(j); L.movT = String(Date.now()); } catch (e) {} }
+    pintaMov(j);
   } catch (e) { say(errMsg(e)); }
 }
 function verDia(f) { filtroDia = f; setTab('mov'); }
@@ -757,7 +901,7 @@ function cancelaEdicion() {
   $('c').value = ''; $('m').value = ''; $('f').value = hoy(); say('');
 }
 async function borrar(x) {
-  if (!confirm('¿Borrar "' + sinQuien(x.c) + '" por ' + money(x.m) + '?')) return;
+  if (!confirm('¿Borrar "' + sinQuien(x.c) + '" por ' + moneyReal(x.m) + '?')) return;
   say('Borrando…');
   try { await call({ accion: 'borrar', row: x.row, antes: { c: x.c, m: x.m } }); say('Borrado: ' + x.c + '.'); refrescar(); }
   catch (e) { say(errMsg(e)); refrescar(); }
@@ -765,6 +909,7 @@ async function borrar(x) {
 
 // ---- Gastos fijos ----
 function pintaFijos(l) {
+  try { L.fij = JSON.stringify(l); } catch (e) {}
   const box = $('xl'); box.textContent = '';
   if (!l.length) { box.append(el('div', 'vacio', 'Aún no tienes gastos fijos.')); return; }
   l.forEach(x => {
@@ -774,6 +919,7 @@ function pintaFijos(l) {
   });
 }
 async function fijosCargar() {
+  const c = leeFij(); if (c) pintaFijos(c); else skeleton($('xl'), 2);
   try { pintaFijos((await call({ accion: 'fijos' })).fijos); } catch (e) { say(errMsg(e)); }
 }
 async function fijoAgregar() {
@@ -792,7 +938,7 @@ async function fijoBorrar(x) {
 // Convierte un gasto de la lista en gasto fijo mensual
 async function fijoDesde(x) {
   const d0 = esFecha(x.f) ? parseInt(x.f.slice(8, 10), 10) : '';
-  const v = prompt('"' + sinQuien(x.c) + '" por ' + money(x.m) + ' se registrará solo cada mes. ¿Qué día del mes?', d0);
+  const v = prompt('"' + sinQuien(x.c) + '" por ' + moneyReal(x.m) + ' se registrará solo cada mes. ¿Qué día del mes?', d0);
   if (v === null) return;
   const dia = parseInt(v, 10);
   if (!(dia >= 1 && dia <= 31)) return say('Falta un día válido del 1 al 31.');
@@ -834,10 +980,10 @@ async function exportarPDF() {
     if (!j.items.length) return say('No hay gastos en ese mes.');
     const box = $('imp'); box.textContent = '';
     box.append(el('h1', '', 'Gastos de ' + MESES[Number(ym.slice(5, 7)) - 1] + ' ' + ym.slice(0, 4)));
-    box.append(el('p', '', 'Total: ' + money(j.total) + ' · ' + CATS3.filter(c => j.porCat[c]).map(c => c + ' ' + money(j.porCat[c])).join(' · ')));
+    box.append(el('p', '', 'Total: ' + moneyReal(j.total) + ' · ' + CATS3.filter(c => j.porCat[c]).map(c => c + ' ' + moneyReal(j.porCat[c])).join(' · ')));
     const t = el('table'), hd = el('tr');
     ['Fecha', 'Concepto', 'Categoría', 'Monto'].forEach((x, i) => hd.append(el('th', i === 3 ? 'n' : '', x))); t.append(hd);
-    j.items.slice().reverse().forEach(x => { const r = el('tr'); r.append(el('td', '', ddmm(x.f)), el('td', '', x.c), el('td', '', x.k), el('td', 'n', money(x.m))); t.append(r); });
+    j.items.slice().reverse().forEach(x => { const r = el('tr'); r.append(el('td', '', ddmm(x.f)), el('td', '', x.c), el('td', '', x.k), el('td', 'n', moneyReal(x.m))); t.append(r); });
     box.append(t); say('');
     setTimeout(() => window.print(), 250);
   } catch (e) { say(errMsg(e)); }
@@ -969,10 +1115,16 @@ function comprime(file) {
   return new Promise((ok, no) => {
     const img = new Image(), url = URL.createObjectURL(file);
     img.onload = () => {
-      const k = Math.min(1, 1280 / Math.max(img.width, img.height)), cv = document.createElement('canvas');
-      cv.width = Math.round(img.width * k); cv.height = Math.round(img.height * k);
-      cv.getContext('2d').drawImage(img, 0, 0, cv.width, cv.height); URL.revokeObjectURL(url);
-      ok(cv.toDataURL('image/jpeg', 0.72).split(',')[1]);
+      const mx = Math.max(img.width, img.height), cv = document.createElement('canvas'), ctx = cv.getContext('2d');
+      let lado = Math.min(1280, mx), cal = .72, out = '';
+      for (let i = 0; i < 6; i++) { // se baja calidad y tamaño hasta que pese ~200 KB (sigue legible para la IA)
+        const k = Math.min(1, lado / mx); cv.width = Math.round(img.width * k); cv.height = Math.round(img.height * k);
+        ctx.drawImage(img, 0, 0, cv.width, cv.height);
+        out = cv.toDataURL('image/jpeg', cal).split(',')[1];
+        if (out.length <= 280000) break;
+        if (cal > .56) cal -= .08; else if (lado > 900) lado = Math.round(lado * .85); else break;
+      }
+      URL.revokeObjectURL(url); ok(out);
     };
     img.onerror = () => no(new Error('img')); img.src = url;
   });
@@ -1062,12 +1214,22 @@ function syncEnviar() {
 // ---- Arranque ----
 function init() {
   const ok = !!(L.u && L.k);
-  $('cfg').hidden = ok; $('tabs').hidden = !ok;
+  $('cfg').hidden = ok; $('tabs').hidden = !ok; $('pv').hidden = !ok;
   if (!ok) { ['inicio', 'mov', 'rep', 'aju'].forEach(x => { $('p-' + x).hidden = true; }); $('hd').classList.remove('sm'); $('ht').textContent = TITULOS.inicio[0]; $('hs').textContent = TITULOS.inicio[1]; return; }
   setTab(tab);
   pintaResumen(leeRes()); flush(); resumen();
 }
+function pintaPriv() { $('pvx').toggleAttribute('hidden', !priv()); $('pv').setAttribute('aria-pressed', priv() ? 'true' : 'false'); }
+function togglePriv() {
+  if (priv()) L.removeItem('priv'); else L.priv = '1';
+  pintaPriv(); const r = leeRes(); pintaResumen(r); pintaPersonas();
+  if (tab === 'mov') { const m = leeMov(); if (m && Array.isArray(m.items) && !hayFiltro()) pintaMov(m); }
+  if (tab === 'aju') { pintaAjustes(); const f = leeFij(); if (f) pintaFijos(f); }
+  say(priv() ? 'Listo: montos ocultos.' : 'Listo: montos visibles.');
+}
 (() => {
+  setTimeout(() => { const sp = $('splash'); if (sp) { sp.classList.add('fin'); setTimeout(() => sp.remove(), 450); } }, 600);
+  $('pv').onclick = togglePriv; pintaPriv();
   $('f').value = hoy();
   $('go').onclick = save;
   $('cn').onclick = cancelaEdicion;
@@ -1111,7 +1273,7 @@ function init() {
   $('sgo').onclick = () => { if (confirm('¿Quitar el bloqueo de esta app?')) { ['pin', 'lock', 'cred'].forEach(x => L.removeItem(x)); pintaSeg(); say('Guardado: bloqueo quitado.'); } };
   $('lkc').onclick = lkCerrar; $('lkb').onclick = bioEntrar;
   $('lku').onclick = () => { lkVista(true, !!L.cred); $('lkt').textContent = 'Ingresa tu PIN'; };
-  $('lko').onclick = () => { if (confirm('Se borrará la configuración de este teléfono y tendrás que pegar otra vez la dirección y la clave. ¿Continuar?')) { ['pin', 'lock', 'cred', 'u', 'k', 'res'].forEach(x => L.removeItem(x)); location.reload(); } };
+  $('lko').onclick = () => { if (confirm('Se borrará la configuración de este teléfono y tendrás que pegar otra vez la dirección y la clave. ¿Continuar?')) { ['pin', 'lock', 'cred', 'u', 'k', 'res', 'mov', 'fij', 'cm'].forEach(x => L.removeItem(x)); location.reload(); } };
   document.addEventListener('visibilitychange', () => {
     if (document.hidden) { ocultoDesde = Date.now(); return; }
     if (noBloquear) { noBloquear = false; return; }
@@ -1152,6 +1314,7 @@ function init() {
   };
   window.addEventListener('online', flush);
   init();
+  if ('serviceWorker' in navigator) addEventListener('load', () => { navigator.serviceWorker.register('sw.js').catch(() => {}); });
   // Accesos rápidos del icono (Android): ?a=voz | ticket | hoy
   try {
     const a = new URLSearchParams(location.search).get('a');
