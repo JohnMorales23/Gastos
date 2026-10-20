@@ -11,6 +11,7 @@
 <link rel="icon" href="icon-192.png?v=2">
 <link rel="manifest" href="manifest.json?v=3">
 <meta name="theme-color" content="#F7F3EC">
+<script>(function(){function m(){if(window.__arr||document.getElementById("fallo"))return;var d=document.createElement("div");d.id="fallo";d.setAttribute("style","position:fixed;inset:0;z-index:99999;background:#0B2146;color:#F6F1E7;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:14px;padding:28px;text-align:center;font-family:system-ui,sans-serif");d.innerHTML='<div style="font-size:22px;font-weight:800">No se pudo cargar</div><div style="font-size:15px;line-height:1.45;max-width:320px;opacity:.9">Revisa tu internet (datos o WiFi) y vuelve a intentar. Tus gastos pendientes siguen guardados en este teléfono.</div><button id="fr1" style="height:50px;padding:0 28px;border-radius:14px;background:#D6B482;color:#0B2146;font-size:16px;font-weight:800;border:0">Reintentar</button><button id="fr2" style="background:none;border:0;color:#D6B482;font-size:14px;text-decoration:underline">Borrar copia guardada y reintentar</button>';document.body.appendChild(d);document.getElementById("fr1").onclick=function(){location.reload()};document.getElementById("fr2").onclick=function(){try{(navigator.serviceWorker.getRegistrations()||Promise.resolve([])).then(function(r){return Promise.all(r.map(function(x){return x.unregister()}))}).then(function(){return window.caches?caches.keys():[]}).then(function(k){return Promise.all(k.map(function(x){return caches.delete(x)}))}).then(function(){location.reload()},function(){location.reload()})}catch(e){location.reload()}}}window.__fallo=m;setTimeout(m,6000);window.addEventListener("error",function(){setTimeout(m,1500)})})();</script>
 <script>try{var t=localStorage.tema;if(t==="dark"||t==="light")document.documentElement.dataset.tema=t}catch(e){}</script>
 <title>JonKa · Control de gastos</title>
 <style>
@@ -142,7 +143,7 @@ input[type=search]{-webkit-appearance:none;appearance:none}
 #lkp span{display:block}
 /* Impresión / PDF */
 #imp{display:none}
-@media print{body>*:not(#imp){display:none!important}#imp{display:block;padding:12px;color:#000;background:#fff;font-family:system-ui,sans-serif}#imp h1{font-size:22px;margin:0 0 4px}#imp p{margin:2px 0 10px;font-size:13px}#imp table{width:100%;border-collapse:collapse;font-size:12px}#imp th,#imp td{border-bottom:1px solid #ccc;padding:5px 4px;text-align:left}#imp td.n,#imp th.n{text-align:right}}
+@media print{body>*:not(#imp){display:none!important}#imp{display:block;padding:12px;color:#000;background:#fff;font-family:system-ui,sans-serif}#imp h1{font-size:22px;margin:0 0 4px}#imp p{margin:2px 0 10px;font-size:13px}#imp table{width:100%;border-collapse:collapse;font-size:12px}#imp th,#imp td{border-bottom:1px solid #ccc;padding:5px 4px;text-align:left}#imp td.n,#imp th.n{text-align:right}#imp.inf{padding:0}#imp .ih{background:#0B2146!important;color:#F6F1E7!important;padding:18px 20px;display:flex;align-items:center;gap:14px;-webkit-print-color-adjust:exact;print-color-adjust:exact}#imp .ih img{width:44px;height:44px;border-radius:10px}#imp .ih h1{color:#F6F1E7;margin:0;font-size:22px}#imp .ih small{color:#D6B482;font-size:12px}#imp .ib{padding:16px 20px}#imp .it{font-size:30px;font-weight:800;color:#0B2146;margin:0}#imp .ibar{height:10px;border-radius:5px;background:#EEE6D6!important;margin:3px 0 10px;-webkit-print-color-adjust:exact;print-color-adjust:exact}#imp .ibar i{display:block;height:100%;border-radius:5px;-webkit-print-color-adjust:exact;print-color-adjust:exact}#imp .ir{display:flex;justify-content:space-between;font-size:13px}#imp h2{font-size:15px;color:#0B2146;border-bottom:2px solid #D6B482;padding-bottom:3px;margin:18px 0 8px}#imp li{font-size:13px;margin:3px 0}#imp .pie{margin-top:22px;font-size:11px;color:#777}}
 /* Movimiento suave */
 @keyframes subir{from{opacity:0;transform:translateY(8px)}to{opacity:1;transform:none}}
 @keyframes brillo{to{background-position:-200% 0}}
@@ -207,12 +208,14 @@ header{position:relative}
 <div class="trow"><div id="smt">$0.00</div><span data-eye></span></div>
 <div class="cs"><div>Esencial<b id="sme">$0.00</b></div><div>Mantener<b id="smm">$0.00</b></div><div>Innecesario<b id="smi">$0.00</b></div></div>
 <div id="sma" hidden></div>
-<div id="sml" class="sub" hidden></div><div id="spr" class="sub" hidden></div>
+<div id="sml" class="sub" hidden></div><div id="shy" class="sub" hidden></div><div id="spr" class="sub" hidden></div>
 </div>
+<div id="sof" class="warn" hidden></div>
 <div id="saa" class="warn" hidden></div>
 <div id="scb" class="warn" hidden><span id="scbt"></span> <button id="scbb" class="mini" type="button">Ver cierre</button></div>
 <div id="smw" class="warn" hidden><span id="smwt"></span> <button id="smwb" class="mini" type="button">Cómo extenderlas</button></div>
 <div class="card gold" id="bc" hidden><div class="trow"><h2>Por aprobar</h2><span id="bn" class="badge"></span></div><p>Gastos que avisó tu banco, Wallet o Apple Pay. Revisa y aprueba.</p><div id="bl"></div></div>
+<div class="card" id="sbc" hidden><h2>Cobros que se repiten</h2><p>Se cobran cada mes. Conviértelos en gasto fijo para que se registren solos.</p><div id="sbl"></div></div>
 <div class="card gold" id="form">
 <h2>Registrar gasto</h2>
 <div id="vj" class="warn" hidden><span>Modo viaje: los montos se toman en dólares y se guardan en pesos.</span> <button id="vjb" class="mini" type="button">Desactivar</button></div>
@@ -279,7 +282,8 @@ header{position:relative}
 <div class="card gold"><div class="trow"><h2 id="rt">Resumen del mes</h2><span data-eye></span></div><div id="rb"></div></div>
 <div class="card" id="pyc" hidden><h2>Proyección del mes</h2><div id="pyb"></div></div>
 <div class="card" id="mpc" hidden><h2>Mapa del mes</h2><div id="mpb"></div></div>
-<div class="card" id="clc"><h2 id="clt">Cierre de mes</h2><div><label for="cmes">Mes</label><input id="cmes" type="month"></div><div id="clb"><div class="vacio">Cargando…</div></div></div>
+<div class="card" id="clc"><h2 id="clt">Cierre de mes</h2><div><label for="cmes">Mes</label><input id="cmes" type="month"></div><div id="clb"><div class="vacio">Cargando…</div></div><button id="clp" type="button" class="out" style="margin-top:14px" hidden>Informe del mes en PDF</button></div>
+<div class="card" id="etc"><h2>¿En qué se va?</h2><div class="two"><select id="etm" aria-label="Mes"><option value="0">Este mes</option><option value="1">Mes pasado</option></select><select id="etk" aria-label="Categoría"><option value="">Todas</option><option>Esencial</option><option>Mantener</option><option>Innecesario</option></select></div><div id="etb"><div class="vacio">Cargando…</div></div></div>
 <div class="card" id="hzc" hidden><h2>Gastos hormiga</h2><div id="hzb"></div></div>
 <div class="card" id="rcard" hidden><h2>Últimos 6 meses</h2><div id="rcmp"></div></div>
 <div class="card" id="pcard" hidden><h2>Quién registró (este mes)</h2><div id="rper"></div></div>
@@ -310,6 +314,11 @@ header{position:relative}
 <button id="cgb" type="button" class="out">Cómo conectar el teléfono</button>
 <div class="two"><button id="cpu" type="button" class="mini" style="height:40px">Copiar dirección</button><button id="cpk" type="button" class="mini" style="height:40px">Copiar clave</button></div>
 </div>
+<div class="card" id="cnc"><h2>Conciliar con el estado de cuenta</h2>
+<p>Sube el PDF o CSV de Santander. Reviso qué cargos no tienes registrados y los mando a "Por aprobar". No se guarda nada sin tu aprobación.</p>
+<input id="cnf" type="file" accept=".pdf,.csv,.txt,application/pdf,text/csv,text/plain,image/*" style="display:none">
+<button id="cnb" type="button" class="out">Elegir estado de cuenta</button>
+<div id="cnr" class="vacio" style="margin-top:8px"></div></div>
 <div class="card gold">
 <h2>Gastos fijos</h2>
 <p>Se registran solos cada mes, en el día que elijas.</p>
@@ -515,28 +524,29 @@ function setTab(t) {
   window.scrollTo(0, 0);
   const pn = $('p-' + t); pn.classList.remove('in'); void pn.offsetWidth; pn.classList.add('in'); clearTimeout(inT); inT = setTimeout(() => pn.classList.remove('in'), 700);
   if (t === 'mov') { pintaPersonas(); movCargar(); }
-  if (t === 'rep') { pintaReportes(leeRes()); cierreCargar(); }
+  if (t === 'rep') { pintaReportes(leeRes()); cierreCargar(); etiquetasCargar(); }
   if (t === 'lis') listasCargar();
   if (t === 'aju') { pintaAjustes(); fijosCargar(); pintaAvisos(); }
-  if (t === 'inicio') { pintaViaje(); pintaBorradores(); }
+  if (t === 'inicio') { pintaViaje(); pintaBorradores(); pintaSus(); }
 }
 
 // ---- Envío de gastos (con cola sin conexión) ----
 let busy = false, fotoActual = '', partesPend = null, tkData = null;
 async function flush() {
   if (busy) return; busy = true;
-  let c = q(), enviados = 0, fallos = 0;
-  while (c.length) {
-    try { const j = await send(c[0]); enviados++; avisoGuardado(c[0].concepto, c[0].monto, j, c[0].cat); }
+  let c, enviados = 0, fallos = 0;
+  while ((c = q()).length) { // se relee la cola en cada vuelta: lo que se agregue mientras se envía no se pierde
+    const it = c[0];
+    try { const j = await send(it); enviados++; avisoGuardado(it.concepto, it.monto, j, it.cat); }
     catch (e) {
       if (!e.fatal) { if (!navigator.onLine) say('Sin conexión: el gasto se enviará solo cuando vuelva.'); break; }
-      fallos++; say('Error: ' + e.message + ' (' + c[0].concepto + ')');
+      fallos++; say('Error: ' + e.message + ' (' + it.concepto + ')');
     }
-    c.shift(); L.q = JSON.stringify(c);
+    const n = q(), i = n.findIndex(x => x.id === it.id); n.splice(i >= 0 ? i : 0, 1); L.q = JSON.stringify(n);
   }
   busy = false;
   if (enviados || fallos) refrescar();
-  $('pend').textContent = c.length ? c.length + ' gasto(s) pendiente(s) por enviar' : '';
+  $('pend').textContent = q().length ? q().length + ' gasto(s) pendiente(s) por enviar' : '';
 }
 
 // Guarda la cola en el teléfono; si no cabe (fotos grandes), quita fotos antes que perder el gasto
@@ -684,7 +694,7 @@ async function resumen() {
     try { j = await call({ accion: sinInicio ? 'resumen' : 'inicio', hoy: hh }); }
     catch (e) { if (!sinInicio && e.fatal && /Datos inv/i.test(e.message)) { sinInicio = true; j = await call({ accion: 'resumen', hoy: hh }); } else throw e; } // Code.gs viejo
     j.mesDe = hh.slice(0, 7);
-    const movs = j.movs, fij = j.fijos, bor = j.borradores, cst = j.correosEstado; delete j.movs; delete j.fijos; delete j.borradores; delete j.correosEstado;
+    const movs = j.movs, fij = j.fijos, bor = j.borradores, cst = j.correosEstado, sus = j.suscripciones; delete j.movs; delete j.fijos; delete j.borradores; delete j.correosEstado; delete j.suscripciones;
     if (Number(L.tope) > 0 && j.config && !CATS3.some(k => j.config.topes[k] > 0)) { // pasa el tope antiguo de este teléfono al servidor
       try { j.config = (await call({ accion: 'config_topes', topes: { Innecesario: Number(L.tope) } })).config; L.removeItem('tope'); } catch (e) {}
     }
@@ -695,12 +705,14 @@ async function resumen() {
     if (fij) { try { L.fij = JSON.stringify(fij); } catch (e) {} }
     if (bor) guardaBor(bor.filter(b => !q().some(x => x.borr === b.id)));
     if (cst) { try { L.cst = JSON.stringify(cst); } catch (e) {} }
+    if (sus) { try { L.sus = JSON.stringify(sus); } catch (e) {} pintaSus(); }
     pintaResumen(j); pintaPersonas(); if (tab === 'aju') pintaAvisos();
     if (movs && tab === 'mov' && !hayFiltro()) pintaMov(movs);
     if (fij && tab === 'aju') pintaFijos(fij);
+    $('sof').hidden = true;
     if (j.anioCambiado) aviso('Tu hoja pasó al año ' + j.anioCambiado.a + '. Antes guardé un respaldo.');
   }
-  catch (e) {} finally { rbusy = false; }
+  catch (e) { if (navigator.onLine !== false) { $('sof').hidden = false; $('sof').textContent = /Clave/i.test(e.message || '') ? 'La clave de este teléfono ya no coincide con la de tu hoja. Revísala en Ajustes.' : 'No hay conexión con tu hoja. Se muestran los últimos datos guardados y tus gastos se enviarán cuando regrese.'; } } finally { rbusy = false; }
 }
 function refrescar() { resumen(); if (tab === 'mov' && hayFiltro()) movCargar(true); }
 
@@ -728,6 +740,10 @@ function pintaResumen(r) {
   const ing = ingresoDe(r), tot = valido ? r.mes.total : 0, pr = proyeccion(tot);
   $('sml').hidden = !(valido && ing > 0);
   if (valido && ing > 0) $('sml').textContent = ing - tot >= 0 ? 'Te quedan ' + money(ing - tot) + ' de tu ingreso de ' + money(ing) + '.' : 'Ya pasaste tu ingreso de ' + money(ing) + ' por ' + money(tot - ing) + '.';
+  const dd = Number(h.slice(8, 10)), nd = new Date(Number(h.slice(0, 4)), Number(h.slice(5, 7)), 0).getDate(), rest = nd - dd + 1;
+  const gHoy = Number(valido && r.porDia && r.porDia[h]) || 0, perm = (ing - (tot - gHoy)) / rest;
+  $('shy').hidden = !(valido && ing > 0);
+  if (valido && ing > 0) $('shy').textContent = perm - gHoy >= 0 ? 'Hoy te quedan ' + money(perm - gHoy) + ' (hasta ' + money(Math.max(0, perm)) + ' al día).' : 'Hoy te pasaste por ' + money(gHoy - Math.max(0, perm)) + ' (tu límite es ' + money(Math.max(0, perm)) + ' al día).';
   $('spr').hidden = !(valido && pr > 0);
   if (valido && pr > 0) $('spr').textContent = 'A este ritmo cerrarás el mes en ' + money(pr) + '.';
   const ah = Number(r && r.anioHoja), ay = Number(h.slice(0, 4));
@@ -828,6 +844,7 @@ function pintaCierre(j) {
   const box = $('clb'); box.textContent = '';
   $('clt').textContent = 'Cierre de ' + (j.nombre || 'mes');
   if (!$('cmes').value) $('cmes').value = j.mes;
+  $('clp').hidden = !!j.vacio;
   if (j.vacio) { box.append(el('div', 'vacio', 'No hay gastos registrados en ese mes.')); return; }
   const t = el('div', 'bl'); t.append(el('div', '', 'Total'), el('div', '', money(j.total))); box.append(t);
   const d = el('p', '', j.n + ' gastos · ' + CATS3.filter(c => j.porCat[c]).map(c => c + ' ' + money(j.porCat[c])).join(' · ') + (j.anterior ? ' · mes anterior ' + money(j.anterior) : '')); d.style.marginTop = '6px'; box.append(d);
@@ -1068,7 +1085,7 @@ async function exportarPDF() {
   try {
     const j = await datosMes(ym);
     if (!j.items.length) return say('No hay gastos en ese mes.');
-    const box = $('imp'); box.textContent = '';
+    const box = $('imp'); box.textContent = ''; box.className = '';
     box.append(el('h1', '', 'Gastos de ' + MESES[Number(ym.slice(5, 7)) - 1] + ' ' + ym.slice(0, 4)));
     box.append(el('p', '', 'Total: ' + moneyReal(j.total) + ' · ' + CATS3.filter(c => j.porCat[c]).map(c => c + ' ' + moneyReal(j.porCat[c])).join(' · ')));
     const t = el('table'), hd = el('tr');
@@ -1311,6 +1328,8 @@ function pintaBorradores() {
   const l = leeBor(), box = $('bl'); box.textContent = '';
   $('bc').hidden = !l.length; $('bn').textContent = l.length;
   const bd = document.querySelector('#tabs [data-t=inicio] .bdg'); if (bd) { bd.hidden = !l.length; bd.textContent = l.length; }
+  const nd = l.filter(b => !b.dup).length;
+  if (nd >= 3) { const bt = el('button', 'out', 'Aprobar todos (' + nd + ')'); bt.style.marginBottom = '6px'; bt.onclick = apruebaTodos; box.append(bt); }
   l.forEach(b => {
     const w = el('div', 'bd'), top = el('div', 'top'), sub = el('div', 'rc2'), acts = el('div', 'acts');
     top.append(el('div', 'rc1', sinQuien(b.c)), el('div', 'rm', money(b.m)));
@@ -1333,6 +1352,125 @@ function editaBor(b) {
   setTab('inicio'); borrId = b.id;
   $('f').value = esFecha(b.f) ? b.f : hoy(); $('c').value = sinQuien(b.c); $('m').value = b.m; $('k').value = b.k; $('cn').hidden = false;
   $('form').scrollIntoView({ behavior: 'smooth', block: 'start' }); say('Editando el aviso: ajusta y pulsa Guardar gasto.');
+}
+
+// ---- Aprobar todos ----
+function apruebaTodos() {
+  const l = leeBor().filter(b => !b.dup);
+  if (!l.length || !confirm('¿Aprobar ' + l.length + ' gastos de golpe? Se guardan tal como aparecen.')) return;
+  const ok = [];
+  l.forEach(b => { if (agregaGasto({ id: nuevoId(), fecha: b.f, concepto: b.c, cat: b.k, monto: b.m, borr: b.id }, { mxn: true })) ok.push(b.id); });
+  guardaBor(leeBor().filter(x => ok.indexOf(x.id) < 0));
+}
+
+// ---- Cobros que se repiten ----
+const leeSus = () => { try { return JSON.parse(L.sus || '[]') || []; } catch (e) { return []; } };
+function pintaSus() {
+  const l = leeSus(), box = $('sbl'); box.textContent = ''; $('sbc').hidden = !l.length;
+  l.forEach(x => {
+    const w = el('div', 'bd'), top = el('div', 'top'), sub = el('div', 'rc2'), acts = el('div', 'acts');
+    top.append(el('div', 'rc1', x.c), el('div', 'rm', money(x.m)));
+    sub.append('Cada mes, hacia el día ' + x.dia + ' · ' + x.n + ' meses seguidos' + (x.ya ? ' · ya va este mes' : ''));
+    const bf = el('button', 'mini ap', 'Hacer fijo'), bi = el('button', 'mini', 'Ignorar');
+    bf.onclick = () => susFijo(x); bi.onclick = () => susIgnorar(x);
+    acts.append(bf, bi); w.append(top, sub, acts); box.append(w);
+  });
+}
+const quitaSus = x => { try { L.sus = JSON.stringify(leeSus().filter(y => y.c !== x.c)); } catch (e) {} pintaSus(); };
+async function susFijo(x) {
+  const v = prompt('"' + x.c + '" por ' + moneyReal(x.m) + ' se registrará solo cada mes. ¿Qué día del mes?', x.dia);
+  if (v === null) return;
+  const dia = parseInt(v, 10); if (!(dia >= 1 && dia <= 31)) return say('Falta un día válido del 1 al 31.');
+  say('Guardando gasto fijo…');
+  try {
+    const j = await call({ accion: 'fijo_agregar', concepto: x.c, monto: x.m, cat: x.k, dia, hoy: hoy(), omitirMes: x.ya ? hoy().slice(0, 7) : undefined });
+    quitaSus(x); if (tab === 'aju') pintaFijos(j.fijos); say('Fijo agregado: ' + x.c + ' el día ' + dia + ' de cada mes.');
+  } catch (e) { say(errMsg(e)); }
+}
+async function susIgnorar(x) {
+  quitaSus(x);
+  try { await call({ accion: 'suscripcion_ignorar', c: x.c }); say('Listo: no volveré a avisar de ' + x.c + '.'); } catch (e) { say(errMsg(e)); }
+}
+
+// ---- Etiquetas: en qué se va cada categoría ----
+let etD = null, etN = 0;
+const ETC = ['#16305A', '#D6B482', '#C0694B', '#5B8A72', '#7A6BA8', '#4F8FB0', '#B0803A', '#8C9AAE', '#A65D7A', '#9AA17A'];
+async function etiquetasCargar() {
+  if (!L.u) return;
+  const m = $('etm').value === '1' ? sumaMes(hoy().slice(0, 7), -1) : hoy().slice(0, 7), n = ++etN;
+  $('etb').textContent = ''; $('etb').append(el('div', 'vacio', 'Clasificando tus gastos…'));
+  try { const j = await call({ accion: 'etiquetas', hoy: hoy(), mes: m }); if (n !== etN) return; etD = j; pintaEtiquetas(); }
+  catch (e) { if (n === etN) { $('etb').textContent = ''; $('etb').append(el('div', 'vacio', 'No pude clasificar ahora. Intenta más tarde.')); } }
+}
+function sumaMes(ym, d) { const t = new Date(Number(ym.slice(0, 4)), Number(ym.slice(5, 7)) - 1 + d, 1); return t.getFullYear() + '-' + String(t.getMonth() + 1).padStart(2, '0'); }
+function pintaEtiquetas() {
+  const box = $('etb'); box.textContent = '';
+  if (!etD || !etD.total) { box.append(el('div', 'vacio', 'No hay gastos en ese mes.')); return; }
+  const k = $('etk').value, val = o => k ? (o.porCat[k] || 0) : o.total;
+  const ls = Object.keys(etD.tags).map(t => ({ t, o: etD.tags[t], v: val(etD.tags[t]) })).filter(x => x.v > 0).sort((a, b) => b.v - a.v);
+  const tot = ls.reduce((a, x) => a + x.v, 0);
+  if (!ls.length) { box.append(el('div', 'vacio', 'Sin gastos de ' + k + ' en ese mes.')); return; }
+  const inn = Object.keys(etD.tags).map(t => ({ t, v: etD.tags[t].porCat.Innecesario || 0 })).filter(x => x.v > 0).sort((a, b) => b.v - a.v);
+  if (inn.length && !k) { const ti = inn.reduce((a, x) => a + x.v, 0), p = el('p', '', 'Lo innecesario (' + money(ti) + ') se va sobre todo en ' + inn[0].t + ' (' + Math.round(inn[0].v / ti * 100) + '%).'); p.style.marginBottom = '10px'; box.append(p); }
+  ls.forEach((x, i) => {
+    const w = barra(x.t, money(x.v) + ' · ' + Math.round(x.v / tot * 100) + '%', x.v / ls[0].v * 100, ETC[i % ETC.length]);
+    w.style.cursor = 'pointer'; const det = el('div', ''); det.hidden = true;
+    x.o.items.forEach(it => {
+      const r = el('div', 'row'), s = el('select'); s.setAttribute('aria-label', 'Etiqueta de ' + it.c); s.style.maxWidth = '120px';
+      etD.etiquetas.forEach(t => { const o = el('option', '', t); o.value = t; s.append(o); }); s.value = x.t;
+      s.onchange = async () => { try { await call({ accion: 'etiqueta_guardar', c: it.c, t: s.value }); say('Listo: ' + it.c + ' ahora es ' + s.value + '.'); etiquetasCargar(); } catch (e) { say(errMsg(e)); s.value = x.t; } };
+      r.append(el('div', 'rc1', it.c), el('div', 'rm', money(it.m)), s); det.append(r);
+    });
+    w.onclick = e => { if (e.target.tagName !== 'SELECT' && e.target.tagName !== 'OPTION') det.hidden = !det.hidden; };
+    box.append(w, det);
+  });
+  box.append(el('p', '', 'Toca una barra para ver sus gastos y cambiarles la etiqueta.'));
+}
+
+// ---- Informe del mes en PDF ----
+async function informePDF() {
+  const ym = $('cmes').value || sumaMes(hoy().slice(0, 7), -1); if (!/^\d{4}-\d{2}$/.test(ym)) return say('Elige el mes del informe.');
+  say('Preparando informe…'); $('clp').disabled = true;
+  try {
+    const [c, e] = await Promise.all([call({ accion: 'cierre', hoy: hoy(), mes: ym }), call({ accion: 'etiquetas', hoy: hoy(), mes: ym }).catch(() => null)]);
+    if (c.vacio) return say('No hay gastos en ese mes.');
+    const box = $('imp'); box.textContent = ''; box.className = 'inf';
+    const ih = el('div', 'ih'), im = el('img'); im.src = 'icon-192.png?v=2'; im.alt = ''; const tt = el('div'); tt.append(el('h1', '', 'Informe de ' + c.nombre + ' ' + ym.slice(0, 4)), el('small', '', 'Control de gastos · JonKa')); ih.append(im, tt);
+    const ib = el('div', 'ib'); ib.append(el('p', 'it', moneyReal(c.total)), el('p', '', c.n + ' gastos' + (c.anterior ? ' · mes anterior ' + moneyReal(c.anterior) : '') + (c.ingreso > 0 ? ' · ingreso ' + moneyReal(c.ingreso) : '')));
+    ib.append(el('h2', '', 'Por categoría'));
+    const cc = { Esencial: '#16305A', Mantener: '#D6B482', Innecesario: '#C0694B' };
+    CATS3.filter(k => c.porCat[k]).forEach(k => { const r = el('div', 'ir'); r.append(el('span', '', k), el('span', '', moneyReal(c.porCat[k]) + ' · ' + Math.round(c.porCat[k] / c.total * 100) + '%')); const b = el('div', 'ibar'), i = el('i'); i.style.width = Math.round(c.porCat[k] / c.total * 100) + '%'; i.style.background = cc[k]; b.append(i); ib.append(r, b); });
+    if (e && e.total) {
+      ib.append(el('h2', '', 'En qué se fue'));
+      const ls = Object.keys(e.tags).map(t => ({ t, v: e.tags[t].total })).sort((a, b) => b.v - a.v);
+      ls.forEach((x, i) => { const r = el('div', 'ir'); r.append(el('span', '', x.t), el('span', '', moneyReal(x.v) + ' · ' + Math.round(x.v / e.total * 100) + '%')); const b = el('div', 'ibar'), f = el('i'); f.style.width = Math.round(x.v / ls[0].v * 100) + '%'; f.style.background = ETC[i % ETC.length]; b.append(f); ib.append(r, b); });
+    }
+    [['Lo mejor', c.mejor], ['Lo peor', c.peor]].forEach(([t, l]) => { if (l && l.length) { ib.append(el('h2', '', t)); const ul = el('ul'); l.forEach(x => ul.append(el('li', '', x))); ib.append(ul); } });
+    ib.append(el('div', 'pie', 'Generado el ' + hoy() + ' con Control de gastos.'));
+    box.append(ih, ib); say('');
+    setTimeout(() => window.print(), 300);
+  } catch (er) { say(errMsg(er)); } finally { $('clp').disabled = false; }
+}
+
+// ---- Conciliar con el estado de cuenta ----
+const leeArchivo = (f, modo) => new Promise((ok, no) => { const r = new FileReader(); r.onload = () => ok(r.result); r.onerror = () => no(new Error('No pude leer el archivo.')); modo === 'texto' ? r.readAsText(f) : r.readAsDataURL(f); });
+async function conciliarArchivo(f) {
+  if (!f) return;
+  const r = $('cnr'), nombre = f.name.toLowerCase();
+  if (f.size > 3 * 1024 * 1024) { r.textContent = 'El archivo pesa más de 3 MB. Sube solo el estado de cuenta del mes.'; return; }
+  $('cnb').disabled = true; r.textContent = 'Leyendo el estado de cuenta… puede tardar hasta un minuto.';
+  try {
+    const body = { accion: 'conciliar', hoy: hoy() };
+    if (/\.(csv|txt)$/.test(nombre) || /^text\//.test(f.type)) body.texto = await leeArchivo(f, 'texto');
+    else { const u = await leeArchivo(f, 'url'), mime = f.type || (/\.pdf$/.test(nombre) ? 'application/pdf' : 'image/jpeg'); body.archivo = { mime, data: String(u).split(',')[1] || '' }; }
+    const j = await call(body);
+    if (j.borradores) guardaBor(j.borradores.filter(b => !q().some(x => x.borr === b.id)));
+    const fm = d => ddmm(d);
+    let t = 'Revisé ' + j.total + ' cargos del ' + fm(j.desde) + ' al ' + fm(j.hasta) + '. ' + j.coinciden + ' ya estaban en tu registro; ' + j.nuevos + ' faltaban y quedaron en "Por aprobar"' + (j.omitidos ? ' (' + j.omitidos + ' ya estaban ahí)' : '') + '.';
+    r.textContent = t;
+    if (j.repetidos && j.repetidos.length) { const ul = el('ul', 'lst'); j.repetidos.forEach(x => ul.append(el('li', '', 'Repetido ' + x.n + ' veces: ' + x.c + ' ' + money(x.m) + ' el ' + fm(x.f)))); r.append(el('div', 'bl', 'Posibles repetidos en tu registro'), ul); }
+    say(j.nuevos ? 'Listo: ' + j.nuevos + ' cargo(s) por aprobar en Inicio.' : 'Todo coincide con tu registro.');
+  } catch (e) { r.textContent = errMsg(e); } finally { $('cnb').disabled = false; $('cnf').value = ''; }
 }
 
 // ---- Ajustes: correos a vigilar ----
@@ -1474,6 +1612,7 @@ function pintaPrecios() {
 
 // ---- Arranque ----
 function init() {
+  window.__arr = 1;
   const ok = !!(L.u && L.k);
   $('cfg').hidden = ok; $('tabs').hidden = !ok;
   if (!ok) { ['inicio', 'mov', 'lis', 'rep', 'aju'].forEach(x => { $('p-' + x).hidden = true; }); $('hd').classList.remove('sm'); $('ht').textContent = TITULOS.inicio[0]; $('hs').textContent = TITULOS.inicio[1]; return; }
@@ -1519,6 +1658,8 @@ function togglePriv() {
   $('tkb').onclick = () => { if (!tkData) return; $('tki').src = 'data:' + tkData.mime + ';base64,' + tkData.data; $('tkv').hidden = false; };
   $('tkx').onclick = () => { $('tkv').hidden = true; $('tki').removeAttribute('src'); };
   $('smwb').onclick = () => { $('ay').hidden = false; }; $('ayx').onclick = () => { $('ay').hidden = true; };
+  $('clp').onclick = informePDF; $('etm').onchange = etiquetasCargar; $('etk').onchange = pintaEtiquetas;
+  $('cnb').onclick = () => $('cnf').click(); $('cnf').onchange = () => conciliarArchivo($('cnf').files[0]);
   $('scbb').onclick = () => setTab('rep'); $('cmes').onchange = cierreCargar;
   $('vjb').onclick = () => { L.removeItem('viaje'); pintaViaje(); pintaAjustes(); say('Guardado: modo viaje desactivado.'); };
   $('vjc').onchange = () => { if ($('vjc').checked) L.viaje = '1'; else L.removeItem('viaje'); pintaViaje(); say($('vjc').checked ? 'Guardado: modo viaje activado.' : 'Guardado: modo viaje desactivado.'); };

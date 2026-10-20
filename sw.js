@@ -1,5 +1,5 @@
 // Guarda la app en el teléfono: abre al instante y también sin internet. Los gastos viajan por otra vía (cola local).
-const V = 'jk-v1';
+const V = 'jk-v2';
 const SHELL = ['./', 'index.html', 'manifest.json?v=3', 'logo.png?v=3', 'icon.png?v=2', 'icon-192.png?v=2', 'icon-512.png?v=3'];
 self.addEventListener('install', e => {
   e.waitUntil(caches.open(V).then(c => Promise.all(SHELL.map(u => c.add(new Request(u, { cache: 'reload' })).catch(() => {})))).then(() => self.skipWaiting()));
