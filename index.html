@@ -2,6 +2,7 @@
 <html lang="es">
 <head>
 <meta charset="utf-8">
+<meta name="application-version" content="2026.10.29-compras.2">
 <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
 <meta name="apple-mobile-web-app-capable" content="yes">
 <meta name="mobile-web-app-capable" content="yes">
@@ -185,6 +186,20 @@ header{position:relative}
 #av ol{margin:6px 0 10px;padding-left:20px}
 #av li{margin-bottom:6px}
 #av h3{margin:14px 0 4px;font-size:16px}
+
+/* Compras: campos independientes y controles accesibles en teléfono. */
+.compra-row,.compra-head{display:grid;grid-template-columns:30px minmax(68px,1fr) 65px 76px;gap:6px;align-items:center}
+.compra-head{font-size:11px;color:var(--muted);margin-top:14px}
+.compra-row{padding:12px 0;border-bottom:1px solid var(--line)}
+.compra-row input{width:100%;min-width:0;height:44px;padding:0 6px;font-size:13px}
+.compra-row .precio{text-align:right}.compra-row .cantidad{text-align:center}
+.compra-row .ck{height:30px;width:30px;padding:0;border:2px solid var(--line);border-radius:9px;background:var(--field);color:transparent}
+.compra-row .ck.on{background:var(--pri);border-color:var(--pri);color:var(--pritx)}
+.compra-controls{grid-column:2/-1;display:flex;gap:8px}.compra-controls button{min-height:36px;padding:4px 9px;font-size:12px}.compra-controls .del{margin-left:auto}
+.compra-row.seleccionado{background:var(--chip);border-radius:10px}.compra-row [aria-invalid=true]{border-color:var(--bad)}
+.hist-item{padding:8px 0;border-bottom:1px solid var(--line);font-size:14px}#lhist details{margin:16px 0}#lestado{min-height:18px}button:disabled{opacity:.45}
+#ldel{width:min(360px,calc(100% - 32px));box-sizing:border-box;border:1px solid var(--gold);border-radius:18px;background:var(--card);color:var(--ink);padding:22px}#ldel::backdrop{background:rgba(8,16,30,.55)}#ldel .ln button{flex:1;width:auto}#ltrash{margin:12px 0;font-size:14px}#ltrashitems .ln{justify-content:space-between}
+@media(min-width:500px){.compra-row,.compra-head{grid-template-columns:32px minmax(100px,1fr) 82px 92px}.compra-row input{font-size:15px}}
 </style>
 </head>
 <body>
@@ -257,17 +272,22 @@ header{position:relative}
 <section id="p-lis" class="pg" hidden>
 <div class="card gold">
 <div class="trow"><h2>Mi lista</h2><span data-eye></span></div>
-<div class="seg"><button id="sg1" type="button" class="on">Lista</button><button id="sg2" type="button">Precios</button></div>
-<div id="lv1">
+<div class="seg"><button id="sg1" type="button" class="on">Lista</button><button id="sg2" type="button">Precios</button><button id="sg3" type="button">Historial</button></div>
 <div id="lch" class="chips"></div>
+<div id="lacciones" class="ln" style="justify-content:space-between;gap:12px" hidden><button id="lrn" type="button" class="lnk">Renombrar lista</button><button id="lbr" type="button" class="mini del">Borrar lista de compras</button></div>
+<details id="ltrash" hidden><summary>Listas borradas</summary><div id="ltrashitems"></div></details>
+<dialog id="ldel" aria-labelledby="ldeltitulo"><h2 id="ldeltitulo">Borrar lista de compras</h2><p id="ldeltexto"></p><p>Los gastos registrados se conservan. Podrás restaurar esta lista desde “Listas borradas”.</p><div class="ln"><button id="ldelcancel" type="button" class="out">Cancelar</button><button id="ldelok" type="button" class="pri">Borrar lista</button></div></dialog>
+<p id="lestado" class="rc2" role="status">Los cambios se guardan automáticamente</p>
+<div id="lv1">
+<p id="lsemana" class="rc2"></p>
 <div class="ln"><input id="lin" list="lsug" placeholder="Agregar producto (separa con comas)" autocomplete="off" enterkeyhint="done"><button id="lia" type="button" class="icb dark" aria-label="Agregar" style="color:#fff;font-size:26px">+</button></div>
 <datalist id="lsug"></datalist>
+<div class="compra-head" aria-hidden="true"><span></span><span>Producto</span><span>Cantidad</span><span>Precio total</span></div>
 <div id="lit"></div>
 <div id="lsm" class="warn" hidden></div>
 <div id="lfo" hidden>
 <div class="two"><div><label for="lck">Categoría del gasto</label><select id="lck"><option>Esencial</option><option>Mantener</option><option>Innecesario</option></select></div></div>
 <button id="lgo" type="button" class="pri" style="margin-top:10px">Guardar como gasto</button>
-<div class="ln" style="justify-content:center;gap:16px"><button id="lrn" type="button" class="lnk">Renombrar lista</button><button id="lbr" type="button" class="lnk">Borrar lista</button></div>
 </div>
 </div>
 <div id="lv2" hidden>
@@ -276,6 +296,7 @@ header{position:relative}
 <div class="ln"><input id="pn" placeholder="Producto" autocomplete="off"><input id="pp" inputmode="decimal" placeholder="Precio" style="max-width:110px" autocomplete="off"><button id="pa" type="button" class="icb dark" aria-label="Guardar precio" style="color:#fff;font-size:26px">+</button></div>
 <div id="lpr"></div>
 </div>
+<div id="lv3" hidden><label for="lhweek">Semana</label><select id="lhweek"></select><div id="lhist"></div></div>
 </div>
 </section>
 <section id="p-rep" class="pg" hidden>
@@ -315,9 +336,9 @@ header{position:relative}
 <div class="two"><button id="cpu" type="button" class="mini" style="height:40px">Copiar dirección</button><button id="cpk" type="button" class="mini" style="height:40px">Copiar clave</button></div>
 </div>
 <div class="card" id="cnc"><h2>Conciliar con el estado de cuenta</h2>
-<p>Sube el PDF o CSV de Santander. Reviso qué cargos no tienes registrados y los mando a "Por aprobar". No se guarda nada sin tu aprobación.</p>
-<input id="cnf" type="file" accept=".pdf,.csv,.txt,application/pdf,text/csv,text/plain,image/*" style="display:none">
-<button id="cnb" type="button" class="out">Elegir estado de cuenta</button>
+<p>Importa un CSV o TXT sin números de tarjeta, cuentas ni saldos. Los cargos que falten pasarán a “Por aprobar”. Los PDF e imágenes completos no se envían para conciliar.</p>
+<input id="cnf" type="file" accept=".csv,.txt,text/csv,text/plain" style="display:none">
+<button id="cnb" type="button" class="out">Elegir CSV o TXT</button>
 <div id="cnr" class="vacio" style="margin-top:8px"></div></div>
 <div class="card gold">
 <h2>Gastos fijos</h2>
@@ -407,6 +428,7 @@ header{position:relative}
 <button data-t="rep"><svg viewBox="0 0 24 24"><path d="M5 21v-8M11 21V6M17 21v-10M3 21h18"/></svg>Reportes</button>
 <button data-t="aju"><svg viewBox="0 0 24 24"><path d="M4 7h9M17 7h3M4 17h3M11 17h9"/><circle cx="15" cy="7" r="2"/><circle cx="9" cy="17" r="2"/></svg>Ajustes</button>
 </nav>
+<script src="compras-model.js?v=20261029-3"></script>
 <script>
 const $ = id => document.getElementById(id), L = localStorage;
 const MESES = ['Enero','Febrero','Marzo','Abril','Mayo','Junio','Julio','Agosto','Septiembre','Octubre','Noviembre','Diciembre'];
@@ -537,12 +559,12 @@ async function flush() {
   let c, enviados = 0, fallos = 0;
   while ((c = q()).length) { // se relee la cola en cada vuelta: lo que se agregue mientras se envía no se pierde
     const it = c[0];
-    try { const j = await send(it); enviados++; avisoGuardado(it.concepto, it.monto, j, it.cat); }
+    try { const j = await send(it); compraEstado(it.id,'guardado'); enviados++; avisoGuardado(it.concepto, it.monto, j, it.cat); }
     catch (e) {
       if (!e.fatal) { if (!navigator.onLine) say('Sin conexión: el gasto se enviará solo cuando vuelva.'); break; }
-      fallos++; say('Error: ' + e.message + ' (' + it.concepto + ')');
+      fallos++; compraEstado(it.id,'error'); say('Error: ' + e.message + ' (' + it.concepto + '). El gasto sigue pendiente; corrige la configuración y reintenta.'); break;
     }
-    const n = q(), i = n.findIndex(x => x.id === it.id); n.splice(i >= 0 ? i : 0, 1); L.q = JSON.stringify(n);
+    const n = q(), i = n.findIndex(x => x.id === it.id); if (i >= 0) n.splice(i, 1); L.q = JSON.stringify(n);
   }
   busy = false;
   if (enviados || fallos) refrescar();
@@ -753,9 +775,10 @@ function pintaResumen(r) {
   $('scb').hidden = !(valido && diaMes <= 7 && ant && ant.total > 0);
   if (valido && diaMes <= 7 && ant && ant.total > 0) $('scbt').textContent = 'Ya puedes ver el cierre de ' + MESES[(Number(h.slice(5, 7)) + 10) % 12].toLowerCase() + '.';
   pintaFrecuentes(r);
-  const quedan = valido ? r.limite - r.ultimaFila : 999;
-  $('smw').hidden = !(quedan <= 120);
-  if (quedan <= 120) {
+  const quedan = valido ? (r.capacidad ? r.capacidad.libres : r.limite - r.ultimaFila) : 999;
+  const capacidadAviso = valido && (r.capacidad ? r.capacidad.porcentaje >= 80 : quedan <= (r.limite - 4) * .2);
+  $('smw').hidden = !capacidadAviso;
+  if (capacidadAviso) {
     const rit = valido && diaMes >= 5 && r.mes.n > 0 ? r.mes.n / diaMes * 30 : 0;
     $('smwt').textContent = quedan > 0 ? 'Quedan ' + quedan + ' filas en el Registro' + (rit > 0 ? ' (a tu ritmo alcanzan para unos ' + Math.max(1, Math.floor(quedan / rit)) + ' mes(es))' : '') + '. Pronto hay que extenderlo.' : 'El Registro está lleno. Hay que extenderlo.';
   }
@@ -1457,11 +1480,12 @@ const leeArchivo = (f, modo) => new Promise((ok, no) => { const r = new FileRead
 async function conciliarArchivo(f) {
   if (!f) return;
   const r = $('cnr'), nombre = f.name.toLowerCase();
+  if (!/\.(csv|txt)$/.test(nombre) && !/^text\//.test(f.type)) { r.textContent = 'Elige un CSV o TXT sin datos de tarjeta, cuentas ni saldos.'; return; }
   if (f.size > 3 * 1024 * 1024) { r.textContent = 'El archivo pesa más de 3 MB. Sube solo el estado de cuenta del mes.'; return; }
   $('cnb').disabled = true; r.textContent = 'Leyendo el estado de cuenta… puede tardar hasta un minuto.';
   try {
     const body = { accion: 'conciliar', hoy: hoy() };
-    if (/\.(csv|txt)$/.test(nombre) || /^text\//.test(f.type)) body.texto = await leeArchivo(f, 'texto');
+    if (/\.(csv|txt)$/.test(nombre) || /^text\//.test(f.type)) body.texto = CM.redact(await leeArchivo(f, 'texto'));
     else { const u = await leeArchivo(f, 'url'), mime = f.type || (/\.pdf$/.test(nombre) ? 'application/pdf' : 'image/jpeg'); body.archivo = { mime, data: String(u).split(',')[1] || '' }; }
     const j = await call(body);
     if (j.borradores) guardaBor(j.borradores.filter(b => !q().some(x => x.borr === b.id)));
@@ -1498,113 +1522,199 @@ async function correosAhora() {
 }
 async function copia(t, que) { try { await navigator.clipboard.writeText(t); say('Listo: ' + que + ' copiado.'); } catch (e) { say('Error: no pude copiar ' + que + '.'); } }
 
-// ---- Compras: lista, precios y gasto ----
+// ---- Compras: persistencia inmediata, orden y memoria por semana ----
+const CM = ComprasModel;
 const leePrc = () => { try { return JSON.parse(L.prc || '{}') || {}; } catch (e) { return {}; } };
-let lst = { listas: [], act: '', s: [] }, prc = {}, lVista = 1, lSync = false, lT = null;
-try { const x = JSON.parse(L.lst || 'null'); if (x && Array.isArray(x.listas)) lst = Object.assign({ act: '', s: [] }, x); } catch (e) {}
+let lst = { listas: [], act: '', s: [], clock:0 }, prc = {}, lVista = 1, lSync = false, lT = null, lEdit = 0, lCompatible = false, lEliminarId = '';
+try { const x = JSON.parse(L.lst || 'null'); if (x && Array.isArray(x.listas)) lst = Object.assign({ act:'', s:[], clock:0 }, x); } catch (e) { say('Error: no se pudo leer la memoria de Compras. Conserva los datos de este dispositivo.'); }
 prc = leePrc();
-const lstGuarda = () => { try { L.lst = JSON.stringify(lst); } catch (e) {} };
+const lTick = () => (lst.clock = Math.max(Date.now(), (lst.clock || 0) + 1));
+const lstGuarda = () => { try { L.lst = JSON.stringify(lst); return true; } catch (e) { say('Error: no hay espacio para guardar Compras. No cierres la app hasta liberar espacio.'); return false; } };
 const lActiva = () => lst.listas.find(x => x.id === lst.act && !x.del) || lst.listas.find(x => !x.del) || null;
-const estP = n => (prc[normC(n)] || {}).p || 0;
-function mezclaLocal(a, b) { // a = local, b = servidor: por producto gana el cambio más reciente
-  const m = {};
-  (a.items || []).concat(b.items || []).forEach(x => { const o = m[x.id]; if (!o || (x.t || 0) >= (o.t || 0)) m[x.id] = x; });
-  const meta = (a.tm || 0) >= (b.tm || 0) ? a : b;
-  return { id: a.id, n: meta.n, cat: meta.cat, tm: meta.tm || 0, del: !!meta.del, items: Object.keys(m).map(k => m[k]).sort((p, r) => (p.t || 0) - (r.t || 0)) };
+const precioKey = (n, cantidad) => normC(n) + (cantidad ? '|' + normC(cantidad) : '');
+const estP = (n, cantidad) => (prc[precioKey(n,cantidad)] || {}).p || 0;
+const mezclaLocal = (a,b) => CM.mergeInto(a,b);
+function comprasEstado(text) { $('lestado').textContent = text; }
+function sucia(l) {
+  l.tm = lTick(); lEdit++;
+  if (!lst.s.includes(l.id)) lst.s.push(l.id);
+  const ok = lstGuarda(); comprasEstado(ok ? 'Guardado en este teléfono · Sincronización pendiente' : 'No se pudo guardar. No cierres la app.');
+  clearTimeout(lT); lT = setTimeout(lstSync,1200); return ok;
 }
-function sucia(l) { if (!lst.s.includes(l.id)) lst.s.push(l.id); lstGuarda(); clearTimeout(lT); lT = setTimeout(lstSync, 1200); }
+function prepararSemana(l) {
+  if(l.del)return;
+  CM.migrate(l,CM.week(hoy()));
+  if (CM.rollWeek(l,CM.week(hoy()),lTick())) sucia(l);
+}
+lst.listas.forEach(prepararSemana);
+function editandoCompra() { return $('lit').contains(document.activeElement) || document.activeElement === $('lin'); }
 async function lstSync() {
-  if (!L.u || lSync || !lst.s.length) return; lSync = true;
+  if (!L.u || lSync || !lst.s.length) return;
+  lSync = true;
   try {
-    for (let n = 0; n < 6 && lst.s.length; n++) {
-      const id = lst.s[0], l = lst.listas.find(x => x.id === id);
+    for (let n=0;n<6 && lst.s.length;n++) {
+      const id=lst.s[0], l=lst.listas.find(x=>x.id===id);
       if (!l) { lst.s.shift(); continue; }
-      const antes = JSON.stringify(l), j = await call({ accion: 'lista_guardar', lista: l });
-      const i = lst.listas.findIndex(x => x.id === id);
-      if (i >= 0) { const cambio = JSON.stringify(lst.listas[i]) !== antes; lst.listas[i] = mezclaLocal(lst.listas[i], j.lista); if (!cambio) lst.s = lst.s.filter(x => x !== id); }
-      else lst.s = lst.s.filter(x => x !== id);
+      const antes=JSON.stringify(l), j=await call({accion:'lista_guardar',lista:l});
+      lCompatible = j.comprasVersion >= 2 || !!(j.lista && j.lista.week);
+      const i=lst.listas.findIndex(x=>x.id===id);
+      if (i>=0) {
+        const cambio=JSON.stringify(lst.listas[i])!==antes;
+        if (!editandoCompra()) lst.listas[i]=mezclaLocal(lst.listas[i],j.lista);
+        if (!cambio) lst.s=lst.s.filter(x=>x!==id);
+      } else lst.s=lst.s.filter(x=>x!==id);
     }
-  } catch (e) {} finally { lSync = false; lstGuarda(); }
+    comprasEstado(lst.s.length ? 'Guardado en este teléfono · Sincronización pendiente' : lCompatible ? 'Cambios sincronizados' : 'Guardado en este teléfono');
+  } catch(e) { comprasEstado(e.fatal ? 'Guardado en este teléfono · '+e.message : 'Guardado en este teléfono · Se sincronizará al recuperar conexión'); }
+  finally { lSync=false; lstGuarda(); }
 }
 async function listasCargar() {
   pintaCompras();
   if (!L.u) return;
+  const revision=lEdit;
   try {
-    const j = await call({ accion: 'listas' });
-    j.listas.forEach(sv => { const i = lst.listas.findIndex(x => x.id === sv.id); if (i >= 0) lst.listas[i] = mezclaLocal(lst.listas[i], sv); else lst.listas.push(sv); });
-    lst.listas = lst.listas.filter(l => j.listas.some(sv => sv.id === l.id) || lst.s.includes(l.id)); // las borradas en otro teléfono desaparecen
-    prc = j.precios || {}; try { L.prc = JSON.stringify(prc); } catch (e) {}
+    const j=await call({accion:'listas'});
+    lCompatible = j.comprasVersion >= 2;
+    if (revision!==lEdit || editandoCompra()) { lstSync(); return; }
+    (j.listas || []).forEach(sv=>{ const i=lst.listas.findIndex(x=>x.id===sv.id); if(i>=0) lst.listas[i]=mezclaLocal(lst.listas[i],sv); else lst.listas.push(sv); });
+    // Keep local lists even if an older server temporarily omits them.
+    lst.listas.forEach(prepararSemana);
+    prc={...(j.precios || {}),...prc}; try { L.prc=JSON.stringify(prc); } catch(e) {}
     lstGuarda(); pintaCompras(); lstSync();
-  } catch (e) {}
+  } catch(e) { comprasEstado('Guardado en este teléfono · Sin conexión'); }
 }
 function listaNueva(nombre) {
-  const l = { id: nuevoId(), n: nombre.trim().slice(0, 30) || 'Lista', cat: 'Esencial', tm: Date.now(), items: [] };
-  lst.listas.push(l); lst.act = l.id; sucia(l); pintaCompras(); return l;
+  const l={id:nuevoId(),n:nombre.trim().slice(0,30)||'Lista',cat:'Esencial',tm:lTick(),week:CM.week(hoy()),archives:{},hist:[],items:[]};
+  lst.listas.push(l); lst.act=l.id; sucia(l); pintaCompras(); return l;
+}
+function listaBorrar() {
+  const l=lActiva();if(!l)return;lEliminarId=l.id;
+  $('ldeltexto').textContent='¿Borrar la lista “'+l.n+'” y quitarla de tus listas activas?';$('ldel').showModal();
+}
+function listaBorrarConfirmada() {
+  const l=lst.listas.find(x=>x.id===lEliminarId&&!x.del);if(!l){$('ldel').close();return;}
+  const antes=CM.copy(l);CM.removeList(l,lTick());
+  if(!sucia(l)){Object.assign(l,antes);return;}
+  lst.act='';lstGuarda();$('ldel').close();pintaCompras();say('Lista borrada: '+l.n+'. Los gastos registrados se conservan.');
+}
+function pintaListasBorradas() {
+  const box=$('ltrashitems');box.textContent='';const borradas=lst.listas.filter(x=>x.del);$('ltrash').hidden=!borradas.length;
+  borradas.forEach(l=>{const row=el('div','ln');row.append(el('span','',l.n));const b=el('button','mini','Restaurar');b.type='button';b.setAttribute('aria-label','Restaurar lista '+l.n);b.onclick=()=>{
+    const antes=CM.copy(l);CM.restoreList(l,lTick());if(!sucia(l)){Object.assign(l,antes);return;}lst.act=l.id;lstGuarda();pintaCompras();
+  };row.append(b);box.append(row);});
 }
 function totales(l) {
-  let real = 0, n = 0, falta = 0, est = 0, sinp = 0;
-  l.items.filter(x => !x.del).forEach(x => { const e = estP(x.n), v = x.p != null ? x.p : e; if (x.ok) { n++; real += v || 0; if (x.p == null && !e) sinp++; } else { est += v || 0; falta++; } });
-  return { real: Math.round(real * 100) / 100, n, falta, est: Math.round(est * 100) / 100, sinp };
+  const s=CM.selection(l), todos=CM.ordered(l);
+  const est=todos.filter(x=>!x.ok).reduce((sum,x)=>sum+(x.p!=null?x.p:estP(x.n,x.q)),0);
+  return {real:s.total,n:s.items.length,falta:todos.length-s.items.length,est:CM.round(est),sinp:s.invalid.length};
 }
 function pintaTotales() {
-  const l = lActiva(); if (!l) return;
-  const t = totales(l), vivos = t.n + t.falta;
-  $('lsm').hidden = !vivos;
-  $('lsm').textContent = 'Comprado: ' + money(t.real) + ' (' + t.n + ' de ' + vivos + ') · Por comprar, estimado: ' + money(t.est) + (t.sinp ? ' · ' + t.sinp + ' marcado(s) sin precio' : '');
-  $('lfo').hidden = !vivos; $('lgo').textContent = 'Guardar como gasto · ' + money(t.real); $('lgo').disabled = t.n === 0;
+  const l=lActiva(); if(!l)return;
+  const t=totales(l), vivos=t.n+t.falta;
+  $('lsm').hidden=!vivos;
+  $('lsm').textContent='Seleccionado: '+money(t.real)+' ('+t.n+' de '+vivos+') · Pendiente, estimado: '+money(t.est)+(t.sinp?' · '+t.sinp+' seleccionado(s) sin precio válido':'');
+  $('lfo').hidden=!vivos;
+  $('lgo').textContent='Registrar '+t.n+' seleccionado'+(t.n===1?'':'s')+' · '+money(t.real);
+  $('lgo').disabled=t.n===0 || t.sinp>0;
+}
+function campoCompra(label,value,placeholder) {
+  const input=document.createElement('input'); input.value=value; input.placeholder=placeholder; input.autocomplete='off'; input.setAttribute('aria-label',label); return input;
 }
 function pintaCompras() {
-  document.querySelectorAll('#p-lis .seg button').forEach(b => b.classList.toggle('on', b.id === (lVista === 1 ? 'sg1' : 'sg2')));
-  $('lv1').hidden = lVista !== 1; $('lv2').hidden = lVista !== 2;
-  if (lVista === 2) return pintaPrecios();
-  const ch = $('lch'); ch.textContent = '';
-  const act = lActiva(); if (act) lst.act = act.id;
-  lst.listas.filter(x => !x.del).forEach(l => { const b = el('button', 'chip', l.n); b.type = 'button'; if (act && l.id === act.id) { b.style.background = 'var(--pri)'; b.style.color = 'var(--pritx)'; } b.onclick = () => { lst.act = l.id; lstGuarda(); pintaCompras(); }; ch.append(b); });
-  const nb = el('button', 'chip', '+ Nueva lista'); nb.type = 'button'; nb.onclick = () => { const n = prompt('Nombre de la lista (ej. Súper, Farmacia):', ''); if (n !== null && n.trim()) listaNueva(n); }; ch.append(nb);
-  const dl = $('lsug'); dl.textContent = '';
-  Object.keys(prc).slice(0, 200).map(k => prc[k].n).sort().forEach(n => { const o = document.createElement('option'); o.value = n; dl.append(o); });
-  const box = $('lit'); box.textContent = '';
-  if (!act) { box.append(el('div', 'vacio', 'Crea tu primera lista con "+ Nueva lista" (por ejemplo, Súper).')); $('lsm').hidden = true; $('lfo').hidden = true; $('lin').disabled = true; $('lia').disabled = true; return; }
-  $('lin').disabled = false; $('lia').disabled = false; $('lck').value = act.cat;
-  const vivos = act.items.filter(x => !x.del).sort((a, b) => (a.ok ? 1 : 0) - (b.ok ? 1 : 0));
-  if (!vivos.length) box.append(el('div', 'vacio', 'La lista está vacía. Escribe un producto arriba.'));
-  vivos.forEach(x => {
-    const row = el('div', 'li' + (x.ok ? ' hecho' : '')), ck = el('button', 'ck' + (x.ok ? ' on' : ''), '✓'), nm = el('div', 'nm', x.n), pi = document.createElement('input'), dx = el('button', 'x', '×');
-    ck.type = 'button'; dx.type = 'button'; ck.setAttribute('aria-label', 'Marcar comprado'); dx.setAttribute('aria-label', 'Quitar');
-    pi.inputMode = 'decimal'; pi.placeholder = estP(x.n) ? '~' + estP(x.n) : '$'; pi.value = x.p != null ? x.p : ''; pi.setAttribute('aria-label', 'Precio de ' + x.n);
-    ck.onclick = () => { x.ok = !x.ok; x.t = Date.now(); sucia(act); pintaCompras(); };
-    dx.onclick = () => { x.del = true; x.t = Date.now(); sucia(act); pintaCompras(); };
-    pi.oninput = () => { const v = parseFloat(pi.value.replace(/[$,\s]/g, '')); x.p = v >= 0 ? v : null; x.t = Date.now(); pintaTotales(); };
-    pi.onchange = () => { sucia(act); };
-    row.append(ck, nm, pi, dx); box.append(row);
+  document.querySelectorAll('#p-lis .seg button').forEach(b=>b.classList.toggle('on',b.id===(lVista===1?'sg1':lVista===2?'sg2':'sg3')));
+  $('lv1').hidden=lVista!==1; $('lv2').hidden=lVista!==2; $('lv3').hidden=lVista!==3;
+  const act=lActiva(); if(act){lst.act=act.id;prepararSemana(act);}
+  $('lacciones').hidden=!act;pintaListasBorradas();
+  const ch=$('lch'); ch.textContent='';
+  lst.listas.filter(x=>!x.del).forEach(l=>{const b=el('button','chip',l.n); b.type='button'; if(act&&l.id===act.id){b.style.background='var(--pri)';b.style.color='var(--pritx)';}b.onclick=()=>{lst.act=l.id;lstGuarda();pintaCompras();};ch.append(b);});
+  const nb=el('button','chip','+ Nueva lista');nb.type='button';nb.onclick=()=>{const n=prompt('Nombre de la lista (ej. Mercado):','');if(n&&n.trim())listaNueva(n);};ch.append(nb);
+  if(lVista===2)return pintaPrecios();
+  if(lVista===3)return pintaHistorial();
+  const dl=$('lsug');dl.textContent='';
+  [...new Set(Object.keys(prc).map(k=>prc[k].n))].slice(0,200).sort().forEach(n=>{const o=document.createElement('option');o.value=n;dl.append(o);});
+  const box=$('lit');box.textContent='';
+  $('lin').disabled=!act;$('lia').disabled=!act;
+  if(!act){box.append(el('div','vacio','Crea tu primera lista con “+ Nueva lista”.'));$('lsm').hidden=true;$('lfo').hidden=true;return;}
+  $('lck').value=act.cat;
+  $('lsemana').textContent='Semana del '+ddmm(act.week)+' · Los precios corresponden a la cantidad indicada';
+  const vivos=CM.ordered(act);
+  if(!vivos.length)box.append(el('div','vacio','La lista está vacía. Escribe un producto arriba.'));
+  vivos.forEach((x,index)=>{
+    const row=el('div','compra-row'+(x.ok?' seleccionado':''));row.dataset.item=x.id;
+    const ck=el('button','ck'+(x.ok?' on':''),'✓');ck.type='button';ck.setAttribute('aria-label','Seleccionar '+x.n);ck.setAttribute('aria-pressed',String(!!x.ok));
+    const nm=campoCompra('Producto',x.n,'Producto'), qty=campoCompra('Cantidad de '+x.n,x.q||'','Ej. 500 g'), pi=campoCompra('Precio de '+x.n,x.p!=null?x.p:'',estP(x.n,x.q)?'~'+estP(x.n,x.q):'$');
+    nm.className='producto';qty.className='cantidad';pi.className='precio';pi.inputMode='decimal';pi.title='Precio total de esta cantidad, no precio por unidad';
+    const persist=()=>{x.t=lTick();sucia(act);pintaTotales();};
+    nm.oninput=()=>{x.n=nm.value.slice(0,60);persist();};
+    qty.oninput=()=>{x.q=qty.value.slice(0,40);pi.placeholder=estP(x.n,x.q)?'~'+estP(x.n,x.q):'$';persist();};
+    pi.oninput=()=>{x.p=CM.price(pi.value);pi.setAttribute('aria-invalid',String(pi.value.trim()!==''&&x.p==null));persist();};
+    ck.onclick=()=>{x.ok=!x.ok;persist();pintaCompras();};
+    const controls=el('div','compra-controls');
+    const up=el('button','mini','↑ Subir'), down=el('button','mini','↓ Bajar'), dx=el('button','mini del','Quitar');
+    [up,down,dx].forEach(b=>b.type='button');up.disabled=index===0;down.disabled=index===vivos.length-1;
+    up.setAttribute('aria-label','Subir '+x.n);down.setAttribute('aria-label','Bajar '+x.n);dx.setAttribute('aria-label','Quitar '+x.n);
+    const mover=delta=>{if(CM.move(act,x.id,delta,lTick())){sucia(act);pintaCompras();const r=[...$('lit').children].find(v=>v.dataset.item===x.id);if(r)r.querySelector('.producto').focus();}};
+    up.onclick=()=>mover(-1);down.onclick=()=>mover(1);dx.onclick=()=>{x.del=true;persist();pintaCompras();};
+    controls.append(up,down,dx);row.append(ck,nm,qty,pi,controls);box.append(row);
   });
   pintaTotales();
 }
 function itemsAgregar() {
-  const act = lActiva(); if (!act) return;
-  const partes = $('lin').value.split(',').map(x => x.trim()).filter(Boolean).slice(0, 30);
-  if (!partes.length) return;
-  partes.forEach(n => { if (!act.items.some(x => !x.del && normC(x.n) === normC(n))) act.items.push({ id: nuevoId(), n: (n.charAt(0).toUpperCase() + n.slice(1)).slice(0, 60), p: null, ok: false, t: Date.now() }); });
-  $('lin').value = ''; sucia(act); pintaCompras(); $('lin').focus();
+  const act=lActiva();if(!act)return;
+  const partes=$('lin').value.split(',').map(x=>x.trim()).filter(Boolean).slice(0,30);
+  if(!partes.length)return;
+  if(CM.ordered(act).length+partes.length>150)return say('Revisa: cada lista admite hasta 150 productos.');
+  partes.forEach(n=>{if(!act.items.some(x=>!x.del&&normC(x.n)===normC(n)))act.items.push({id:nuevoId(),n:(n.charAt(0).toUpperCase()+n.slice(1)).slice(0,60),q:'',p:null,ok:false,t:lTick(),o:CM.ordered(act).length});});
+  if(sucia(act))$('lin').value='';pintaCompras();$('lin').focus();
 }
 function listaAGasto() {
-  const act = lActiva(); if (!act) return;
-  const t = totales(act), vivos = act.items.filter(x => !x.del && x.ok);
-  if (!vivos.length || !(t.real > 0)) return say('Falta el precio de algún producto marcado.');
-  const compra = vivos.filter(x => x.p > 0).map(x => ({ n: x.n, p: x.p }));
-  if (!agregaGasto({ id: nuevoId(), fecha: hoy(), concepto: act.n, cat: act.cat, monto: t.real, compra }, { mxn: true })) return;
-  compra.forEach(c => { const k = normC(c.n), o = prc[k] || { c: 0 }; prc[k] = { n: c.n, p: c.p, c: (o.c || 0) + 1, f: hoy() }; }); try { L.prc = JSON.stringify(prc); } catch (e) {}
-  vivos.forEach(x => { x.del = true; x.t = Date.now(); }); sucia(act); pintaCompras();
+  const act=lActiva();if(!act)return;
+  let entry;try{entry=CM.receipt(act,nuevoId(),hoy());}catch(e){return say(e.message);}
+  if(!confirm('¿Registrar '+entry.items.length+' producto(s) seleccionado(s) de '+act.n+' por '+moneyReal(entry.total)+'? Los demás quedan pendientes.'))return;
+  // Persist the weekly breakdown before allowing the expense into the durable queue.
+  const prev=CM.copy(act);CM.record(act,entry,lTick());if(!sucia(act)){Object.assign(act,prev);return;}
+  const compra=entry.items.map(x=>({n:x.n,q:x.q,p:x.p}));
+  if(!agregaGasto({id:entry.id,fecha:entry.f,concepto:act.n,cat:act.cat,monto:entry.total,compra},{mxn:true})){
+    Object.assign(act,prev);sucia(act);pintaCompras();return;
+  }
+  compra.forEach(c=>{const k=precioKey(c.n,c.q),o=prc[k]||{c:0};prc[k]={n:c.n,q:c.q,p:c.p,c:(o.c||0)+1,f:hoy()};});
+  try{L.prc=JSON.stringify(prc);}catch(e){}
+  pintaCompras();
 }
+function compraEstado(id,state) {
+  lst.listas.forEach(l=>{const r=(l.hist||[]).find(x=>x.id===id);if(r){r.state=state;r.t=lTick();sucia(l);}});
+}
+function pintaHistorial() {
+  const box=$('lhist');box.textContent='';const act=lActiva();if(!act)return box.append(el('p','vacio','Crea una lista para ver su historial.'));
+  const weeks=[...new Set([act.week,...Object.keys(act.archives||{}),...(act.hist||[]).map(r=>r.w)])].sort().reverse();
+  const select=$('lhweek'),selected=select.value;select.textContent='';weeks.forEach(w=>{const o=document.createElement('option');o.value=w;o.textContent='Semana del '+ddmm(w)+' / '+w.slice(0,4);select.append(o);});if(weeks.includes(selected))select.value=selected;
+  const w=select.value,receipts=(act.hist||[]).filter(r=>r.w===w).sort((a,b)=>b.t-a.t);
+  const items=w===act.week?CM.ordered(act):CM.ordered((act.archives||{})[w]||{items:[]});
+  box.append(el('h3','',act.n+' · '+items.length+' productos en la lista'));
+  if(!receipts.length)box.append(el('p','rc2','No hay gastos registrados desde esta lista en esta semana.'));
+  receipts.forEach(r=>{const card=el('div','bd');card.append(el('b','',ddmm(r.f)+' · '+money(r.total)),el('div','rc2',r.items.length+' productos · '+(r.state==='guardado'?'Registrado en la hoja':r.state==='error'?'Pendiente: revisa la conexión o configuración':'Pendiente de envío')));r.items.forEach(x=>card.append(el('div','hist-item',x.n+(x.q?' · '+x.q:'')+' · '+money(x.p))));box.append(card);});
+  const details=document.createElement('details'),title=document.createElement('summary');title.textContent='Ver lista completa de la semana';details.append(title);
+  items.forEach(x=>details.append(el('div','hist-item',x.n+(x.q?' · '+x.q:'')+(x.p!=null?' · '+money(x.p):''))));box.append(details);
+  if(w!==act.week&&items.length){const b=el('button','out','Copiar productos a esta semana');b.type='button';b.onclick=()=>{
+    items.forEach(x=>{if(!act.items.some(y=>!y.del&&normC(y.n)===normC(x.n)))act.items.push({...CM.copy(x),id:nuevoId(),ok:false,p:null,t:lTick(),o:CM.ordered(act).length});});sucia(act);lVista=1;pintaCompras();
+  };box.append(b);}
+  const exportar=el('button','out','Descargar respaldo de Compras');exportar.type='button';exportar.onclick=()=>{
+    const blob=new Blob([JSON.stringify({version:2,fecha:hoy(),compras:lst,precios:prc},null,2)],{type:'application/json'});
+    const url=URL.createObjectURL(blob),a=document.createElement('a');a.href=url;a.download='JonKa-compras-'+hoy()+'.json';a.click();setTimeout(()=>URL.revokeObjectURL(url),1000);
+  };box.append(exportar);
+}
+
+
 function pintaPrecios() {
   const box = $('lpr'); box.textContent = '';
   const f = normC($('lps').value), ks = Object.keys(prc).filter(k => !f || k.indexOf(f) >= 0).sort((a, b) => prc[a].n.localeCompare(prc[b].n, 'es'));
   if (!ks.length) box.append(el('div', 'vacio', f ? 'No hay productos con ese nombre.' : 'Aún no hay precios. Se llenan solos al guardar una compra.'));
   ks.slice(0, 200).forEach(k => {
     const x = prc[k], row = el('div', 'li'), nm = el('div', 'nm'), pi = document.createElement('input'), dx = el('button', 'x', '×');
-    nm.append(x.n, el('div', 'rc2', (x.c || 0) + (x.c === 1 ? ' compra' : ' compras') + (x.f ? ' · ' + ddmm(x.f) : '')));
+    nm.append(x.n + (x.q ? ' · ' + x.q : ''), el('div', 'rc2', (x.c || 0) + (x.c === 1 ? ' compra' : ' compras') + (x.f ? ' · ' + ddmm(x.f) : '')));
     pi.inputMode = 'decimal'; pi.value = x.p; pi.setAttribute('aria-label', 'Precio de ' + x.n); dx.type = 'button'; dx.setAttribute('aria-label', 'Borrar precio');
-    pi.onchange = async () => { const v = parseFloat(pi.value.replace(/[$,\s]/g, '')); if (!(v > 0)) { pi.value = x.p; return say('Revisa: escribe un precio válido.'); } x.p = v; try { L.prc = JSON.stringify(prc); } catch (e) {} try { await call({ accion: 'precio_guardar', n: x.n, p: v }); say('Guardado: ' + x.n + ' a ' + money(v) + '.'); } catch (e) { say(errMsg(e)); } };
+    let precioTimer;
+    pi.oninput = () => { const v = CM.price(pi.value); clearTimeout(precioTimer); if (!(v > 0)) { pi.setAttribute('aria-invalid','true'); return; } pi.setAttribute('aria-invalid','false'); x.p = v; try { L.prc = JSON.stringify(prc); } catch (e) { return say('Error: no se pudo guardar el precio en este teléfono.'); } precioTimer = setTimeout(async () => { try { await call({ accion: 'precio_guardar', n: x.n, q: x.q || '', p: v }); } catch(e) { say('Precio guardado en este teléfono; sincronización pendiente.'); } },1200); };
     dx.onclick = async () => { delete prc[k]; try { L.prc = JSON.stringify(prc); } catch (e) {} pintaPrecios(); try { await call({ accion: 'precio_borrar', pk: k }); } catch (e) { say(errMsg(e)); } };
     row.append(nm, pi, dx); box.append(row);
   });
@@ -1630,12 +1740,13 @@ function togglePriv() {
 }
 (() => {
   setTimeout(() => { const sp = $('splash'); if (sp) { sp.classList.add('fin'); setTimeout(() => sp.remove(), 450); } }, 600);
-  $('sg1').onclick = () => { lVista = 1; pintaCompras(); }; $('sg2').onclick = () => { lVista = 2; pintaCompras(); };
+  $('sg1').onclick = () => { lVista = 1; pintaCompras(); }; $('sg2').onclick = () => { lVista = 2; pintaCompras(); }; $('sg3').onclick = () => { lVista = 3; pintaCompras(); }; $('lhweek').onchange = pintaHistorial;
   $('lia').onclick = itemsAgregar; $('lin').addEventListener('keydown', e => { if (e.key === 'Enter') { e.preventDefault(); itemsAgregar(); } });
   $('lgo').onclick = listaAGasto;
   $('lck').onchange = () => { const a = lActiva(); if (a) { a.cat = $('lck').value; a.tm = Date.now(); sucia(a); } };
   $('lrn').onclick = () => { const a = lActiva(); if (!a) return; const n = prompt('Nuevo nombre de la lista:', a.n); if (n !== null && n.trim()) { a.n = n.trim().slice(0, 30); a.tm = Date.now(); sucia(a); pintaCompras(); } };
-  $('lbr').onclick = () => { const a = lActiva(); if (!a) return; if (confirm('¿Borrar la lista "' + a.n + '"?')) { a.del = true; a.tm = Date.now(); sucia(a); lst.act = ''; pintaCompras(); } };
+  $('lbr').onclick = listaBorrar;
+  $('ldelok').onclick = listaBorrarConfirmada; $('ldelcancel').onclick = () => $('ldel').close();
   $('lps').addEventListener('input', pintaPrecios);
   $('pa').onclick = async () => { const n = $('pn').value.trim(), v = parseFloat($('pp').value.replace(/[$,\s]/g, '')); if (!n || !(v > 0)) return say('Falta el producto o un precio válido.'); const k = normC(n), o = prc[k] || { c: 0, f: '' }; prc[k] = { n, p: v, c: o.c || 0, f: o.f || '' }; try { L.prc = JSON.stringify(prc); } catch (e) {} $('pn').value = ''; $('pp').value = ''; pintaPrecios(); try { await call({ accion: 'precio_guardar', n, p: v }); say('Guardado: ' + n + ' a ' + money(v) + '.'); } catch (er) { say(errMsg(er)); } };
   $('cia').onclick = () => { const v = $('cin').value.trim(); if (!v) return; const r = leeRes(), l = ((r && r.config && r.config.correos) || []).slice(); if (!l.includes(v)) l.push(v); $('cin').value = ''; correosGuardar(l); };
@@ -1734,7 +1845,9 @@ function togglePriv() {
     if (!u.startsWith('https://script.google.com/') || !k) return say('Revisa la dirección y la clave.');
     L.u = u; L.k = k; say(''); init();
   };
-  window.addEventListener('online', flush);
+  window.addEventListener('online', () => { flush(); lstSync(); });
+  window.addEventListener('pagehide', lstGuarda);
+  document.addEventListener('visibilitychange', () => { if (document.hidden) lstGuarda(); else lstSync(); });
   init();
   if ('serviceWorker' in navigator) addEventListener('load', () => { navigator.serviceWorker.register('sw.js').catch(() => {}); });
   // Accesos rápidos del icono (Android): ?a=voz | ticket | hoy

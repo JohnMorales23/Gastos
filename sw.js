@@ -1,8 +1,8 @@
 // Guarda la app en el teléfono: abre al instante y también sin internet. Los gastos viajan por otra vía (cola local).
-const V = 'jk-v2';
-const SHELL = ['./', 'index.html', 'manifest.json?v=3', 'logo.png?v=3', 'icon.png?v=2', 'icon-192.png?v=2', 'icon-512.png?v=3'];
+const V = 'jk-compras-20261029-3';
+const SHELL = ['compras-model.js?v=20261029-3', './', 'index.html', 'manifest.json?v=3', 'logo.png?v=3', 'icon.png?v=2', 'icon-192.png?v=2', 'icon-512.png?v=3'];
 self.addEventListener('install', e => {
-  e.waitUntil(caches.open(V).then(c => Promise.all(SHELL.map(u => c.add(new Request(u, { cache: 'reload' })).catch(() => {})))).then(() => self.skipWaiting()));
+  e.waitUntil(caches.open(V).then(c => Promise.all(SHELL.map(u => c.add(new Request(u, { cache: 'reload' }))))).then(() => self.skipWaiting()));
 });
 self.addEventListener('activate', e => {
   e.waitUntil(caches.keys().then(k => Promise.all(k.filter(x => x !== V).map(x => caches.delete(x)))).then(() => self.clients.claim()));
