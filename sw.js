@@ -1,7 +1,8 @@
 // Guarda la app en el teléfono: abre al instante y también sin internet. Los gastos viajan por otra vía (cola local).
-// Etapa 1c: la versión cambia en 3 lugares a la vez (V, SHELL y el ?v= de compras-model.js en index.html)
-const V = 'jk-compras-20261101-1c2';
-const SHELL = ['compras-model.js?v=20261101-1c2', './', 'index.html', 'manifest.json?v=3', 'logo.png?v=3', 'icon.png?v=2', 'icon-192.png?v=2', 'icon-512.png?v=3'];
+// La versión cambia en 3 lugares a la vez (V, SHELL y el ?v= de compras-model.js en index.html)
+// Fase 1 (2026.11.02-diseno.1): se agregan las letras de la app (Manrope y Bricolage Grotesque, OFL) al armazón
+const V = 'jk-compras-20261102-d1';
+const SHELL = ['compras-model.js?v=20261102-d1', './', 'index.html', 'manifest.json?v=3', 'logo.png?v=3', 'icon.png?v=2', 'icon-192.png?v=2', 'icon-512.png?v=3', 'fonts/manrope-latin-wght.woff2', 'fonts/bricolage-latin-wght.woff2'];
 self.addEventListener('install', e => {
   e.waitUntil(caches.open(V).then(c => Promise.all(SHELL.map(u => c.add(new Request(u, { cache: 'reload' }))))).then(() => self.skipWaiting()));
 });
