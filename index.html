@@ -2,7 +2,7 @@
 <html lang="es">
 <head>
 <meta charset="utf-8">
-<meta name="application-version" content="2026.10.29-compras.2">
+<meta name="application-version" content="2026.11.01-pantalla.1c2">
 <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
 <meta name="apple-mobile-web-app-capable" content="yes">
 <meta name="mobile-web-app-capable" content="yes">
@@ -126,10 +126,10 @@ input[type=search]{-webkit-appearance:none;appearance:none}
 .hc.e{background:transparent;pointer-events:none}
 .hc:disabled{opacity:.55}
 .hc.hoy{outline:2px solid var(--navy);outline-offset:1px}
-#tkv,#ay,#av{position:fixed;inset:0;z-index:90;background:rgba(8,16,30,.92);display:flex;flex-direction:column;align-items:center;justify-content:center;gap:14px;padding:20px}
+#tkv,#ay,#av,#avz{position:fixed;inset:0;z-index:90;background:rgba(8,16,30,.92);display:flex;flex-direction:column;align-items:center;justify-content:center;gap:14px;padding:20px}
 #tkv img{max-width:100%;max-height:75vh;border-radius:12px;background:#fff}
-#ay>div,#av>div{background:var(--card);border-radius:18px;padding:20px;max-width:430px;max-height:80vh;overflow:auto;font-size:14px;line-height:1.5}
-#ay h2,#av h2{margin:0 0 8px;font-size:20px}
+#ay>div,#av>div,#avz>div{background:var(--card);border-radius:18px;padding:20px;max-width:430px;max-height:80vh;overflow:auto;font-size:14px;line-height:1.5}
+#ay h2,#av h2,#avz h2{margin:0 0 8px;font-size:20px}
 #ay code,#av code{background:var(--chip);padding:1px 6px;border-radius:6px;font-size:13px}
 #lkb{width:min(280px,80%)}
 /* Bloqueo */
@@ -200,6 +200,23 @@ header{position:relative}
 .hist-item{padding:8px 0;border-bottom:1px solid var(--line);font-size:14px}#lhist details{margin:16px 0}#lestado{min-height:18px}button:disabled{opacity:.45}
 #ldel{width:min(360px,calc(100% - 32px));box-sizing:border-box;border:1px solid var(--gold);border-radius:18px;background:var(--card);color:var(--ink);padding:22px}#ldel::backdrop{background:rgba(8,16,30,.55)}#ldel .ln button{flex:1;width:auto}#ltrash{margin:12px 0;font-size:14px}#ltrashitems .ln{justify-content:space-between}
 @media(min-width:500px){.compra-row,.compra-head{grid-template-columns:32px minmax(100px,1fr) 82px 92px}.compra-row input{font-size:15px}}
+/* Etapa 1c: foto del ticket sin IA, pendientes con error y aviso de voz */
+.fprev{display:flex;align-items:center;gap:12px;margin-top:10px}
+.fprev img{width:64px;height:64px;object-fit:cover;border-radius:10px;border:1px solid var(--line);background:var(--field);flex:none}
+.fprev .rc2{flex:1;min-width:0}
+#fest{margin:0}
+#pend .warn{text-align:left;margin-top:8px;display:flex;flex-direction:column;gap:4px}
+#pend .warn .row{border-bottom-color:rgba(122,82,0,.2)}
+#pend .warn .rc2{color:inherit;opacity:.9}
+#pend .warn .acts{display:flex;gap:6px;flex:none}
+#pend .warn .rm{flex:none}
+#pend .warn .bot .rc2{flex:1;min-width:0}
+/* M8: los botones mini se ven igual, pero su área de toque mide 44 px de alto */
+.mini{position:relative}
+.mini::after{content:"";position:absolute;left:0;right:0;top:50%;height:44px;transform:translateY(-50%)}
+.icb.apagado{opacity:.55}
+#avz .ln{margin-top:14px}
+#avz .ln button{flex:1;width:auto}
 </style>
 </head>
 <body>
@@ -240,15 +257,22 @@ header{position:relative}
 <button id="mic" class="icb dark" type="button" aria-label="Dictar" hidden><svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="9" y="3" width="6" height="11" rx="3"/><path d="M5 11a7 7 0 0 0 14 0M12 18v3"/></svg></button></div>
 <p id="hint" style="margin-top:8px;font-size:12px">Para dictar toca el micrófono del teclado de tu celular.</p>
 </div>
-<button id="fb" type="button" class="out"><svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M4 8.5A1.5 1.5 0 0 1 5.5 7H8l1.2-2h5.6L16 7h2.5A1.5 1.5 0 0 1 20 8.5v9a1.5 1.5 0 0 1-1.5 1.5h-13A1.5 1.5 0 0 1 4 17.5z"/><circle cx="12" cy="13" r="3.4"/></svg>Escanear ticket</button>
+<button id="fb" type="button" class="out"><svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M4 8.5A1.5 1.5 0 0 1 5.5 7H8l1.2-2h5.6L16 7h2.5A1.5 1.5 0 0 1 20 8.5v9a1.5 1.5 0 0 1-1.5 1.5h-13A1.5 1.5 0 0 1 4 17.5z"/><circle cx="12" cy="13" r="3.4"/></svg>Escanear ticket con IA</button>
 <input id="ph" type="file" accept="image/*" capture="environment" hidden><input id="ph2" type="file" accept="image/*" hidden>
-<div id="ts" hidden><div class="sh"><b>Escanear ticket</b><button id="tsc" type="button" class="pri">Abrir cámara</button><button id="tsf" type="button" class="out">Subir foto o archivo</button><button id="tsx" type="button" class="lnk">Cancelar</button></div></div>
+<div id="ts" hidden><div class="sh"><b>Escanear ticket con IA</b><p style="margin:0;text-align:center;font-size:13px;color:var(--muted)">La foto se manda a la IA para leer fecha, comercio y total.</p><button id="tsc" type="button" class="pri">Abrir cámara</button><button id="tsf" type="button" class="out">Subir foto o archivo</button><button id="tsx" type="button" class="lnk">Cancelar</button></div></div>
 <div id="pt" class="warn" hidden><span id="ptt"></span> <button id="ptb" class="mini" type="button">Guardar dividido</button></div>
 <div id="fqw" hidden><label>Frecuentes</label><div class="chips" id="fq"></div></div>
 <div><label for="f">Fecha</label><input id="f" type="date"></div>
 <div><label for="c">Concepto</label><input id="c" autocomplete="off" placeholder="Ej. Tacos"></div>
 <div><label for="m">Monto</label><input id="m" inputmode="decimal" placeholder="$0.00"></div>
 <div><label for="k">Categoría</label><select id="k"><option>Esencial</option><option>Mantener</option><option>Innecesario</option></select></div>
+<!-- Foto del ticket a mano (B1): se guarda en Drive con el gasto y nunca va a la IA -->
+<div id="fwrap"><label>Foto del ticket (opcional)</label>
+<div class="two"><button id="fcam" type="button" class="out">Tomar foto</button><button id="fgal" type="button" class="out">Subir de galería</button></div>
+<div id="fprev" class="fprev" hidden><img id="fimg" alt="Miniatura de la foto del ticket"><span class="rc2">Se guarda en tu Drive con el gasto. No se manda a la IA.</span><button id="fqx" type="button" class="mini del">Quitar</button></div>
+<input id="phm" type="file" accept="image/*" capture="environment" hidden><input id="phg" type="file" accept="image/*" hidden>
+</div>
+<p id="fest" class="rc2" role="status" hidden></p>
 <button id="go" class="pri">Guardar gasto</button>
 <button id="cn" class="lnk" hidden>Cancelar edición</button>
 <button id="tkb" type="button" class="out" hidden>Ver foto del ticket</button>
@@ -311,9 +335,10 @@ header{position:relative}
 <div class="card"><h2>Metas de ahorro</h2><div id="gl"></div>
 <div class="two"><div><label for="gn">Nueva meta</label><input id="gn" autocomplete="off" placeholder="Ej. Viaje"></div><div><label for="gob">Objetivo</label><input id="gob" inputmode="decimal" placeholder="$0.00"></div></div>
 <button id="ga" class="out">Agregar meta</button></div>
-<div class="card"><h2>¿Dónde puedo ahorrar?</h2><p>La IA revisa tu mes y te da ideas usando tus propios números.</p><button id="ab" class="pri">Analizar mi mes</button><div id="ar" hidden></div></div>
+<div class="card"><h2>¿Dónde puedo ahorrar?</h2><p>La IA revisa tu mes y te da ideas usando tus propios números.</p><p id="abx" class="warn" hidden>La IA está apagada por privacidad. Tus números siguen en el Resumen y el Cierre de arriba.</p><button id="ab" class="pri">Analizar mi mes</button><div id="ar" hidden></div></div>
 <div class="card">
 <h2>Preguntar a mis gastos</h2>
+<p id="qx" class="warn" hidden>La IA está apagada por privacidad. Busca por día, palabra o categoría en Movimientos.</p>
 <div class="ln"><input id="qi" autocomplete="off" enterkeyhint="send" placeholder="¿En qué gasté el 29/09?">
 <button id="qb" class="icb" type="button" aria-label="Preguntar"><svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12h14M13 6l6 6-6 6"/></svg></button>
 <button id="qmic" class="icb dark" type="button" aria-label="Dictar" hidden><svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="9" y="3" width="6" height="11" rx="3"/><path d="M5 11a7 7 0 0 0 14 0M12 18v3"/></svg></button></div>
@@ -331,6 +356,7 @@ header{position:relative}
 <div id="cl"></div>
 <div class="ln"><input id="cin" placeholder="santander  o  alertas@banco.com" autocomplete="off" autocapitalize="none"><button id="cia" type="button" class="icb dark" aria-label="Agregar correo" style="color:#fff;font-size:26px">+</button></div>
 <p id="cst"></p>
+<p id="crx" class="warn" hidden>La IA está apagada por privacidad: no se leen correos ni se crean avisos nuevos. Los que ya están en «Por aprobar» se pueden aprobar.</p>
 <button id="crb" type="button" class="out">Revisar correos ahora</button>
 <button id="cgb" type="button" class="out">Cómo conectar el teléfono</button>
 <div class="two"><button id="cpu" type="button" class="mini" style="height:40px">Copiar dirección</button><button id="cpk" type="button" class="mini" style="height:40px">Copiar clave</button></div>
@@ -338,6 +364,7 @@ header{position:relative}
 <div class="card" id="cnc"><h2>Conciliar con el estado de cuenta</h2>
 <p>Importa un CSV o TXT sin números de tarjeta, cuentas ni saldos. Los cargos que falten pasarán a “Por aprobar”. Los PDF e imágenes completos no se envían para conciliar.</p>
 <input id="cnf" type="file" accept=".csv,.txt,text/csv,text/plain" style="display:none">
+<p id="cnx" class="warn" hidden>La IA está apagada por privacidad: la conciliación no está disponible.</p>
 <button id="cnb" type="button" class="out">Elegir CSV o TXT</button>
 <div id="cnr" class="vacio" style="margin-top:8px"></div></div>
 <div class="card gold">
@@ -351,9 +378,9 @@ header{position:relative}
 </div>
 <div class="card">
 <h2>Preferencias</h2>
-<label class="chk"><input id="au" type="checkbox" checked><span>Guardar directo con IA<small>Al escribir o dictar un gasto se guarda sin pedirte revisarlo.</small></span></label>
+<label class="chk"><input id="au" type="checkbox" checked><span>Guardar directo con IA<small id="aux">Al escribir o dictar un gasto se guarda sin pedirte revisarlo.</small></span></label>
 <div><label for="ing">Ingreso mensual</label><div class="ln"><input id="ing" inputmode="decimal" placeholder="Ej. 25000"><button id="ingb" class="mini" type="button" style="height:52px;width:96px;flex:none;border-radius:12px">Guardar</button></div><p style="margin-top:6px;font-size:12px">Es la misma celda de tu hoja (Resumen Mensual, E3): si la cambias aquí o allá, se actualiza en los dos lados.</p></div>
-<div><label for="yo">Mi inicial (para saber quién registró)</label><input id="yo" maxlength="2" autocomplete="off" placeholder="Ej. J"></div>
+<div><label for="yo">Mi inicial (para saber quién registró)</label><select id="yo"></select><p style="margin-top:6px;font-size:12px">K = Karla · J = Jonathan. Se agrega al final de cada gasto que registres desde este teléfono.</p></div>
 <div><label for="tc">Dólar a pesos</label><input id="tc" inputmode="decimal" placeholder="Ej. 18.50"><p id="tcs" style="margin-top:6px;font-size:12px"></p></div>
 <label class="chk"><input id="tca" type="checkbox" checked><span>Buscar el tipo de cambio de cada día<small>Al decir "20 dólares de Uber" se usa el tipo de cambio de la fecha del gasto (referencia internacional; puede diferir un poco de tu banco). Si lo desmarcas, se usa el que escribas arriba.</small></span></label>
 <div><label for="tpE">Tope mensual Esencial</label><input id="tpE" inputmode="decimal" placeholder="Sin tope"></div>
@@ -389,7 +416,7 @@ header{position:relative}
 <h2>Conexión</h2>
 <p>Esta app está conectada a tu hoja de Google.</p>
 <button id="rc" class="out">Cambiar configuración</button>
-<p style="text-align:center;font-size:12px">JonKa · Control de gastos</p>
+<p id="ver" style="text-align:center;font-size:12px">JonKa · Control de gastos</p>
 </div>
 </section>
 </main>
@@ -419,6 +446,9 @@ header{position:relative}
 <p><b>2. En Resumen Mensual:</b> Edición > Buscar y reemplazar. Buscar <code>$1003</code>, reemplazar con <code>$3003</code>, buscar en "Esta hoja" y marca "Buscar también dentro de las fórmulas". Reemplazar todo.</p>
 <p><b>3. En Apps Script (Code.gs):</b> cambia <code>ULTIMA = 1003</code> por <code>ULTIMA = 3003</code> y publica una Nueva versión.</p>
 <button id="ayx" class="pri" type="button" style="margin-top:8px">Entendido</button></div></div>
+<!-- Aviso de voz (B5): se muestra la primera vez, con el texto exacto que manda el servidor -->
+<div id="avz" hidden role="dialog" aria-modal="true" aria-labelledby="avzt"><div><h2 id="avzt">Antes de usar la voz</h2><p id="avzx"></p>
+<div class="ln"><button id="avzm" type="button" class="out">Registrar a mano</button><button id="avza" type="button" class="pri">Aceptar</button></div></div></div>
 <div id="imp"></div>
 <div id="lock" hidden><img src="logo.png?v=3" alt="JonKa"><h2 id="lkt"></h2><div id="lkd"></div><div id="lkp"></div><button id="lkb" class="pri" hidden>Usar Face ID / huella</button><button id="lku" class="lnk" hidden>Usar PIN</button><button id="lkc" class="lnk" hidden>Cancelar</button><button id="lko" class="lnk">Olvidé mi PIN</button></div>
 <nav id="tabs" hidden>
@@ -428,7 +458,7 @@ header{position:relative}
 <button data-t="rep"><svg viewBox="0 0 24 24"><path d="M5 21v-8M11 21V6M17 21v-10M3 21h18"/></svg>Reportes</button>
 <button data-t="aju"><svg viewBox="0 0 24 24"><path d="M4 7h9M17 7h3M4 17h3M11 17h9"/><circle cx="15" cy="7" r="2"/><circle cx="9" cy="17" r="2"/></svg>Ajustes</button>
 </nav>
-<script src="compras-model.js?v=20261029-3"></script>
+<script src="compras-model.js?v=20261101-1c2"></script>
 <script>
 const $ = id => document.getElementById(id), L = localStorage;
 const MESES = ['Enero','Febrero','Marzo','Abril','Mayo','Junio','Julio','Agosto','Septiembre','Octubre','Noviembre','Diciembre'];
@@ -443,6 +473,25 @@ const larga = f => esFecha(f) ? Number(f.slice(8, 10)) + ' ' + MES3[Number(f.sli
 const moneyReal = n => '$' + Number(n).toLocaleString('es-MX', { minimumFractionDigits: 2, maximumFractionDigits: 2 });
 const priv = () => L.priv === '1';
 const money = n => priv() ? '$•••••' : moneyReal(n);
+// Lee un monto escrito a mano (B2). Acepta «45,50», «45.50», «$45», «$ 200», «1,234.56» y «1.234,56».
+// Devuelve el número redondeado a «dec» decimales, o null si no es un monto válido. Misma idea que ComprasModel.price.
+// No junta números separados por espacio («45 50») ni lee «0,001» como miles (M3).
+function leeMonto(v, opc) {
+  const dec = (opc && opc.dec) || 2, D = '\\d{1,' + dec + '}';
+  let s = String(v == null ? '' : v).trim(), signo = 1;
+  if (opc && opc.neg && s.charAt(0) === '-') { signo = -1; s = s.slice(1).trim(); } // metas: negativo = retiro
+  s = s.replace(/^\$\s*/, ''); // el signo de pesos puede llevar un espacio después; dentro del número, no
+  if (!s || /\s/.test(s)) return null;
+  let n = null;
+  if (new RegExp('^\\d+(?:\\.\\d{0,' + dec + '})?$').test(s)) n = s;                                   // 45 · 45.5 · 45.50
+  else if (new RegExp('^\\d+,' + D + '$').test(s)) n = s.replace(',', '.');                              // 45,5 · 45,50
+  else if (new RegExp('^[1-9]\\d{0,2}(?:,\\d{3})+(?:\\.' + D + ')?$').test(s)) n = s.replace(/,/g, '');   // 1,234 · 1,234.56 (no «0,001»)
+  else if (new RegExp('^[1-9]\\d{0,2}(?:\\.\\d{3})+,' + D + '$').test(s)) n = s.replace(/\./g, '').replace(',', '.'); // 1.234,56
+  if (n === null) return null;
+  const f = Math.pow(10, dec), x = Math.round(Number(n) * f) / f;
+  return Number.isFinite(x) ? signo * x : null;
+}
+const MSG_MONTO = 'Revisa el monto: escribe un número mayor que 0, por ejemplo 45.50 o 45,50.';
 const nuevoId = () => Date.now().toString(36) + Math.random().toString(36).slice(2, 8);
 const leeMov = () => { try { return JSON.parse(L.mov || 'null'); } catch (e) { return null; } };
 const leeFij = () => { try { return JSON.parse(L.fij || 'null'); } catch (e) { return null; } };
@@ -468,18 +517,51 @@ function parseLocal(t) {
     if (w === 'ayer') fecha = ayer(); else if (w !== 'hoy') { const d = new Date(); d.setDate(d.getDate() - 2); fecha = iso(d); }
     t = (t.slice(0, dm.index) + ' ' + t.slice(dm.index + dm[0].length)).trim().replace(/\s+/g, ' ');
   }
-  const NUM = '\\$?\\s?(\\d{1,3}(?:,\\d{3})+|\\d+)(?:\\.(\\d{1,2}))?';
-  let m = new RegExp('^(.+?)\\s+(?:por\\s+)?' + NUM + '\\s*(?:pesos|mxn)?$', 'i').exec(t), c, ent, dec;
-  if (m) { c = m[1]; ent = m[2]; dec = m[3]; }
-  else { m = new RegExp('^' + NUM + '\\s*(?:pesos|mxn)?\\s+(?:de\\s+|en\\s+)?(.+)$', 'i').exec(t); if (!m) return null; ent = m[1]; dec = m[2]; c = m[3]; }
-  const monto = Number(ent.replace(/,/g, '') + (dec ? '.' + dec : ''));
+  // El monto se lee con leeMonto (M4): «tacos 45,50» y «tacos 1,234.50» se resuelven aquí, sin IA
+  const NUM = '(\\$?\\s?\\d[\\d.,]*)';
+  let m = new RegExp('^(.+?)\\s+(?:por\\s+)?' + NUM + '\\s*(?:pesos|mxn)?$', 'i').exec(t), c, tok;
+  if (m) { c = m[1]; tok = m[2]; }
+  else { m = new RegExp('^' + NUM + '\\s*(?:pesos|mxn)?\\s+(?:de\\s+|en\\s+)?(.+)$', 'i').exec(t); if (!m) return null; tok = m[1]; c = m[2]; }
+  const monto = leeMonto(tok);
   c = c.replace(/\s+(por|de|en)$/i, '').trim();
   if (!(monto > 0) || monto >= 1e6 || !c || /\d/.test(c) || c.split(' ').length > 4) return null;
   const k = leeCM()[normC(c)];
   if (!k) return null;
   return { fecha, concepto: c.charAt(0).toUpperCase() + c.slice(1), cat: k, monto };
 }
-const errMsg = e => e.fatal ? 'Error: ' + e.message : 'Error: no hay conexión. Intenta de nuevo.';
+// Errores del servidor con código (B5): texto claro en lugar del mensaje crudo
+const CODIGOS = {
+  IA_DESACTIVADA: 'La IA está apagada por privacidad. Registra el gasto a mano; no se envió nada a la IA.',
+  ARCHIVO_IA_DESACTIVADO: 'La lectura de fotos y audio con IA está apagada. Registra el gasto a mano; no se envió nada a la IA.',
+  IA_VOZ_DESACTIVADA: 'La voz está apagada; registra a mano.',
+  GEMINI_PAGO_REQUERIDO: 'La voz necesita el servicio de IA de pago y todavía no está activo. Registra a mano.', // servidor v20
+  VOZ_PAGO_REQUERIDO: 'La voz necesita el servicio de IA de pago y todavía no está activo. Registra a mano.', // servidor nuevo (W44-AP44)
+  VOZ_LIMITE_DIARIO: 'Ya se usó la voz el máximo de veces de hoy; registra a mano.',
+  HOJA_OCUPADA: 'La hoja está ocupada y el gasto no se guardó. Intenta de nuevo o registra a mano.', // fuera de la cola no hay reintento automático; en la cola, ver motivoCola
+  VOZ_CONTADOR_INVALIDO: 'No se pudo revisar el límite de voz de hoy. Registra a mano.',
+  DICTADO_INVALIDO: 'El dictado debe tener entre 1 y 300 caracteres. Dilo más corto o registra a mano.',
+  CONCILIACION_DESACTIVADA: 'La conciliación está apagada por privacidad. Revisa tus movimientos a mano.',
+  AUDIO_INVALIDO: 'Eso no es una grabación de voz. Usa el micrófono o registra a mano.',
+  AUDIO_MUY_GRANDE: 'La grabación es muy larga. Dilo más corto o registra a mano.',
+  FECHA_INVALIDA: 'La fecha no es válida o es futura. Revísala.',
+  // Servidor nuevo de la voz (PR #6, rama constructor/etapa2b-voz-openai, commit 4fdfd33)
+  OPENAI_LLAVE_RECHAZADA: 'El servicio de IA rechazó la llave de la voz. Hay que revisarla en el script; mientras, registra a mano.',
+  OPENAI_LIMITE: 'El servicio de IA está saturado. Intenta en unos minutos o registra a mano.',
+  OPENAI_SIN_SALDO: 'Se acabó el saldo del servicio de IA. Hay que recargarlo; mientras, registra a mano.',
+  OPENAI_NO_DISPONIBLE: 'El servicio de IA tiene una falla temporal. Intenta en unos segundos o registra a mano.',
+  OPENAI_SIN_CONEXION: 'No se pudo conectar con el servicio de IA. Intenta de nuevo o registra a mano.',
+  OPENAI_SOLICITUD_RECHAZADA: 'El servicio de IA no aceptó la grabación. Intenta con una más clara o registra a mano.',
+  OPENAI_SIN_PERMISO: 'El servicio de IA no dio permiso para la voz. Hay que revisar la llave en el script; mientras, registra a mano.',
+  OPENAI_MODELO: 'El servicio de IA no encontró el modelo de voz. Hay que revisarlo en el script; mientras, registra a mano.',
+  OPENAI_ERROR: 'El servicio de IA respondió con un error. Registra a mano.',
+  VOZ_NO_ENTENDIDA: 'No entendí el gasto. Dilo otra vez con concepto y monto, o registra a mano.',
+  VOZ_SIN_TEXTO: 'No se escuchó nada en la grabación. Intenta de nuevo o registra a mano.'
+};
+// El texto crudo del servidor nunca muestra «Gemini» (W44-AP44): se cambia por «la IA»
+const sinGemini = t => String(t).replace(/GEMINI_KEY/g, 'la llave de la IA').replace(/(?:Google\s+)?Gemini(?:_[A-Z]+)?/gi, 'la IA');
+const textoError = e => (e && e.codigo && CODIGOS[e.codigo]) || (e && e.message ? sinGemini(e.message) : '') || 'algo salió mal.';
+// red = no hubo respuesta; lento = pasó el tiempo límite; ocupado = el servidor respondió que está saturado
+const errMsg = e => e.fatal ? 'Error: ' + textoError(e) : e.lento ? 'Error: ' + e.message + ' Intenta de nuevo.' : e.ocupado ? 'Error: ' + (CODIGOS[e.codigo] || 'el servidor está ocupado. Intenta de nuevo en un momento.') : 'Error: no hay conexión. Intenta de nuevo.';
 const RE_Q = /\s·\s?([A-Za-zÁÉÍÓÚÑáéíóúñ]{1,2})$/;
 const quienDe = c => { const m = RE_Q.exec(String(c)); return m ? m[1].toUpperCase() : ''; };
 const sinQuien = c => String(c).replace(RE_Q, '');
@@ -510,6 +592,19 @@ function aviso(t, undo) {
   b.onclick = () => { b.disabled = true; undo(); };
   s.append(b); clearTimeout(stT); stT = setTimeout(() => { s.hidden = true; }, 9000);
 }
+// Lleva al formulario manual (salida de la voz y de la IA cuando no se pueden usar)
+function irAMano() {
+  if (tab !== 'inicio') setTab('inicio');
+  $('form').scrollIntoView({ behavior: 'smooth', block: 'start' });
+  try { $('c').focus({ preventScroll: true }); } catch (e) {}
+}
+// Aviso con botón "Registrar a mano"
+function avisoManual(t) {
+  say(t);
+  const s = $('st'), b = el('button', 'ub', 'Registrar a mano'); b.type = 'button';
+  b.onclick = () => { say(''); irAMano(); };
+  s.append(b); clearTimeout(stT); stT = setTimeout(() => { s.hidden = true; }, 9000);
+}
 function avisoGuardado(c, m, j, cat) {
   const nom = sinQuien(c);
   aviso((j.dup ? 'Guardado, pero ojo: ya había "' + nom + '" por ' + money(m) + ' ese día. ' : 'Guardado: ' + nom + ' · ' + money(m) + (cat ? ' · ' + cat : '') + '. ') +
@@ -520,14 +615,32 @@ function avisoGuardado(c, m, j, cat) {
     });
 }
 
-async function call(body) {
+// Tiempo límite de cada llamada (B3): si Apps Script se cuelga, la cola y el resumen no esperan para siempre
+const LIMITE_MS = 20000, LENTO_MS = 60000; // 60 s solo para respaldos, correos y conciliar, que tardan más
+async function call(body, ms) {
   const extra = {}; if (viajeActivo()) extra.monedaBase = 'USD'; if (L.yo) extra.quien = L.yo; if (Number(L.tc) > 0) extra.tc = Number(L.tc); extra.tcAuto = L.tca !== '0';
-  const r = await fetch(L.u, { method: 'POST', headers: { 'Content-Type': 'text/plain;charset=utf-8' }, body: JSON.stringify({ k: L.k, ...extra, ...body }) });
-  const j = await r.json();
-  if (!j.ok) throw Object.assign(new Error(j.error), { fatal: !/Lock timeout|too many times|Exceeded maximum|Service invoked/i.test(String(j.error || '')) });
+  const lim = ms || LIMITE_MS, ctl = typeof AbortController === 'function' ? new AbortController() : null;
+  const tt = ctl ? setTimeout(() => ctl.abort(), lim) : 0;
+  const lento = () => Object.assign(new Error('El servidor tardó más de ' + Math.round(lim / 1000) + ' s en responder.'), { fatal: false, lento: true });
+  let r, j;
+  try {
+    try { r = await fetch(L.u, { method: 'POST', headers: { 'Content-Type': 'text/plain;charset=utf-8' }, body: JSON.stringify({ k: L.k, ...extra, ...body }), signal: ctl ? ctl.signal : undefined }); }
+    catch (e) { throw e && e.name === 'AbortError' ? lento() : Object.assign(new Error('No hay conexión.'), { fatal: false, red: true }); }
+    // Sí hubo respuesta: si no es JSON, no es "sin conexión" (dirección equivocada, permiso de la implementación o error de Google)
+    // general = el problema no es de un gasto en particular (I1): la cola se detiene sin marcar ninguno
+    try { j = await r.json(); }
+    catch (e) { throw e && e.name === 'AbortError' ? lento() : Object.assign(new Error('El servidor respondió algo que la app no entiende (HTTP ' + r.status + '). Revisa la dirección en Ajustes o intenta más tarde.'), { fatal: true, sinJson: true, general: true, status: r.status }); }
+  } finally { clearTimeout(tt); }
+  if (!j || !j.ok) {
+    const msg = String((j && j.error) || 'El servidor no confirmó la operación.'), ocupado = (j && j.codigo) === 'HOJA_OCUPADA' || /Lock timeout|too many times|Exceeded maximum|Service invoked/i.test(msg); // pasajero: como un HTTP 5xx
+    const general = r.status >= 500 || /Clave incorrecta|hoja Registro está llena|No existe la pestaña/i.test(msg); // clave, hoja llena o falla de Google: no es culpa del gasto
+    throw Object.assign(new Error(msg), { fatal: !ocupado, ocupado, general, codigo: j && j.codigo, status: r.status });
+  }
   return j;
 }
-const send = g => call(g);
+// Lo que solo vive en el teléfono (error y tiempos agotados de un pendiente) no viaja al servidor.
+// Un registro con foto tiene 60 s (I2): la foto tarda más en subir.
+const send = g => { const { err, lentos, ...cuerpo } = g; return call(cuerpo, cuerpo.foto ? LENTO_MS : 0); };
 
 // ---- Pestañas ----
 const TITULOS = {
@@ -554,28 +667,96 @@ function setTab(t) {
 
 // ---- Envío de gastos (con cola sin conexión) ----
 let busy = false, fotoActual = '', partesPend = null, tkData = null;
+// Reintento automático de la cola (I1): 15 s, 30 s, 60 s… hasta 5 min; además de abrir la app y de volver la conexión
+let reT = 0, reN = 0;
+function programaReintento() { clearTimeout(reT); const ms = Math.min(300000, 15000 * Math.pow(2, reN++)); reT = setTimeout(() => { reT = 0; flush(); }, ms); }
+// Por qué se detuvo la cola, sin culpar a ningún gasto
+function motivoCola(e) {
+  if (e.lento) return 'El servidor tardó en responder: tus gastos siguen pendientes y se enviarán solos.';
+  if (e.codigo === 'HOJA_OCUPADA') return 'La hoja está ocupada; se vuelve a intentar sola.';
+  if (e.ocupado) return 'El servidor está ocupado: tus gastos siguen pendientes y se enviarán solos.';
+  if (!e.fatal) return 'Sin conexión: tus gastos siguen pendientes y se enviarán solos cuando vuelva.';
+  if (/Clave incorrecta/i.test(e.message)) return 'Error: la clave de este teléfono ya no coincide con la de tu hoja. Revísala en Ajustes; tus gastos siguen pendientes.';
+  return 'Error: ' + textoError(e) + ' Tus gastos siguen pendientes y se reintentan solos.';
+}
 async function flush() {
-  if (busy) return; busy = true;
-  let c, enviados = 0, fallos = 0;
-  while ((c = q()).length) { // se relee la cola en cada vuelta: lo que se agregue mientras se envía no se pierde
-    const it = c[0];
-    try { const j = await send(it); compraEstado(it.id,'guardado'); enviados++; avisoGuardado(it.concepto, it.monto, j, it.cat); }
-    catch (e) {
-      if (!e.fatal) { if (!navigator.onLine) say('Sin conexión: el gasto se enviará solo cuando vuelva.'); break; }
-      fallos++; compraEstado(it.id,'error'); say('Error: ' + e.message + ' (' + it.concepto + '). El gasto sigue pendiente; corrige la configuración y reintenta.'); break;
+  if (busy) return; busy = true; clearTimeout(reT); reT = 0;
+  let enviados = 0, fallos = 0, saltados = 0, ultimo = null, detenida = null;
+  const vistos = new Set();
+  try {
+    for (;;) { // se relee la cola en cada vuelta: lo que se agregue mientras se envía no se pierde
+      // Los que tienen error esperan a "Reintentar"; los que ya agotaron el tiempo 3 veces van al final (I2)
+      const c = q(), libre = x => !x.err && !vistos.has(x.id);
+      const it = c.find(x => libre(x) && (x.lentos || 0) < 3) || c.find(libre);
+      if (!it) break;
+      vistos.add(it.id);
+      try {
+        const j = await send(it);
+        const n = q(), i = n.findIndex(x => x.id === it.id); if (i >= 0) { n.splice(i, 1); guardaQ(n); }
+        compraEstado(it.id, 'guardado'); enviados++; avisoGuardado(it.concepto, it.monto, j, it.cat);
+        if (it.foto) verificaFoto(it);
+      } catch (e) {
+        if (e.lento) { // tiempo agotado: se cuenta; a la tercera seguida, la cola pasa al siguiente sin perderlo (I2)
+          const n = q(), x = n.find(y => y.id === it.id);
+          if (x) { x.lentos = (x.lentos || 0) + 1; guardaQ(n); if (x.lentos >= 3) { saltados++; continue; } }
+        }
+        if (!e.fatal || e.general) { detenida = e; break; } // red, tiempo, ocupado, no JSON, HTTP ≥ 500 o clave: nadie se marca (I1)
+        // El servidor rechazó este gasto en concreto (B3): se marca y la cola sigue con los demás
+        fallos++; ultimo = { it, e }; marcaErrorQ(it.id, textoError(e)); compraEstado(it.id, 'error');
+      }
     }
-    const n = q(), i = n.findIndex(x => x.id === it.id); if (i >= 0) n.splice(i, 1); L.q = JSON.stringify(n);
-  }
-  busy = false;
-  if (enviados || fallos) refrescar();
-  $('pend').textContent = q().length ? q().length + ' gasto(s) pendiente(s) por enviar' : '';
+  } finally { busy = false; }
+  if (fallos) say('Error: ' + (fallos === 1 ? '«' + sinQuien(ultimo.it.concepto) + '» no se guardó: ' + textoError(ultimo.e) : fallos + ' gastos no se guardaron.') + ' Está en Pendientes, en Inicio, con Reintentar y Quitar.');
+  else if (detenida) say(motivoCola(detenida));
+  else if (saltados) say('Un gasto tarda demasiado en enviarse: sigue pendiente y se reintentará. Los demás ya se enviaron.');
+  // El resumen se saltó mientras se enviaba (L891): se refresca también tras un tiempo límite o una pausa (I2)
+  if (enviados || fallos || detenida || saltados) refrescar();
+  if (q().some(x => !x.err) && (detenida || saltados)) programaReintento(); else if (!detenida) reN = 0;
+  pintaPend();
+}
+function marcaErrorQ(id, m) {
+  const n = q(), x = n.find(y => y.id === id);
+  if (x) { x.err = { m: String(m || 'Error').slice(0, 200), t: Date.now() }; guardaQ(n); }
+}
+// Pendientes: cuántos faltan y cuáles tuvieron error, con Reintentar y Quitar (B3)
+function pintaPend() {
+  const c = q(), box = $('pend'), malos = c.filter(x => x.err), n = c.length - malos.length;
+  box.textContent = '';
+  if (n) box.append(el('div', '', n + ' gasto(s) pendiente(s) por enviar'));
+  if (!malos.length) return;
+  const w = el('div', 'warn');
+  w.append(el('b', '', malos.length === 1 ? 'Un gasto no se guardó' : malos.length + ' gastos no se guardaron'));
+  malos.forEach(it => {
+    // Concepto y monto en renglones separados del error: un concepto largo se corta y el monto siempre se ve (M8);
+    // con el ojo cerrado no se ve ningún monto, tampoco en dólares (M1)
+    const row = el('div', 'row g'), top = el('div', 'top'), bot = el('div', 'bot'), acts = el('div', 'acts');
+    top.append(el('div', 'rc1', sinQuien(it.concepto)), el('div', 'rm', it.usd ? 'USD ' + (priv() ? '•••••' : it.monto) : money(it.monto)));
+    const br = el('button', 'mini', 'Reintentar'), bq = el('button', 'mini del', 'Quitar');
+    br.type = bq.type = 'button';
+    br.setAttribute('aria-label', 'Reintentar ' + sinQuien(it.concepto)); bq.setAttribute('aria-label', 'Quitar ' + sinQuien(it.concepto));
+    br.onclick = () => reintentaQ(it.id); bq.onclick = () => quitaQ(it.id);
+    acts.append(br, bq); bot.append(el('div', 'rc2', ddmm(it.fecha) + ' · ' + it.err.m), acts); row.append(top, bot); w.append(row);
+  });
+  if (malos.length > 1) { const b = el('button', 'mini', 'Reintentar todos'); b.type = 'button'; b.onclick = () => reintentaQ(); w.append(b); }
+  box.append(w);
+}
+function reintentaQ(id) {
+  const n = q(); n.forEach(x => { if (x.err && (!id || x.id === id)) { delete x.err; delete x.lentos; } });
+  guardaQ(n); pintaPend(); flush();
+}
+function quitaQ(id) {
+  const n = q(), x = n.find(y => y.id === id); if (!x) return pintaPend();
+  if (!confirm('¿Quitar «' + sinQuien(x.concepto) + '» de los pendientes? No se guardará en tu hoja.')) return;
+  guardaQ(n.filter(y => y.id !== id));
+  const m = leeMov(); if (m && Array.isArray(m.items)) { m.items = m.items.filter(y => y.qid !== id); try { L.mov = JSON.stringify(m); } catch (e) {} }
+  pintaPend(); say('Quitado: ' + sinQuien(x.concepto) + '.'); refrescar();
 }
 
 // Guarda la cola en el teléfono; si no cabe (fotos grandes), quita fotos antes que perder el gasto
 function guardaQ(c) {
   try { L.q = JSON.stringify(c); return true; } catch (e) {}
   c.forEach((x, i) => { if (x.foto && i < c.length - 1) delete x.foto; });
-  try { L.q = JSON.stringify(c); return true; } catch (e) {}
+  try { L.q = JSON.stringify(c); say('Aviso: poco espacio; se quitaron las fotos de gastos pendientes anteriores.'); return true; } catch (e) {}
   c.forEach(x => { delete x.foto; });
   try { L.q = JSON.stringify(c); say('Aviso: poco espacio; el gasto se guardó sin la foto.'); return true; } catch (e) { return false; }
 }
@@ -601,7 +782,7 @@ function aplicaLocal(it) {
   if (r && r.mesDe === hoy().slice(0, 7) && !it.usd) { suma(r, it); try { L.res = JSON.stringify(r); } catch (e) {} pintaResumen(r); }
   const m = leeMov();
   if (m && Array.isArray(m.items)) {
-    m.items.unshift({ row: 0, f: it.fecha, c: L.yo ? it.concepto + ' · ' + L.yo : it.concepto, k: it.cat, m: it.monto, pend: 1 });
+    m.items.unshift({ row: 0, f: it.fecha, c: L.yo ? sinQuien(it.concepto) + ' · ' + L.yo : it.concepto, k: it.cat, m: it.monto, pend: 1, qid: it.id }); // la inicial una sola vez, como conQuien del servidor (M6)
     m.items = m.items.slice(0, 30); m.n = (m.n || 0) + 1;
     try { L.mov = JSON.stringify(m); } catch (e) {}
     if (tab === 'mov' && !hayFiltro()) pintaMov(m);
@@ -612,13 +793,14 @@ function agregaGasto(it, opc) {
   if (viajeActivo() && !(opc && opc.mxn)) it.usd = true;
   if (!encola([it])) return false;
   aplicaLocal(it); aprende([[it.concepto, it.cat]]);
-  aviso('Guardado: ' + it.concepto + ' · ' + money(it.monto) + ' · ' + it.cat + '.');
+  aviso('Guardado: ' + it.concepto + ' · ' + money(it.monto) + ' · ' + it.cat + '.' + (it.foto ? ' La foto va con el gasto; se confirma al enviarse.' : ''));
   flush(); return true;
 }
 
 async function save() {
-  const monto = parseFloat($('m').value.replace(/[$,\s]/g, '')), concepto = $('c').value.trim(), fecha = $('f').value;
-  if (!fecha || !concepto || !(monto > 0)) return say('Falta fecha, concepto o un monto válido.');
+  const monto = leeMonto($('m').value), concepto = $('c').value.trim(), fecha = $('f').value;
+  if (!fecha || !concepto) return say('Falta la fecha o el concepto.');
+  if (!(monto > 0)) return say(MSG_MONTO);
   if (editando) {
     $('go').disabled = true; say('Guardando cambios…');
     try {
@@ -634,8 +816,32 @@ async function save() {
   if (borrId) item.borr = borrId;
   if (!agregaGasto(item, borrId ? { mxn: true } : null)) return;
   if (borrId) { guardaBor(leeBor().filter(x => x.id !== borrId)); borrId = ''; $('cn').hidden = true; }
-  fotoActual = ''; partesPend = null; $('pt').hidden = true;
+  fotoActual = ''; pintaFoto(); partesPend = null; $('pt').hidden = true;
   $('c').value = ''; $('m').value = ''; $('f').value = hoy();
+}
+
+// ---- Foto del ticket a mano (B1): va a Drive con el gasto, aunque la IA esté apagada; nunca a la IA ----
+function pintaFoto() {
+  $('fprev').hidden = !fotoActual;
+  if (fotoActual) $('fimg').src = 'data:image/jpeg;base64,' + fotoActual; else $('fimg').removeAttribute('src');
+}
+async function adjuntaFoto(f) {
+  if (!f) return;
+  say('Preparando foto…');
+  try { fotoActual = await comprime(f); pintaFoto(); $('fest').hidden = true; say('Listo: foto adjunta. Se guarda en tu Drive con el gasto.'); }
+  catch (e) { say('Error: no pude preparar la foto. Intenta con otra.'); }
+}
+function quitaFoto() { fotoActual = ''; pintaFoto(); }
+function estadoFoto(t, malo) { const p = $('fest'); p.textContent = t; p.className = malo ? 'warn' : 'rc2'; p.hidden = false; }
+// El servidor no dice si la foto quedó en Drive: se confirma pidiéndola de vuelta (ticket_ver) y nunca se presume
+async function verificaFoto(it) {
+  const nom = sinQuien(it.concepto);
+  if (it.usd) return estadoFoto('La foto de «' + nom + '» se envió con el gasto; en modo viaje no se puede confirmar si quedó en Drive.', true);
+  try {
+    const j = await call({ accion: 'ticket_ver', fecha: it.fecha, c: it.concepto, m: it.monto });
+    if (j.data) estadoFoto('Foto de «' + nom + '» guardada en tu Drive.', false);
+    else estadoFoto('Ojo: «' + nom + '» se guardó, pero su foto no quedó en Drive. Conserva la foto en tu galería.', true);
+  } catch (e) { estadoFoto('La foto de «' + nom + '» se envió, pero no se pudo confirmar si quedó en Drive.', true); }
 }
 
 function pintaPartes(g) {
@@ -651,14 +857,24 @@ function guardarDividido() {
   const items = p.partes.map(x => { const it = { id: nuevoId(), fecha: p.fecha, concepto: p.concepto + ' - ' + x.concepto, cat: x.cat, monto: x.monto }; if (foto) it.foto = foto; return it; });
   if (!encola(items)) return;
   items.forEach(it => { aplicaLocal(it); aprende([[it.concepto, it.cat]]); });
-  partesPend = null; fotoActual = ''; $('pt').hidden = true; $('c').value = ''; $('m').value = ''; $('f').value = hoy();
+  partesPend = null; fotoActual = ''; pintaFoto(); $('pt').hidden = true; $('c').value = ''; $('m').value = ''; $('f').value = hoy();
   aviso('Guardado: ' + items.length + ' gastos del ticket.'); flush();
 }
 
-async function ia(audio) {
+// Arma el envío de un dictado de Android (B5): el texto va con fuente «voz» y de 1 a 300 caracteres; si no, no se manda
+function envioDictado(texto, directo) {
+  const t = String(texto == null ? '' : texto).trim();
+  if (!t || t.length > 300) return null;
+  return { accion: directo ? 'rapido' : 'interpretar', texto: t, fuente: 'voz', hoy: hoy() };
+}
+
+// opc.voz = el texto viene del dictado de Android
+async function ia(audio, opc) {
   const texto = audio ? '' : $('ia').value.trim();
   if (!audio && !texto) return say('Escribe o dicta el gasto primero.');
-  const esFoto = !!audio && audio.mime.indexOf('image/') === 0, directo = $('au').checked && !esFoto;
+  const s = iaDe(), esFoto = !!audio && audio.mime.indexOf('image/') === 0, voz = !!(opc && opc.voz) || (!!audio && !esFoto);
+  // Igual que antes, salvo que con la IA apagada lo dictado llena el formulario para revisarlo
+  const directo = $('au').checked && !esFoto && (s.activa || !voz);
   const loc = audio ? null : parseLocal(texto); // gasto simple de algo que ya registraste: sin IA, al instante
   if (loc) {
     $('ia').value = ''; syncEnviar();
@@ -666,32 +882,44 @@ async function ia(audio) {
     pintaPartes(null); $('f').value = loc.fecha; $('c').value = loc.concepto; $('m').value = loc.monto; $('k').value = loc.cat;
     return say('Listo: revisa los datos y pulsa Guardar gasto.');
   }
+  // Con la IA apagada solo la voz (si el servidor la encendió) puede ir al servidor
+  if (esFoto && !s.activa) { fotoActual = audio.data; pintaFoto(); return avisoManual('La IA está apagada: la foto quedó adjunta. Captura los datos a mano.'); }
+  if (!esFoto && !voz && !s.activa) return avisoManual('La IA está apagada y no reconocí ese gasto. Sin IA solo se entiende «concepto y monto» de algo que ya registraste antes, como «tacos 45,50». Llénalo abajo a mano.'); // M4: no promete lo que no pasó
+  if (voz && !s.voz) return avisoManual('La voz está apagada; registra a mano.');
+  const body = voz && !audio ? envioDictado(texto, directo) : { accion: directo ? 'rapido' : 'interpretar', texto, audio, hoy: hoy() };
+  if (!body) return avisoManual('El dictado es muy largo (máximo 300 caracteres). Dilo más corto o registra a mano.');
   $('ib').disabled = true; say(esFoto ? 'Leyendo ticket…' : directo ? 'Guardando…' : 'Interpretando…');
   try {
-    const j = await call({ accion: directo ? 'rapido' : 'interpretar', texto, audio, hoy: hoy() });
+    const j = await call(body, audio ? 45000 : 0);
     const g = j.gasto || {};
     if (!esFoto && g.concepto && g.cat) aprende([[g.concepto, g.cat]]);
     $('ia').value = ''; syncEnviar();
     if (directo) { avisoGuardado(g.concepto, g.monto, j, g.cat); refrescar(); return; }
-    if (esFoto) { fotoActual = audio.data; pintaPartes(g); } else pintaPartes(null);
+    if (esFoto) { fotoActual = audio.data; pintaFoto(); pintaPartes(g); } else pintaPartes(null);
     if (esFecha(g.fecha)) $('f').value = g.fecha;
     if (g.concepto) $('c').value = g.concepto;
     if (g.monto > 0) $('m').value = g.monto;
     if (['Esencial', 'Mantener', 'Innecesario'].includes(g.cat)) $('k').value = g.cat;
     say(esFoto ? 'Listo: revisa los datos del ticket y pulsa Guardar gasto.' : 'Listo: revisa los datos y pulsa Guardar gasto.');
-  } catch (e) { say(errMsg(e)); }
+  } catch (e) {
+    // Si la IA no pudo leer la foto, la foto no se pierde: queda adjunta para el registro manual
+    if (esFoto) { fotoActual = audio.data; pintaFoto(); avisoManual(errMsg(e) + ' La foto quedó adjunta: captura los datos a mano.'); }
+    else if (voz || (e.codigo && CODIGOS[e.codigo])) avisoManual(errMsg(e));
+    else say(errMsg(e));
+  }
   finally { $('ib').disabled = false; }
 }
 
 async function preguntar(audio) {
   const texto = audio ? '' : $('qi').value.trim();
+  if (!iaDe().activa) return say('La IA está apagada por privacidad; preguntar no está disponible.');
   if (!audio && !texto) return say('Escribe tu pregunta.');
   $('qb').disabled = true; say('Consultando tu Sheet…');
   try {
     const j = await call({ accion: 'preguntar', texto, audio, hoy: hoy() });
     $('qr').textContent = j.respuesta; $('qr').hidden = false; say('');
   } catch (e) { say(errMsg(e)); }
-  finally { $('qb').disabled = false; }
+  finally { $('qb').disabled = !iaDe().activa; }
 }
 
 // ---- Resumen del mes ----
@@ -721,7 +949,7 @@ async function resumen() {
       try { j.config = (await call({ accion: 'config_topes', topes: { Innecesario: Number(L.tope) } })).config; L.removeItem('tope'); } catch (e) {}
     }
     aprende((movs && movs.items ? movs.items.slice().reverse().map(x => [x.c, x.k]) : []).concat((j.frecuentes || []).map(x => [x.c, x.k])));
-    q().forEach(it => suma(j, it)); // lo que aún no se ha enviado se sigue viendo
+    q().filter(it => !it.err).forEach(it => suma(j, it)); // lo que aún no se ha enviado se sigue viendo (no los que tuvieron error)
     L.res = JSON.stringify(j);
     if (movs) { try { L.mov = JSON.stringify(movs); L.movT = String(Date.now()); } catch (e) {} }
     if (fij) { try { L.fij = JSON.stringify(fij); } catch (e) {} }
@@ -782,7 +1010,27 @@ function pintaResumen(r) {
     const rit = valido && diaMes >= 5 && r.mes.n > 0 ? r.mes.n / diaMes * 30 : 0;
     $('smwt').textContent = quedan > 0 ? 'Quedan ' + quedan + ' filas en el Registro' + (rit > 0 ? ' (a tu ritmo alcanzan para unos ' + Math.max(1, Math.floor(quedan / rit)) + ' mes(es))' : '') + '. Pronto hay que extenderlo.' : 'El Registro está lleno. Hay que extenderlo.';
   }
+  pintaIA();
   if (tab === 'rep') pintaReportes(r);
+}
+
+// ---- Estado de la IA que manda el servidor en inicio y resumen (B5) ----
+// Si todavía no se conoce (sin respuesta del servidor), se trata como apagada: no se manda nada sin saber.
+function iaDe() {
+  const r = leeRes(), ia = r && r.ia, v = ia && ia.voz;
+  return { activa: !!(ia && ia.activa === true), voz: !!(v && v.activa === true), aviso: v && typeof v.aviso === 'string' ? v.aviso.trim() : '' };
+}
+function pintaIA() {
+  const s = iaDe(), off = !s.activa;
+  $('fb').hidden = off; if (off) $('ts').hidden = true; // leer el ticket con IA solo si está encendida
+  $('ab').disabled = off; $('abx').hidden = !off;
+  ['qi', 'qb', 'qmic'].forEach(id => { $(id).disabled = off; }); document.querySelectorAll('[data-q]').forEach(b => { b.disabled = off; }); $('qx').hidden = !off;
+  $('crb').disabled = off; $('crx').hidden = !off;
+  $('cnb').disabled = off; $('cnx').hidden = !off;
+  $('au').disabled = off;
+  $('aux').textContent = !off ? 'Al escribir o dictar un gasto se guarda sin pedirte revisarlo.' : s.voz ? 'La IA está apagada: lo que dictes se llena en el formulario para que lo revises.' : 'La IA está apagada: registra a mano.';
+  $('ia').placeholder = off ? 'Ej. tacos 150' : 'Ej. Ayer gasté $180 en tacos'; // sin IA solo se entienden conceptos ya registrados
+  $('mic').classList.toggle('apagado', !s.voz); $('mic').setAttribute('aria-label', s.voz ? 'Dictar' : 'Dictar (la voz está apagada)');
 }
 
 const COL = () => oscuro() ? { Esencial: '#7FA0DB', Mantener: '#D6B482', Innecesario: '#E08A6C' } : { Esencial: '#16305A', Mantener: '#D6B482', Innecesario: '#C0694B' };
@@ -925,8 +1173,9 @@ function pintaMetas(r) {
   });
 }
 async function metaAgregar() {
-  const nombre = $('gn').value.trim(), objetivo = parseFloat($('gob').value.replace(/[$,\s]/g, ''));
-  if (!nombre || !(objetivo > 0)) return say('Falta el nombre o el monto de la meta.');
+  const nombre = $('gn').value.trim(), objetivo = leeMonto($('gob').value);
+  if (!nombre) return say('Falta el nombre de la meta.');
+  if (!(objetivo > 0)) return say(MSG_MONTO);
   $('ga').disabled = true;
   try { setConfig((await call({ accion: 'meta_agregar', nombre, objetivo })).config); $('gn').value = ''; $('gob').value = ''; say('Guardado: meta "' + nombre + '".'); }
   catch (e) { say(errMsg(e)); } finally { $('ga').disabled = false; }
@@ -934,8 +1183,8 @@ async function metaAgregar() {
 async function metaAbonar(g) {
   const v = prompt('¿Cuánto abonas a "' + g.n + '"? (usa un número negativo para retirar)', '');
   if (v === null) return;
-  const monto = parseFloat(v.replace(/[$,\s]/g, ''));
-  if (!isFinite(monto) || monto === 0) return say('Falta un monto válido.');
+  const monto = leeMonto(v, { neg: true });
+  if (monto === null || monto === 0) return say('Revisa el monto: escribe un número, por ejemplo 500 o 45,50 (negativo para retirar).');
   try { setConfig((await call({ accion: 'meta_abonar', id: g.id, monto })).config); say('Guardado: ' + (monto > 0 ? 'abono' : 'retiro') + ' de ' + money(Math.abs(monto)) + ' en "' + g.n + '".'); }
   catch (e) { say(errMsg(e)); }
 }
@@ -946,9 +1195,10 @@ async function metaBorrar(g) {
 
 // ---- Dónde puedo ahorrar (IA) ----
 async function ahorro() {
+  if (!iaDe().activa) return say('La IA está apagada por privacidad; el análisis no está disponible.');
   $('ab').disabled = true; say('Analizando tu mes…');
-  try { const j = await call({ accion: 'ahorro', hoy: hoy() }); $('ar').textContent = j.respuesta; $('ar').hidden = false; say(''); }
-  catch (e) { say(errMsg(e)); } finally { $('ab').disabled = false; }
+  try { const j = await call({ accion: 'ahorro', hoy: hoy() }); $('ar').textContent = sinGemini(j.respuesta); $('ar').hidden = false; say(''); }
+  catch (e) { say(errMsg(e)); } finally { $('ab').disabled = !iaDe().activa; }
 }
 
 // ---- Movimientos ----
@@ -958,7 +1208,7 @@ function filaGasto(x) {
   const be = el('button', 'mini', 'Editar'), bf = el('button', 'mini', 'Fijo'), bd = el('button', 'mini del', 'Borrar');
   be.onclick = () => editar(x); bf.onclick = () => fijoDesde(x); bd.onclick = () => borrar(x);
   top.append(el('div', 'rc1', sinQuien(x.c)), el('div', 'rm', money(x.m)));
-  if (x.pend) acts.append(el('span', 'rc2', 'Enviando…')); else acts.append(be, bf, bd); bot.append(el('div', 'rc2', ddmm(x.f) + ' · ' + x.k + (quienDe(x.c) ? ' · ' + quienDe(x.c) : '')), acts); row.append(top, bot);
+  if (x.pend) { const qi = x.qid && q().find(y => y.id === x.qid); acts.append(el('span', 'rc2', qi && qi.err ? 'No se guardó · revisa en Inicio' : 'Enviando…')); } else acts.append(be, bf, bd); bot.append(el('div', 'rc2', ddmm(x.f) + ' · ' + x.k + (quienDe(x.c) ? ' · ' + quienDe(x.c) : '')), acts); row.append(top, bot);
   return row;
 }
 function pintaMov(j) {
@@ -1023,11 +1273,12 @@ function editar(x) {
   editando = { row: x.row, c: x.c, m: x.m, q: quienDe(x.c) };
   setTab('inicio');
   $('f').value = esFecha(x.f) ? x.f : hoy(); $('c').value = sinQuien(x.c); $('m').value = x.m; $('k').value = x.k;
+  quitaFoto(); $('fwrap').hidden = true; $('fest').hidden = true; // editar no cambia la foto: se ve con "Ver foto del ticket"
   $('go').textContent = 'Guardar cambios'; $('cn').hidden = false; pintaViaje(); pintaFrecuentes(leeRes()); ticketCheck(x);
   $('form').scrollIntoView({ behavior: 'smooth', block: 'start' }); say('Editando: cambia lo que necesites y pulsa Guardar cambios.');
 }
 function cancelaEdicion() {
-  editando = null; borrId = ''; $('go').textContent = 'Guardar gasto'; $('cn').hidden = true; $('tkb').hidden = true; tkData = null; pintaViaje(); pintaFrecuentes(leeRes());
+  editando = null; borrId = ''; $('go').textContent = 'Guardar gasto'; $('cn').hidden = true; $('tkb').hidden = true; tkData = null; $('fwrap').hidden = false; pintaViaje(); pintaFrecuentes(leeRes());
   $('c').value = ''; $('m').value = ''; $('f').value = hoy(); say('');
 }
 async function borrar(x) {
@@ -1053,8 +1304,9 @@ async function fijosCargar() {
   try { pintaFijos((await call({ accion: 'fijos' })).fijos); } catch (e) { say(errMsg(e)); }
 }
 async function fijoAgregar() {
-  const monto = parseFloat($('xm').value.replace(/[$,\s]/g, '')), concepto = $('xc').value.trim(), dia = parseInt($('xd').value, 10);
-  if (!concepto || !(monto > 0) || !(dia >= 1 && dia <= 31)) return say('Falta concepto, monto o un día del 1 al 31.');
+  const monto = leeMonto($('xm').value), concepto = $('xc').value.trim(), dia = parseInt($('xd').value, 10);
+  if (!concepto || !(dia >= 1 && dia <= 31)) return say('Falta el concepto o un día del 1 al 31.');
+  if (!(monto > 0)) return say(MSG_MONTO);
   $('xa').disabled = true;
   try {
     const j = await call({ accion: 'fijo_agregar', concepto, monto, cat: $('xk').value, dia, hoy: hoy() });
@@ -1144,27 +1396,48 @@ function pintaRespaldos(l) {
 }
 async function respaldoAhora() {
   say('Creando respaldo…');
-  try { pintaRespaldos((await call({ accion: 'respaldo_ahora' })).respaldos); say('Guardado: respaldo creado en tu Drive.'); } catch (e) { say(errMsg(e)); }
+  try { pintaRespaldos((await call({ accion: 'respaldo_ahora' }, LENTO_MS)).respaldos); say('Guardado: respaldo creado en tu Drive.'); } catch (e) { say(errMsg(e)); }
 }
 async function respaldoRestaurar(x) {
   const t = prompt('Vas a reemplazar los gastos actuales (columnas A a D de Registro) por los de este respaldo:\n' + x.n + '\nAntes se guarda una copia del estado de hoy.\n\nEscribe RESTAURAR para continuar.', '');
   if (t === null) return;
   if (t.trim() !== 'RESTAURAR') return say('Revisa: escribe RESTAURAR tal cual para confirmar.');
   say('Restaurando…');
-  try { const j = await call({ accion: 'respaldo_restaurar', id: x.id, confirmar: 'RESTAURAR' }); say('Guardado: restaurado con ' + j.filas + ' gasto(s).'); refrescar(); respaldosCargar(); } catch (e) { say(errMsg(e)); }
+  try { const j = await call({ accion: 'respaldo_restaurar', id: x.id, confirmar: 'RESTAURAR' }, LENTO_MS); say('Guardado: restaurado con ' + j.filas + ' gasto(s).'); refrescar(); respaldosCargar(); } catch (e) { say(errMsg(e)); }
 }
 
 // ---- Ajustes ----
 function pintaAjustes() {
   const T = topes();
   $('tpE').value = T.Esencial > 0 ? T.Esencial : ''; $('tpM').value = T.Mantener > 0 ? T.Mantener : ''; $('tpI').value = T.Innecesario > 0 ? T.Innecesario : '';
-  $('yo').value = L.yo || ''; $('tc').value = L.tc || ''; $('tema').value = L.tema || '';
+  pintaYo(); $('tc').value = L.tc || ''; $('tema').value = L.tema || '';
   $('tca').checked = L.tca !== '0';
   { const r0 = leeRes(); $('ing').value = ingresoDe(r0) > 0 ? ingresoDe(r0) : ''; }
   $('vjc').checked = L.viaje === '1'; $('vjh').value = L.viajeHasta || '';
   if ($('tca').checked) tcHoy(); else $('tcs').textContent = 'Se usará el tipo de cambio que escribas aquí.';
   if (!$('xmes').value) $('xmes').value = hoy().slice(0, 7);
+  { const mv = document.querySelector('meta[name=application-version]'); if (mv) $('ver').textContent = 'JonKa · Control de gastos · versión ' + mv.content; }
   pintaSeg();
+}
+
+// ---- Inicial por teléfono (W44-AP28): K en iPhone, J en Android; una inicial ya guardada no se cambia ----
+const INICIALES = [['K', 'K · Karla'], ['J', 'J · Jonathan']]; // D y DR son del Director: no se ofrecen aquí
+function inicialSugerida() { return esIOS ? 'K' : /Android/i.test(navigator.userAgent) ? 'J' : ''; }
+function propInicial() {
+  try {
+    if (L.yo) return;
+    const v = inicialSugerida(); if (!v) return; // otra plataforma: se elige en Ajustes
+    L.yo = v;
+    say('Este teléfono registra como ' + v + (v === 'K' ? ' (Karla)' : ' (Jonathan)') + '. Puedes cambiarlo en Ajustes › Mi inicial.');
+  } catch (e) {}
+}
+function pintaYo() {
+  const s = $('yo'), v = L.yo || '', ops = INICIALES.slice();
+  if (!v) ops.unshift(['', 'Sin elegir']);
+  else if (!ops.some(o => o[0] === v)) ops.push([v, v + ' (la que ya tenías)']); // se muestra para no cambiarla sin querer
+  s.textContent = '';
+  ops.forEach(([val, t]) => { const o = el('option', '', t); o.value = val; s.append(o); });
+  s.value = v;
 }
 
 // ---- Bloqueo con PIN y huella / Face ID ----
@@ -1263,7 +1536,7 @@ function comprime(file) {
 // ---- Voz ----
 const esIOS = /iPhone|iPad|iPod/.test(navigator.userAgent) || (navigator.platform === 'MacIntel' && navigator.maxTouchPoints > 1);
 
-// Convierte lo grabado a WAV de 16 kHz (formato que Gemini entiende siempre)
+// Convierte lo grabado a WAV de 16 kHz (formato que el servicio de voz entiende siempre)
 function wav(chunks, rate) {
   let n = 0; chunks.forEach(c => n += c.length);
   if (n < rate * 0.4) return null; // menos de medio segundo: no hubo voz
@@ -1282,8 +1555,26 @@ function wav(chunks, rate) {
   return btoa(bin);
 }
 
-// Grabadora: funciona en iPhone (también con la app instalada). Gemini escucha el audio.
-function grabadora(btn, accion) {
+// ---- Puerta de la voz (B5): apagada no graba ni manda nada; encendida pide aceptar el aviso del servidor la primera vez ----
+let vozOkMem = '';
+function vozAceptada(a) { if (!a) return false; if (vozOkMem === a) return true; try { return L.vozAviso === a; } catch (e) { return false; } }
+function puertaVoz(seguir) {
+  const s = iaDe();
+  if (!s.voz) { avisoManual('La voz está apagada; registra a mano.'); return false; }
+  if (!s.aviso) { avisoManual('La voz no está lista (falta el aviso del servidor); registra a mano.'); return false; }
+  if (vozAceptada(s.aviso)) return true;
+  $('avzx').textContent = s.aviso; // texto exacto que manda el servidor
+  $('avz').hidden = false; $('avza').focus();
+  $('avza').onclick = () => {
+    vozOkMem = s.aviso; try { L.vozAviso = s.aviso; } catch (e) {}
+    $('avz').hidden = true; seguir();
+  };
+  $('avzm').onclick = () => { $('avz').hidden = true; irAMano(); };
+  return false;
+}
+
+// Grabadora: funciona en iPhone (también con la app instalada). El servicio de IA de la voz escucha el audio.
+function grabadora(btn, accion, puerta) {
   let st = null;
   btn.hidden = false;
   const fin = () => {
@@ -1298,6 +1589,7 @@ function grabadora(btn, accion) {
   };
   btn.onclick = async () => {
     if (st) return fin();
+    if (puerta && !puerta(() => btn.onclick())) return;
     try {
       const stream = await navigator.mediaDevices.getUserMedia({ audio: true });
       const AC = window.AudioContext || window.webkitAudioContext, ctx = new AC();
@@ -1312,20 +1604,22 @@ function grabadora(btn, accion) {
 }
 
 // Dictado: iPhone → grabadora; Android/PC → reconocimiento de voz del navegador
-function mic(btn, input, accion, hint) {
-  const SR = window.SpeechRecognition || window.webkitSpeechRecognition;
+// opc.puerta: decide si se puede usar la voz ahora; opc.sinAudio: no ofrecer la grabadora (el servidor no acepta audio ahí)
+function mic(btn, input, accion, hint, opc) {
+  const SR = window.SpeechRecognition || window.webkitSpeechRecognition, puerta = opc && opc.puerta;
   const puedeGrabar = navigator.mediaDevices && navigator.mediaDevices.getUserMedia && (window.AudioContext || window.webkitAudioContext);
   if (esIOS || !SR) {
-    if (puedeGrabar) { grabadora(btn, accion); if (hint) hint.hidden = true; }
+    if (puedeGrabar && !(opc && opc.sinAudio)) { grabadora(btn, accion, puerta); if (hint) hint.hidden = true; }
     return;
   }
   btn.hidden = false; if (hint) hint.hidden = true;
   let rec = null;
   btn.onclick = () => {
     if (rec) { rec.stop(); return; }
+    if (puerta && !puerta(() => btn.onclick())) return;
     rec = new SR(); rec.lang = 'es-MX'; rec.interimResults = false;
     rec.onstart = () => { btn.classList.add('on'); say('Escuchando…'); };
-    rec.onresult = ev => { input.value = ev.results[0][0].transcript; accion(); };
+    rec.onresult = ev => { input.value = ev.results[0][0].transcript; accion(null, { voz: true }); };
     rec.onerror = ev => {
       if (/not-allowed|service-not-allowed/.test(ev.error)) { btn.hidden = true; syncEnviar(); if (hint) hint.hidden = false; say('Error: no hay permiso de micrófono. Usa el micrófono del teclado.'); }
       else if (ev.error !== 'aborted' && ev.error !== 'no-speech') say('Error: no pude escucharte. Intenta otra vez.');
@@ -1479,6 +1773,7 @@ async function informePDF() {
 const leeArchivo = (f, modo) => new Promise((ok, no) => { const r = new FileReader(); r.onload = () => ok(r.result); r.onerror = () => no(new Error('No pude leer el archivo.')); modo === 'texto' ? r.readAsText(f) : r.readAsDataURL(f); });
 async function conciliarArchivo(f) {
   if (!f) return;
+  if (!iaDe().activa) { $('cnf').value = ''; return say('La IA está apagada por privacidad; la conciliación no está disponible.'); }
   const r = $('cnr'), nombre = f.name.toLowerCase();
   if (!/\.(csv|txt)$/.test(nombre) && !/^text\//.test(f.type)) { r.textContent = 'Elige un CSV o TXT sin datos de tarjeta, cuentas ni saldos.'; return; }
   if (f.size > 3 * 1024 * 1024) { r.textContent = 'El archivo pesa más de 3 MB. Sube solo el estado de cuenta del mes.'; return; }
@@ -1487,19 +1782,19 @@ async function conciliarArchivo(f) {
     const body = { accion: 'conciliar', hoy: hoy() };
     if (/\.(csv|txt)$/.test(nombre) || /^text\//.test(f.type)) body.texto = CM.redact(await leeArchivo(f, 'texto'));
     else { const u = await leeArchivo(f, 'url'), mime = f.type || (/\.pdf$/.test(nombre) ? 'application/pdf' : 'image/jpeg'); body.archivo = { mime, data: String(u).split(',')[1] || '' }; }
-    const j = await call(body);
+    const j = await call(body, LENTO_MS);
     if (j.borradores) guardaBor(j.borradores.filter(b => !q().some(x => x.borr === b.id)));
     const fm = d => ddmm(d);
     let t = 'Revisé ' + j.total + ' cargos del ' + fm(j.desde) + ' al ' + fm(j.hasta) + '. ' + j.coinciden + ' ya estaban en tu registro; ' + j.nuevos + ' faltaban y quedaron en "Por aprobar"' + (j.omitidos ? ' (' + j.omitidos + ' ya estaban ahí)' : '') + '.';
     r.textContent = t;
     if (j.repetidos && j.repetidos.length) { const ul = el('ul', 'lst'); j.repetidos.forEach(x => ul.append(el('li', '', 'Repetido ' + x.n + ' veces: ' + x.c + ' ' + money(x.m) + ' el ' + fm(x.f)))); r.append(el('div', 'bl', 'Posibles repetidos en tu registro'), ul); }
     say(j.nuevos ? 'Listo: ' + j.nuevos + ' cargo(s) por aprobar en Inicio.' : 'Todo coincide con tu registro.');
-  } catch (e) { r.textContent = errMsg(e); } finally { $('cnb').disabled = false; $('cnf').value = ''; }
+  } catch (e) { r.textContent = errMsg(e); } finally { $('cnb').disabled = !iaDe().activa; $('cnf').value = ''; }
 }
 
 // ---- Ajustes: correos a vigilar ----
 const haceCuanto = t => { const m = Math.round((Date.now() - t) / 60000); return m < 1 ? 'hace un momento' : m < 60 ? 'hace ' + m + ' min' : m < 1440 ? 'hace ' + Math.round(m / 60) + ' h' : 'hace ' + Math.round(m / 1440) + ' d'; };
-const errCorreo = e => /autoriz|permiso|permission|authoriz|scope/i.test(e) ? 'Falta dar el permiso de Gmail (paso 1 de la guía).' : e;
+const errCorreo = e => /autoriz|permiso|permission|authoriz|scope/i.test(e) ? 'Falta dar el permiso de Gmail (paso 1 de la guía).' : sinGemini(e);
 function pintaAvisos() {
   const r = leeRes(), l = (r && r.config && r.config.correos) || [], box = $('cl'); box.textContent = '';
   if (!l.length) box.append(el('div', 'vacio', 'Aún no vigilas ningún correo. Agrega, por ejemplo, santander.'));
@@ -1511,14 +1806,15 @@ async function correosGuardar(lista) {
   try { setConfig((await call({ accion: 'config_correos', lista })).config); say('Guardado: correos a vigilar.'); } catch (e) { say(errMsg(e)); }
 }
 async function correosAhora() {
+  if (!iaDe().activa) return say('La IA está apagada por privacidad; no se revisan correos.');
   $('crb').disabled = true; say('Revisando correos…');
   try {
-    const j = await call({ accion: 'correos_ahora', hoy: hoy() });
+    const j = await call({ accion: 'correos_ahora', hoy: hoy() }, LENTO_MS);
     if (j.estado) { try { L.cst = JSON.stringify(j.estado); } catch (e) {} }
     if (j.borradores) guardaBor(j.borradores.filter(b => !q().some(x => x.borr === b.id)));
     pintaAvisos();
     say(j.espera ? 'Revisado hace un momento.' : j.estado && j.estado.e ? errCorreo(j.estado.e) : (j.estado && j.estado.n ? 'Listo: ' + j.estado.n + ' aviso(s) nuevo(s) en Por aprobar.' : 'Listo: no hay avisos nuevos.'));
-  } catch (e) { say(errMsg(e)); } finally { $('crb').disabled = false; }
+  } catch (e) { say(errMsg(e)); } finally { $('crb').disabled = !iaDe().activa; }
 }
 async function copia(t, que) { try { await navigator.clipboard.writeText(t); say('Listo: ' + que + ' copiado.'); } catch (e) { say('Error: no pude copiar ' + que + '.'); } }
 
@@ -1726,14 +2022,15 @@ function init() {
   const ok = !!(L.u && L.k);
   $('cfg').hidden = ok; $('tabs').hidden = !ok;
   if (!ok) { ['inicio', 'mov', 'lis', 'rep', 'aju'].forEach(x => { $('p-' + x).hidden = true; }); $('hd').classList.remove('sm'); $('ht').textContent = TITULOS.inicio[0]; $('hs').textContent = TITULOS.inicio[1]; return; }
+  propInicial(); // antes de enviar la cola, para que los gastos lleven la inicial
   setTab(tab);
-  pintaResumen(leeRes()); pintaBorradores(); flush(); resumen(); lstSync();
+  pintaResumen(leeRes()); pintaBorradores(); pintaFoto(); pintaPend(); flush(); resumen(); lstSync();
 }
 const OJO = '<svg viewBox="0 0 24 24"><path d="M2 12s3.5-7 10-7 10 7 10 7-3.5 7-10 7S2 12 2 12z"/><circle cx="12" cy="12" r="3"/><path class="x" d="M4 20L20 4"/></svg>';
 function pintaPriv() { document.querySelectorAll('.eyeb').forEach(b => { b.setAttribute('aria-pressed', priv() ? 'true' : 'false'); b.querySelector('.x').toggleAttribute('hidden', !priv()); }); }
 function togglePriv() {
   if (priv()) L.removeItem('priv'); else L.priv = '1';
-  pintaPriv(); const r = leeRes(); pintaResumen(r); pintaPersonas();
+  pintaPriv(); const r = leeRes(); pintaResumen(r); pintaPersonas(); pintaPend(); // también los pendientes (M1)
   if (tab === 'mov') { const m = leeMov(); if (m && Array.isArray(m.items) && !hayFiltro()) pintaMov(m); }
   if (tab === 'aju') { pintaAjustes(); const f = leeFij(); if (f) pintaFijos(f); }
   say(priv() ? 'Listo: montos ocultos.' : 'Listo: montos visibles.');
@@ -1748,7 +2045,7 @@ function togglePriv() {
   $('lbr').onclick = listaBorrar;
   $('ldelok').onclick = listaBorrarConfirmada; $('ldelcancel').onclick = () => $('ldel').close();
   $('lps').addEventListener('input', pintaPrecios);
-  $('pa').onclick = async () => { const n = $('pn').value.trim(), v = parseFloat($('pp').value.replace(/[$,\s]/g, '')); if (!n || !(v > 0)) return say('Falta el producto o un precio válido.'); const k = normC(n), o = prc[k] || { c: 0, f: '' }; prc[k] = { n, p: v, c: o.c || 0, f: o.f || '' }; try { L.prc = JSON.stringify(prc); } catch (e) {} $('pn').value = ''; $('pp').value = ''; pintaPrecios(); try { await call({ accion: 'precio_guardar', n, p: v }); say('Guardado: ' + n + ' a ' + money(v) + '.'); } catch (er) { say(errMsg(er)); } };
+  $('pa').onclick = async () => { const n = $('pn').value.trim(), v = leeMonto($('pp').value); if (!n) return say('Falta el producto.'); if (!(v > 0)) return say('Revisa el precio: escribe un número mayor que 0, por ejemplo 45.50 o 45,50.'); const k = normC(n), o = prc[k] || { c: 0, f: '' }; prc[k] = { n, p: v, c: o.c || 0, f: o.f || '' }; try { L.prc = JSON.stringify(prc); } catch (e) {} $('pn').value = ''; $('pp').value = ''; pintaPrecios(); try { await call({ accion: 'precio_guardar', n, p: v }); say('Guardado: ' + n + ' a ' + money(v) + '.'); } catch (er) { say(errMsg(er)); } };
   $('cia').onclick = () => { const v = $('cin').value.trim(); if (!v) return; const r = leeRes(), l = ((r && r.config && r.config.correos) || []).slice(); if (!l.includes(v)) l.push(v); $('cin').value = ''; correosGuardar(l); };
   $('cin').addEventListener('keydown', e => { if (e.key === 'Enter') { e.preventDefault(); $('cia').click(); } });
   $('crb').onclick = correosAhora; $('cgb').onclick = () => { $('av').hidden = false; }; $('avx').onclick = () => { $('av').hidden = true; };
@@ -1777,8 +2074,8 @@ function togglePriv() {
   $('vjh').onchange = () => { if (esFecha($('vjh').value)) L.viajeHasta = $('vjh').value; else L.removeItem('viajeHasta'); pintaViaje(); };
   $('rb1').onclick = respaldoAhora; $('rb2').onclick = respaldosCargar;
   $('ingb').onclick = async () => {
-    const n = parseFloat($('ing').value.replace(/[$,\s]/g, ''));
-    if (!(n > 0)) return say('Falta un ingreso mensual válido.');
+    const n = leeMonto($('ing').value);
+    if (!(n > 0)) return say('Revisa el ingreso: escribe un número mayor que 0, por ejemplo 25000 o 25.000,00.');
     $('ingb').disabled = true;
     try { setConfig((await call({ accion: 'config_ingreso', ingreso: n })).config); say('Guardado: ingreso de ' + money(n) + ' (también en tu hoja, Resumen Mensual E3).'); }
     catch (e) { say(errMsg(e)); } finally { $('ingb').disabled = false; }
@@ -1790,8 +2087,17 @@ function togglePriv() {
     say('Listo: sugerí topes con tu promedio de ' + ms.length + ' mes(es). Revisa y pulsa Guardar topes.');
   };
   $('ga').onclick = metaAgregar; $('ab').onclick = ahorro; $('xcsv').onclick = exportarCSV; $('xpdf').onclick = exportarPDF;
-  $('yo').onchange = () => { const v = $('yo').value.replace(/[^A-Za-zÁÉÍÓÚÑáéíóúñ]/g, '').slice(0, 2).toUpperCase(); $('yo').value = v; if (v) L.yo = v; else L.removeItem('yo'); say(v ? 'Guardado: tu inicial es ' + v + '.' : 'Guardado: sin inicial.'); pintaPersonas(); };
-  $('tc').onchange = () => { const n = parseFloat($('tc').value.replace(/[$,\s]/g, '')); if (n > 0) { L.tc = String(n); say('Guardado: dólar a ' + money(n) + '.'); } else { L.removeItem('tc'); $('tc').value = ''; say('Guardado: sin tipo de cambio.'); } };
+  $('yo').onchange = () => { // solo K o J; la que ya estaba guardada se queda si no se elige otra
+    const v = $('yo').value;
+    if (!INICIALES.some(o => o[0] === v)) { pintaYo(); return; }
+    L.yo = v; pintaYo(); say('Guardado: tu inicial es ' + v + '.'); pintaPersonas();
+  };
+  $('tc').onchange = () => {
+    const t = $('tc').value.trim(), n = leeMonto(t, { dec: 4 });
+    if (!t) { L.removeItem('tc'); say('Guardado: sin tipo de cambio.'); return; }
+    if (!(n > 0)) { $('tc').value = L.tc || ''; return say('Revisa el tipo de cambio: escribe un número como 18.50 o 18,50.'); }
+    L.tc = String(n); say('Guardado: dólar a ' + money(n) + '.');
+  };
   $('tca').onchange = () => { if ($('tca').checked) { L.removeItem('tca'); say('Guardado: tipo de cambio automático por día.'); tcHoy(); } else { L.tca = '0'; $('tcs').textContent = 'Se usará el tipo de cambio que escribas aquí.'; say('Guardado: tipo de cambio manual.'); } };
   $('tema').onchange = () => { if ($('tema').value) L.tema = $('tema').value; else L.removeItem('tema'); aplicarTema(); if (tab === 'rep') pintaReportes(leeRes()); };
   // bloqueo
@@ -1810,8 +2116,8 @@ function togglePriv() {
   if (lockActivo()) lkMostrar('abrir');
   pintaViaje();
   $('au').checked = L.au !== '0'; $('au').onchange = () => { L.au = $('au').checked ? '1' : '0'; };
-  mic($('mic'), $('ia'), ia, $('hint'));
-  mic($('qmic'), $('qi'), preguntar);
+  mic($('mic'), $('ia'), ia, $('hint'), { puerta: puertaVoz });
+  mic($('qmic'), $('qi'), preguntar, null, { sinAudio: true }); // el servidor no acepta audio en "preguntar": en iPhone no se graba
   syncEnviar();
   $('qb').onclick = () => preguntar();
   $('qi').addEventListener('keydown', e => { if (e.key === 'Enter') { e.preventDefault(); preguntar(); } });
@@ -1829,13 +2135,22 @@ function togglePriv() {
   $('ph').onchange = $('ph2').onchange = async e => {
     const f = e.target.files[0]; e.target.value = ''; if (!f) return;
     say('Preparando foto…');
-    try { await ia({ mime: 'image/jpeg', data: await comprime(f) }); } catch (er) { say('Error: no pude leer la foto.'); }
+    let data; try { data = await comprime(f); } catch (er) { return say('Error: no pude leer la foto.'); }
+    await ia({ mime: 'image/jpeg', data });
   };
+  // Foto a mano (B1): dos botones, miniatura y Quitar; no pasa por la IA
+  $('fcam').onclick = () => { noBlq(); $('phm').click(); };
+  $('fgal').onclick = () => { noBlq(); $('phg').click(); };
+  $('phm').onchange = $('phg').onchange = e => { const f = e.target.files[0]; e.target.value = ''; adjuntaFoto(f); };
+  $('fqx').onclick = () => { quitaFoto(); say('Listo: foto quitada.'); };
   $('xa').onclick = fijoAgregar;
   $('tpb').onclick = async () => {
-    const num = id => { const n = parseFloat($(id).value.replace(/[$,\s]/g, '')); return n > 0 ? n : 0; };
+    const num = id => { const v = $(id).value.trim(); if (!v) return 0; const n = leeMonto(v); return n === null ? NaN : n; }; // vacío = sin tope
+    const T = { Esencial: num('tpE'), Mantener: num('tpM'), Innecesario: num('tpI') };
+    const mal = CATS3.filter(k => Number.isNaN(T[k]));
+    if (mal.length) return say('Revisa el tope de ' + mal.join(' y ') + ': escribe un número como 3000 o 3.000,50, o déjalo vacío.');
     $('tpb').disabled = true; say('Guardando topes…');
-    try { const j = await call({ accion: 'config_topes', topes: { Esencial: num('tpE'), Mantener: num('tpM'), Innecesario: num('tpI') } }); L.removeItem('tope'); setConfig(j.config); say('Guardado: topes actualizados.'); }
+    try { const j = await call({ accion: 'config_topes', topes: T }); L.removeItem('tope'); setConfig(j.config); say('Guardado: topes actualizados.'); }
     catch (e) { say(errMsg(e)); } finally { $('tpb').disabled = false; }
   };
   document.addEventListener('visibilitychange', () => { if (!document.hidden && L.u) { flush(); resumen(); } });
@@ -1860,7 +2175,10 @@ function togglePriv() {
         setTab('inicio');
         if (a === 'voz' && !$('mic').hidden && !lkModo) setTimeout(() => $('mic').click(), 400);
         else if (a === 'voz') $('ia').focus();
-        else if (a === 'ticket') say('Toca "Escanear ticket" para tomar la foto.');
+        else if (a === 'ticket') { // con IA: la hoja para leerlo; sin IA: el formulario manual con «Tomar foto» (el navegador exige un toque para abrir la cámara)
+          if (iaDe().activa) $('ts').hidden = false;
+          else { $('fwrap').scrollIntoView({ block: 'center' }); try { $('fcam').focus({ preventScroll: true }); } catch (e) {} say('Toca «Tomar foto» para fotografiar el ticket. Se guarda con el gasto, sin IA.'); }
+        }
       }
     }
   } catch (e) {}
