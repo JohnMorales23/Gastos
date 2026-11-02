@@ -2,7 +2,7 @@
 <html lang="es">
 <head>
 <meta charset="utf-8">
-<meta name="application-version" content="2026.11.02-diseno.1">
+<meta name="application-version" content="2026.11.02-diseno.2">
 <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
 <meta name="apple-mobile-web-app-capable" content="yes">
 <meta name="mobile-web-app-capable" content="yes">
@@ -37,7 +37,7 @@
   --c-acento:var(--p-marino);--c-sobre-acento:var(--p-blanco);--c-acento-2:var(--p-marino-2);--c-dorado:var(--p-dorado);
   --c-indicador:var(--p-marino);--c-foco:var(--p-marino);--c-halo:rgba(16,37,65,.14);--c-serie:var(--p-marino);
   --c-esencial:var(--p-verde);--c-mantener:var(--p-azul);--c-innecesario:var(--p-naranja);
-  --c-exito:var(--p-verde);--c-aviso:var(--p-ambar);--c-peligro:var(--p-rojo);
+  --c-exito:var(--p-verde);--c-aviso:var(--p-ambar);--c-peligro:var(--p-rojo);--c-sobre-cat:var(--p-blanco);
   --c-aviso-fondo:#FFF1D2;--c-aviso-texto:#7A5200;
   --c-toast:var(--p-marino);--c-toast-texto:var(--p-blanco);--c-velo:rgba(8,16,30,.55);--c-velo-fuerte:rgba(8,16,30,.92);
   --c-destacada:var(--p-marino);--c-destacada-texto:var(--p-blanco);--c-destacada-2:#B8C2D3;--c-destacada-oro:var(--p-dorado);
@@ -51,6 +51,8 @@
   --s-1:4px;--s-2:8px;--s-3:12px;--s-4:16px;--s-5:20px;--s-6:24px;--s-8:32px;
   --r-chico:10px;--r-campo:12px;--r-boton:14px;--r-tarjeta:20px;--r-hoja:22px;--r-pildora:999px;
   --toque:44px;--alto-campo:52px;--alto-boton:56px;
+  --teclado:0px;--alto-visible:100dvh; /* I-1 (PR #8): los ajusta visualViewport cuando se abre el teclado */
+  --alto-pie:calc(80px + env(safe-area-inset-bottom)); /* A (PR #8): alto real del pie de la hoja; lo mide un ResizeObserver */
   /* Sombras */
   --sh-1:0 1px 2px rgba(16,37,65,.05),0 8px 24px rgba(16,37,65,.06);
   --sh-2:0 10px 28px rgba(16,37,65,.22);
@@ -69,7 +71,7 @@
   --c-texto:#EEF2F8;--c-texto-2:#A3AEC0;--c-texto-ejemplo:#8C9AB0;
   --c-acento:var(--p-dorado);--c-sobre-acento:#0E1F39;--c-acento-2:#1B2D4B;--c-indicador:var(--p-dorado);--c-foco:var(--p-dorado);--c-halo:rgba(214,180,130,.28);--c-serie:var(--p-dorado);
   --c-esencial:var(--p-verde-o);--c-mantener:var(--p-azul-o);--c-innecesario:var(--p-naranja-o);
-  --c-exito:var(--p-verde-o);--c-aviso:var(--p-ambar-o);--c-peligro:var(--p-rojo-o);
+  --c-exito:var(--p-verde-o);--c-aviso:var(--p-ambar-o);--c-peligro:var(--p-rojo-o);--c-sobre-cat:var(--p-noche);
   --c-aviso-fondo:#3A2D10;--c-aviso-texto:#F0D28A;--c-toast:#2B4066;
   --c-destacada:#14233B;--c-destacada-linea:rgba(255,255,255,.14);
   --sh-1:0 1px 2px rgba(0,0,0,.3),0 8px 24px rgba(0,0,0,.25);--sh-2:0 10px 28px rgba(0,0,0,.45);--sh-flota:0 8px 24px rgba(0,0,0,.5);--sh-chica:0 2px 8px rgba(0,0,0,.35);
@@ -81,7 +83,7 @@
   --c-texto:#EEF2F8;--c-texto-2:#A3AEC0;--c-texto-ejemplo:#8C9AB0;
   --c-acento:var(--p-dorado);--c-sobre-acento:#0E1F39;--c-acento-2:#1B2D4B;--c-indicador:var(--p-dorado);--c-foco:var(--p-dorado);--c-halo:rgba(214,180,130,.28);--c-serie:var(--p-dorado);
   --c-esencial:var(--p-verde-o);--c-mantener:var(--p-azul-o);--c-innecesario:var(--p-naranja-o);
-  --c-exito:var(--p-verde-o);--c-aviso:var(--p-ambar-o);--c-peligro:var(--p-rojo-o);
+  --c-exito:var(--p-verde-o);--c-aviso:var(--p-ambar-o);--c-peligro:var(--p-rojo-o);--c-sobre-cat:var(--p-noche);
   --c-aviso-fondo:#3A2D10;--c-aviso-texto:#F0D28A;--c-toast:#2B4066;
   --c-destacada:#14233B;--c-destacada-linea:rgba(255,255,255,.14);
   --sh-1:0 1px 2px rgba(0,0,0,.3),0 8px 24px rgba(0,0,0,.25);--sh-2:0 10px 28px rgba(0,0,0,.45);--sh-flota:0 8px 24px rgba(0,0,0,.5);--sh-chica:0 2px 8px rgba(0,0,0,.35);
@@ -102,7 +104,7 @@ button:active:not(:disabled){transform:scale(var(--escala-toque))}
 button:disabled{opacity:.45;cursor:default}
 h1,h2,h3{font-family:var(--f-titulo);letter-spacing:-.01em}
 header{position:relative;text-align:center;padding:calc(var(--s-3) + env(safe-area-inset-top)) var(--s-5) var(--s-1)}
-header img{display:block;margin:0 auto;height:110px;width:auto;filter:drop-shadow(0 1px 1.5px rgba(70,45,0,.35))}
+header img{display:block;margin:0 auto;height:84px;width:auto;filter:drop-shadow(0 1px 1.5px rgba(70,45,0,.35))}
 header.sm img{height:64px}
 header h1{margin:var(--s-2) 0 0;font-size:var(--t-28);font-weight:var(--w-titulo);letter-spacing:-.02em}
 header.sm h1{font-size:var(--t-22);margin-top:6px}
@@ -165,7 +167,7 @@ select{color-scheme:inherit;padding-right:40px;background-image:url("data:image/
 #st.bad{background:var(--p-rojo)}
 #st.ok{background:var(--p-verde)}
 /* M-4: avisos con Deshacer que siguen vivos cuando sale otro aviso */
-#stu{position:fixed;left:50%;transform:translateX(-50%);bottom:calc(140px + env(safe-area-inset-bottom));z-index:20;display:flex;flex-direction:column;gap:6px;width:max-content;max-width:calc(100% - 32px);pointer-events:none}
+#stu{position:fixed;left:50%;transform:translateX(-50%);bottom:calc(140px + env(safe-area-inset-bottom));z-index:60;display:flex;flex-direction:column;gap:6px;width:max-content;max-width:calc(100% - 32px);pointer-events:none}
 .stu-i{pointer-events:auto;display:flex;align-items:center;gap:var(--s-2);background:var(--c-toast);color:var(--c-toast-texto);padding:8px 14px;border-radius:var(--r-campo);font-size:var(--t-13);line-height:1.35;box-shadow:var(--sh-flota)}
 .stu-i.ok{background:var(--p-verde)}
 .stu-i .ub{margin-left:auto;flex:none}
@@ -234,7 +236,7 @@ summary{min-height:var(--toque);display:flex;align-items:center;cursor:pointer;f
 .bw{flex:1;width:100%;display:flex;align-items:flex-end}
 .bw i{display:block;width:100%;background:var(--c-serie);opacity:.45;border-radius:6px 6px 2px 2px}
 .bw i.act{opacity:1}
-.heat{display:grid;grid-template-columns:repeat(7,1fr);gap:3px;margin:0 -10px} /* 7 celdas de 44 px o más a 390 px de ancho */
+.heat{display:grid;grid-template-columns:repeat(7,1fr);gap:2px;margin:0 -19px} /* m-3: 7 celdas de 44 px o más desde 360 px de ancho */
 .hh{text-align:center;font-size:var(--t-12);font-weight:var(--w-fuerte);color:var(--c-texto-2)}
 .hc{height:var(--toque);border-radius:var(--r-chico);background:var(--c-chip);font-size:var(--t-13);font-weight:var(--w-fuerte);color:var(--c-texto);padding:0}
 .hc.e{background:transparent;pointer-events:none}
@@ -340,11 +342,106 @@ summary{min-height:var(--toque);display:flex;align-items:center;cursor:pointer;f
 .fprev .rc2{flex:1;min-width:0}
 #fest{margin:0}
 
+/* ===== Fase 2 · Inicio, barra con botón central y hoja de Registrar ===== */
+/* Encabezado: logo arriba, saludo y Ajustes (solo en Inicio) */
+.hdb{position:absolute;top:calc(var(--s-3) + env(safe-area-inset-top));right:var(--s-4);width:var(--toque);height:var(--toque);border-radius:50%;background:var(--c-chip);color:var(--c-acento);display:flex;align-items:center;justify-content:center;padding:0}
+.hdb svg{width:22px;height:22px;fill:none;stroke:currentColor;stroke-width:1.8;stroke-linecap:round;stroke-linejoin:round}
+/* Cifra principal contra lo planeado, con marca del 80 % */
+.mes .m2{font-size:var(--t-14)}
+.cap{margin-top:-6px}
+.capbar{position:relative;height:10px;border-radius:5px;background:rgba(255,255,255,.16)}
+.capbar i{display:block;height:100%;max-width:100%;border-radius:5px;background:var(--c-destacada-oro);transition:background-color var(--d-color) var(--ease-out)}
+.capbar.cerca i{background:var(--c-destacada-aviso)}
+.capbar.paso i{background:var(--c-destacada-peligro)}
+.capbar .m80{position:absolute;left:80%;top:-4px;bottom:-4px;width:2px;border-radius:1px;background:var(--c-destacada-texto);opacity:.75}
+.cap .sub{margin-top:var(--s-2)}
+/* Aviso discreto del estado de la IA */
+.estado{align-self:flex-start;display:inline-flex;align-items:center;gap:var(--s-2);min-height:32px;padding:6px var(--s-3);border-radius:var(--r-pildora);background:var(--c-chip);color:var(--c-texto-2);font-size:var(--t-13);font-weight:var(--w-medio)}
+.estado::before{content:"";width:8px;height:8px;border-radius:50%;background:var(--c-texto-2);flex:none}
+.estado.voz::before{background:var(--c-exito)}
+/* Tres tarjetas iguales por categoría contra su tope */
+.cats{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:var(--s-2)}
+.catc{--cat:var(--c-esencial);background:var(--c-superficie);border:1px solid var(--c-linea);border-radius:16px;padding:10px;box-shadow:var(--sh-1);display:flex;flex-direction:column;gap:6px;min-width:0}
+.catc[data-cat=Mantener]{--cat:var(--c-mantener)}
+.catc[data-cat=Innecesario]{--cat:var(--c-innecesario)}
+.catn{display:flex;align-items:center;gap:5px;font-size:var(--t-12);font-weight:var(--w-fuerte);color:var(--c-texto-2);white-space:nowrap}
+.catn::before{content:"";width:8px;height:8px;border-radius:50%;background:var(--cat);flex:none}
+.catc b{font-size:var(--t-15);font-weight:var(--w-titulo);letter-spacing:-.01em;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;font-variant-numeric:tabular-nums}
+.catc .bar{margin-top:0;height:6px}
+.catc .bar i{background:var(--cat)}
+.catc.cerca .bar i{background:var(--c-aviso)}
+.catc.paso .bar i{background:var(--c-peligro)}
+.catc .rc2{margin:0;line-height:1.3}
+.cats.largo{grid-template-columns:minmax(0,1fr)} /* M-5 en la Fase 2: con montos de 6 cifras, cada tarjeta ocupa un renglón */
+.catc.cerca .rc2{color:var(--c-aviso);font-weight:var(--w-fuerte)}
+.catc.paso .rc2{color:var(--c-peligro);font-weight:var(--w-fuerte)}
+/* Últimos movimientos */
+#ult .row{padding:10px 0}
+#ult .rr{gap:6px}
+.qb{display:inline-flex;align-items:center;justify-content:center;min-width:24px;height:24px;padding:0 6px;border-radius:12px;background:var(--c-chip);color:var(--c-acento);font-size:var(--t-12);font-weight:var(--w-titulo)}
+#scb .rl p{margin-top:4px}
+#ulv{white-space:nowrap;flex:none} /* m-1: «Ver todos» en una línea */
+
+/* Barra inferior: 5 destinos con Registrar al centro; Ajustes sale de la barra (§2) */
+#tabs.sin-ind::before{opacity:0}
+#tabs::before{transition:transform var(--d-menu) var(--ease-in-out),opacity var(--d-menu) var(--ease-out)}
+/* El botón central no sobresale de la barra: así no tapa lo que queda justo arriba al desplazarse */
+#treg .mas{width:52px;height:52px;border-radius:50%;background:var(--c-acento);color:var(--c-sobre-acento);display:flex;align-items:center;justify-content:center;box-shadow:var(--sh-chica)}
+.sr{position:absolute;width:1px;height:1px;margin:-1px;padding:0;overflow:hidden;clip:rect(0 0 0 0);white-space:nowrap;border:0}
+#treg .mas svg{width:26px;height:26px;stroke-width:2.4}
+#treg[aria-expanded=true]{color:var(--c-acento)}
+
+/* Hoja de Registrar: sube con translateY en 300 ms (--ease-drawer) y baja por el mismo camino.
+   Cerrada no se oculta con [hidden]: queda invisible (visibility) e inerte, para conservar lo que hay dentro. */
+#reg{position:fixed;top:0;left:0;right:0;bottom:var(--teclado,0px);z-index:50;display:flex;align-items:flex-end;justify-content:center;background:var(--c-velo);opacity:0;visibility:hidden;pointer-events:none;
+  transition:opacity var(--d-hoja) var(--ease-out),visibility 0s linear var(--d-hoja)}
+#reg[data-state=open]{opacity:1;visibility:visible;pointer-events:auto;transition:opacity var(--d-hoja) var(--ease-out),visibility 0s linear 0s}
+#reg .sh{width:100%;max-width:430px;max-height:calc(var(--alto-visible,100dvh) - 12px - env(safe-area-inset-top));overflow-y:auto;scroll-padding-bottom:calc(var(--alto-pie) + 8px);overscroll-behavior:contain;background:var(--c-superficie);color:var(--c-texto);border-radius:var(--r-hoja) var(--r-hoja) 0 0;
+  padding:var(--s-2) 18px 0;display:flex;flex-direction:column;gap:var(--s-3);box-shadow:var(--sh-2);
+  transform:translateY(var(--hoja-desde));transition:transform var(--d-hoja) var(--ease-drawer)}
+#reg[data-state=open] .sh{transform:translateY(0)}
+#reg .agarra{width:40px;height:5px;border-radius:3px;background:var(--c-linea);margin:2px auto 2px;flex:none}
+#reg h2{margin:0;font-size:var(--t-22);font-weight:var(--w-titulo)}
+#reg h2:focus{outline:none}
+#form{display:flex;flex-direction:column;gap:14px}
+/* I-1: pie fijo de la hoja (sticky dentro de la hoja que se desplaza), con la zona segura de abajo */
+#reg .pie{position:sticky;bottom:0;z-index:2;margin:0 -18px;padding:10px 18px calc(12px + env(safe-area-inset-bottom));background:var(--c-superficie);border-top:1px solid var(--c-linea);display:flex;flex-direction:column;gap:var(--s-2)}
+#reg .pie .ayuda{margin:0}
+.acc{display:flex;gap:var(--s-2)}
+.vozb{flex:3;min-height:64px;border-radius:18px;background:var(--c-acento);color:var(--c-sobre-acento);display:flex;align-items:center;justify-content:center;gap:10px;font-size:var(--t-17);font-weight:var(--w-titulo);padding:0 var(--s-4)}
+.vozb.on{background:var(--p-rojo);color:#fff}
+.vozb.apagado{opacity:.6}
+.fotob{flex:2;min-height:64px;border-radius:18px;flex-direction:column;gap:2px;font-size:var(--t-14);line-height:1.2}
+.sep{display:flex;align-items:center;gap:10px;color:var(--c-texto-2);font-size:var(--t-12);font-weight:var(--w-fuerte);text-transform:uppercase;letter-spacing:.06em}
+.sep::before,.sep::after{content:"";flex:1;height:1px;background:var(--c-linea)}
+.ayuda{margin:6px 0 0;font-size:var(--t-12);color:var(--c-texto-2);line-height:1.35}
+.ayuda.mal{color:var(--c-peligro);font-weight:var(--w-fuerte)}
+.seg3{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:6px}
+.seg3 button{--cat:var(--c-esencial);min-height:var(--toque);border-radius:var(--r-campo);border:1.5px solid var(--c-borde-campo);background:var(--c-campo);color:var(--c-texto);font-weight:var(--w-fuerte);font-size:var(--t-14);padding:0 4px}
+.seg3 button[data-cat=Mantener]{--cat:var(--c-mantener)}
+.seg3 button[data-cat=Innecesario]{--cat:var(--c-innecesario)}
+.seg3 button[aria-checked=true]{background:var(--cat);border-color:var(--cat);color:var(--c-sobre-cat)}
+.quien{display:flex;align-items:center;gap:10px}
+.qi{width:32px;height:32px;border-radius:50%;background:var(--c-acento);color:var(--c-sobre-acento);display:flex;align-items:center;justify-content:center;font-weight:var(--w-titulo);font-size:var(--t-14);flex:none}
+.quien .rc2{margin:0;font-size:var(--t-13)}
+/* Botón Guardar: «Guardando…» → «Guardado» con palomita, o «No se pudo» con qué hacer (§4: 150–200 ms) */
+#go[data-estado=ok]{background:var(--c-exito);color:var(--c-sobre-cat)}
+#go[data-estado=pend]{background:var(--p-marino-2);color:#fff}
+#go[data-estado=mal]{background:var(--c-peligro);color:var(--c-sobre-cat)}
+#go[data-estado=guardando],#go[data-estado=ok],#go[data-estado=pend],#go[data-estado=mal]{opacity:1}
+#go[data-estado=ok]::before,#go[data-estado=pend]::before{content:"✓";display:inline-block;margin-right:var(--s-2);animation:palomita var(--d-aviso) var(--ease-out) both}
+@keyframes palomita{from{opacity:0;transform:scale(.95)}to{opacity:1;transform:none}}
+/* Con la hoja abierta, el aviso flotante sube arriba para no tapar Guardar */
+body.reg-abierta{overflow:hidden}
+body.reg-abierta #st{bottom:auto;top:calc(var(--s-3) + env(safe-area-inset-top))}
+#st{z-index:60}
+
 /* ===== Reducir movimiento: sin desplazamientos; quedan opacidad y color ===== */
 @media (prefers-reduced-motion:reduce){
   button{transition-property:opacity,background-color,color,border-color}
   button:active:not(:disabled){transform:none}
-  #ts .sh,#ts[data-state=open] .sh{transform:none;transition:none}
+  #ts .sh,#ts[data-state=open] .sh,#reg .sh,#reg[data-state=open] .sh{transform:none;transition:none}
+  @keyframes palomita{from{opacity:0}to{opacity:1}}
   #tabs::before{transition:none}
   #st{transition-property:opacity,background-color}
   @keyframes entrar{from{opacity:0}to{opacity:1}}
@@ -358,7 +455,8 @@ summary{min-height:var(--toque);display:flex;align-items:center;cursor:pointer;f
 </head>
 <body>
 <div id="splash"><img src="logo.png?v=3" alt=""></div>
-<header id="hd"><img src="logo.png?v=3" alt="JonKa"><h1 id="ht">Control de gastos</h1><p id="hs">Tus finanzas, en orden.</p></header>
+<header id="hd"><img src="logo.png?v=3" alt="JonKa"><h1 id="ht">Control de gastos</h1><p id="hs">Tus finanzas, en orden.</p>
+<button id="hdaju" class="hdb" type="button" aria-label="Ajustes" hidden><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M4 7h9M17 7h3M4 17h3M11 17h9"/><circle cx="15" cy="7" r="2"/><circle cx="9" cy="17" r="2"/></svg></button></header>
 <main>
 <!-- Primera vez -->
 <section id="cfg" class="card gold" hidden>
@@ -369,52 +467,32 @@ summary{min-height:var(--toque);display:flex;align-items:center;cursor:pointer;f
 <button id="sc" class="pri">Guardar configuración</button>
 </section>
 
-<!-- INICIO -->
+<!-- INICIO (Fase 2): una cifra principal, tres categorías, avisos, frecuentes, últimos movimientos y cierre -->
 <section id="p-inicio" class="pg" hidden>
 <div class="mes">
-<div class="top"><div><div class="m1" id="smm1">Octubre 2026</div><div class="m2">Gastos del mes</div></div>
-<label class="cal" aria-label="Ver los gastos de un día" style="margin:0"><svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="#D6B482" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><rect x="3.5" y="5" width="17" height="15.5" rx="3"/><path d="M8 3v4M16 3v4M3.5 10h17"/></svg><input id="cal" type="date" aria-label="Elegir un día"></label></div>
+<div class="top"><div><div class="m1" id="smm1">Octubre 2026</div><div class="m2" id="smd">Gastado este mes</div></div>
+<label class="cal" aria-label="Ver los gastos de un día"><svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="#D6B482" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="3.5" y="5" width="17" height="15.5" rx="3"/><path d="M8 3v4M16 3v4M3.5 10h17"/></svg><input id="cal" type="date" aria-label="Elegir un día"></label></div>
 <div class="trow"><div id="smt">$0.00</div><span data-eye></span></div>
-<div class="cs"><div>Esencial<b id="sme">$0.00</b></div><div>Mantener<b id="smm">$0.00</b></div><div>Innecesario<b id="smi">$0.00</b></div></div>
+<div id="smcap" class="cap" hidden><div class="capbar" id="smcb" role="progressbar" aria-valuemin="0" aria-valuemax="100" aria-label="Gastado contra lo planeado"><i id="smcf"></i><span class="m80" aria-hidden="true"></span></div><div id="smct" class="sub"></div></div>
 <div id="sma" hidden></div>
 <div id="sml" class="sub" hidden></div><div id="shy" class="sub" hidden></div><div id="spr" class="sub" hidden></div>
 </div>
+<div id="iax" class="estado" role="note" hidden></div>
+<div class="cats" aria-label="Por categoría">
+<div class="catc" data-cat="Esencial"><span class="catn">Esencial</span><b id="sme">$0.00</b><div class="bar"><i id="sbe"></i></div><span class="rc2" id="ste">Sin tope</span></div>
+<div class="catc" data-cat="Mantener"><span class="catn">Mantener</span><b id="smm">$0.00</b><div class="bar"><i id="sbm"></i></div><span class="rc2" id="stm">Sin tope</span></div>
+<div class="catc" data-cat="Innecesario"><span class="catn">Innecesario</span><b id="smi">$0.00</b><div class="bar"><i id="sbi"></i></div><span class="rc2" id="sti">Sin tope</span></div>
+</div>
 <div id="sof" class="warn" hidden></div>
 <div id="saa" class="warn" hidden></div>
-<div id="scb" class="warn" hidden><span id="scbt"></span> <button id="scbb" class="mini" type="button">Ver cierre</button></div>
 <div id="smw" class="warn" hidden><span id="smwt"></span> <button id="smwb" class="mini" type="button">Cómo extenderlas</button></div>
+<div id="pend"></div>
+<p id="fest" class="rc2" role="status" hidden></p>
 <div class="card gold" id="bc" hidden><div class="trow"><h2>Por aprobar</h2><span id="bn" class="badge"></span></div><p>Gastos que avisó tu banco, Wallet o Apple Pay. Revisa y aprueba.</p><div id="bl"></div></div>
 <div class="card" id="sbc" hidden><h2>Cobros que se repiten</h2><p>Se cobran cada mes. Conviértelos en gasto fijo para que se registren solos.</p><div id="sbl"></div></div>
-<div class="card gold" id="form">
-<h2>Registrar gasto</h2>
-<div id="vj" class="warn" hidden><span>Modo viaje: los montos se toman en dólares y se guardan en pesos.</span> <button id="vjb" class="mini" type="button">Desactivar</button></div>
-<div>
-<div class="ln"><input id="ia" autocomplete="off" enterkeyhint="send" placeholder="Ej. Ayer gasté $180 en tacos">
-<button id="ib" class="icb" type="button" aria-label="Enviar"><svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12h14M13 6l6 6-6 6"/></svg></button>
-<button id="mic" class="icb dark" type="button" aria-label="Dictar" hidden><svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="9" y="3" width="6" height="11" rx="3"/><path d="M5 11a7 7 0 0 0 14 0M12 18v3"/></svg></button></div>
-<p id="hint" style="margin-top:8px;font-size:12px">Para dictar toca el micrófono del teclado de tu celular.</p>
-</div>
-<button id="fb" type="button" class="out"><svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M4 8.5A1.5 1.5 0 0 1 5.5 7H8l1.2-2h5.6L16 7h2.5A1.5 1.5 0 0 1 20 8.5v9a1.5 1.5 0 0 1-1.5 1.5h-13A1.5 1.5 0 0 1 4 17.5z"/><circle cx="12" cy="13" r="3.4"/></svg>Escanear ticket con IA</button>
-<input id="ph" type="file" accept="image/*" capture="environment" hidden><input id="ph2" type="file" accept="image/*" hidden>
-<div id="ts" hidden><div class="sh"><b>Escanear ticket con IA</b><p style="margin:0;text-align:center;font-size:var(--t-13);color:var(--c-texto-2)">La foto se manda a la IA para leer fecha, comercio y total.</p><button id="tsc" type="button" class="pri">Abrir cámara</button><button id="tsf" type="button" class="out">Subir foto o archivo</button><button id="tsx" type="button" class="lnk">Cancelar</button></div></div>
-<div id="pt" class="warn" hidden><span id="ptt"></span> <button id="ptb" class="mini" type="button">Guardar dividido</button></div>
-<div id="fqw" hidden><label>Frecuentes</label><div class="chips" id="fq"></div></div>
-<div><label for="f">Fecha</label><input id="f" type="date"></div>
-<div><label for="c">Concepto</label><input id="c" autocomplete="off" placeholder="Ej. Tacos"></div>
-<div><label for="m">Monto</label><input id="m" inputmode="decimal" placeholder="$0.00"></div>
-<div><label for="k">Categoría</label><select id="k"><option>Esencial</option><option>Mantener</option><option>Innecesario</option></select></div>
-<!-- Foto del ticket a mano (B1): se guarda en Drive con el gasto y nunca va a la IA -->
-<div id="fwrap"><label>Foto del ticket (opcional)</label>
-<div class="two"><button id="fcam" type="button" class="out">Tomar foto</button><button id="fgal" type="button" class="out">Subir de galería</button></div>
-<div id="fprev" class="fprev" hidden><img id="fimg" alt="Miniatura de la foto del ticket"><span class="rc2">Se guarda en tu Drive con el gasto. No se manda a la IA.</span><button id="fqx" type="button" class="mini del">Quitar</button></div>
-<input id="phm" type="file" accept="image/*" capture="environment" hidden><input id="phg" type="file" accept="image/*" hidden>
-</div>
-<p id="fest" class="rc2" role="status" hidden></p>
-<button id="go" class="pri">Guardar gasto</button>
-<button id="cn" class="lnk" hidden>Cancelar edición</button>
-<button id="tkb" type="button" class="out" hidden>Ver foto del ticket</button>
-</div>
-<div id="pend"></div>
+<div class="card" id="fqw" hidden><h2>Un toque</h2><p>Tus gastos de siempre: toca uno, ajusta el monto y guarda.</p><div class="chips" id="fq"></div></div>
+<div class="card" id="ulc"><div class="trow"><h2>Últimos movimientos</h2><button id="ulv" class="lnk" type="button">Ver todos</button></div><div id="ult"><div class="vacio">Cargando…</div></div></div>
+<div class="card" id="scb" hidden><div class="trow"><div class="rl"><h2 id="scbh">Cierre del mes pasado</h2><p id="scbt"></p></div><button id="scbb" class="mini" type="button">Ver cierre</button></div></div>
 </section>
 
 <!-- MOVIMIENTOS -->
@@ -560,6 +638,48 @@ summary{min-height:var(--toque);display:flex;align-items:center;cursor:pointer;f
 </main>
 <div id="st" hidden role="status" aria-live="polite"></div>
 <div id="stu" aria-live="polite"></div>
+<!-- REGISTRAR (Fase 2): hoja que sube desde abajo. Cerrada: visibility hidden + inert; abierta: data-state="open" -->
+<div id="reg" data-state="closed" inert aria-hidden="true">
+<div class="sh" role="dialog" aria-modal="true" aria-labelledby="regt">
+<div class="agarra" aria-hidden="true"></div>
+<div class="trow"><h2 id="regt" tabindex="-1">Registrar gasto</h2><button id="regx" class="icb" type="button" aria-label="Cerrar"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" aria-hidden="true"><path d="M6 6l12 12M18 6 6 18"/></svg></button></div>
+<div id="form">
+<div id="vj" class="warn" hidden><span>Modo viaje: los montos se toman en dólares y se guardan en pesos.</span> <button id="vjb" class="mini" type="button">Desactivar</button></div>
+<div class="acc">
+<button id="mic" class="vozb" type="button" aria-label="Dictar" hidden><svg width="26" height="26" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="9" y="3" width="6" height="11" rx="3"/><path d="M5 11a7 7 0 0 0 14 0M12 18v3"/></svg><span id="micl">Dictar gasto</span></button>
+<button id="regfoto" class="out fotob" type="button"><svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M4 8.5A1.5 1.5 0 0 1 5.5 7H8l1.2-2h5.6L16 7h2.5A1.5 1.5 0 0 1 20 8.5v9a1.5 1.5 0 0 1-1.5 1.5h-13A1.5 1.5 0 0 1 4 17.5z"/><circle cx="12" cy="13" r="3.4"/></svg>Foto del ticket</button>
+</div>
+<p id="hint" class="rc2">Para dictar toca el micrófono del teclado de tu celular.</p>
+<div class="ln"><input id="ia" autocomplete="off" enterkeyhint="send" placeholder="O escribe: tacos 150" aria-label="Escribe el gasto">
+<button id="ib" class="icb" type="button" aria-label="Enviar"><svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M5 12h14M13 6l6 6-6 6"/></svg></button></div>
+<button id="fb" type="button" class="out"><svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M4 8.5A1.5 1.5 0 0 1 5.5 7H8l1.2-2h5.6L16 7h2.5A1.5 1.5 0 0 1 20 8.5v9a1.5 1.5 0 0 1-1.5 1.5h-13A1.5 1.5 0 0 1 4 17.5z"/><circle cx="12" cy="13" r="3.4"/></svg>Escanear ticket con IA</button>
+<input id="ph" type="file" accept="image/*" capture="environment" hidden><input id="ph2" type="file" accept="image/*" hidden>
+<div id="pt" class="warn" hidden><span id="ptt"></span> <button id="ptb" class="mini" type="button">Guardar dividido</button></div>
+<div class="sep" aria-hidden="true"><span>A mano</span></div>
+<div><label for="c">Concepto</label><input id="c" autocomplete="off" autocapitalize="sentences" maxlength="80" enterkeyhint="next" placeholder="Ej. Tacos" aria-describedby="ch"><p id="ch" class="ayuda" hidden></p></div>
+<div><label for="m">Monto</label><input id="m" inputmode="decimal" placeholder="Ej. 45,50" autocomplete="off" enterkeyhint="done" aria-describedby="mh"><p id="mh" class="ayuda">Número mayor que 0. Acepta 45,50 o 1,234.50.</p></div>
+<div><label id="kl">Categoría</label><div class="seg3" id="kb" role="radiogroup" aria-labelledby="kl"><button type="button" role="radio" data-cat="Esencial">Esencial</button><button type="button" role="radio" data-cat="Mantener">Mantener</button><button type="button" role="radio" data-cat="Innecesario">Innecesario</button></div>
+<select id="k" hidden aria-hidden="true" tabindex="-1"><option>Esencial</option><option>Mantener</option><option>Innecesario</option></select></div>
+<div class="quien"><span class="qi" id="rq" aria-hidden="true">?</span><span class="rc2" id="rqt">Quién: elige tu inicial en Ajustes.</span></div>
+<label class="chk"><input id="vjr" type="checkbox"><span>En dólares (modo viaje)<small>El monto se toma en dólares y se guarda en pesos con el tipo de cambio del día del gasto.</small></span></label>
+<!-- Foto del ticket a mano (B1): se guarda en Drive con el gasto y nunca va a la IA -->
+<div id="fwrap"><label>Foto del ticket (opcional · se guarda en tu Drive)</label>
+<div class="two"><button id="fcam" type="button" class="out">Tomar foto</button><button id="fgal" type="button" class="out">Subir de galería</button></div>
+<div id="fprev" class="fprev" hidden><img id="fimg" alt="Miniatura de la foto del ticket"><span class="rc2">Se guarda en tu Drive con el gasto. No se manda a la IA.</span><button id="fqx" type="button" class="mini del">Quitar</button></div>
+<input id="phm" type="file" accept="image/*" capture="environment" hidden><input id="phg" type="file" accept="image/*" hidden>
+</div>
+<div><label for="f">Fecha</label><input id="f" type="date" aria-describedby="fh"><p id="fh" class="ayuda" hidden></p></div>
+<button id="tkb" type="button" class="out" hidden>Ver foto del ticket</button>
+<!-- I-1 (auditoría del PR #8): «Guardar gasto» queda fijo al pie de la hoja, siempre a la vista -->
+<div class="pie">
+<p id="rege" class="ayuda mal" role="alert" hidden></p>
+<button id="go" class="pri" type="button">Guardar gasto</button>
+<button id="cn" class="lnk" type="button" hidden>Cancelar edición</button>
+</div>
+</div>
+</div>
+</div>
+<div id="ts" hidden><div class="sh"><b>Escanear ticket con IA</b><p style="margin:0;text-align:center;font-size:var(--t-13);color:var(--c-texto-2)">La foto se manda a la IA para leer fecha, comercio y total.</p><button id="tsc" type="button" class="pri">Abrir cámara</button><button id="tsf" type="button" class="out">Subir foto o archivo</button><button id="tsx" type="button" class="lnk">Cancelar</button></div></div>
 <div id="tkv" hidden><img id="tki" alt="Foto del ticket"><button id="tkx" class="pri" type="button" style="max-width:280px">Cerrar</button></div>
 <div id="av" hidden><div><h2>Conectar avisos del banco</h2>
 <h3>1 · Correos de Santander (Android y iPhone)</h3>
@@ -590,14 +710,14 @@ summary{min-height:var(--toque);display:flex;align-items:center;cursor:pointer;f
 <div class="ln"><button id="avzm" type="button" class="out">Registrar a mano</button><button id="avza" type="button" class="pri">Aceptar</button></div></div></div>
 <div id="imp"></div>
 <div id="lock" hidden><img src="logo.png?v=3" alt="JonKa"><h2 id="lkt"></h2><div id="lkd"></div><div id="lkp"></div><button id="lkb" class="pri" hidden>Usar Face ID / huella</button><button id="lku" class="lnk" hidden>Usar PIN</button><button id="lkc" class="lnk" hidden>Cancelar</button><button id="lko" class="lnk">Olvidé mi PIN</button></div>
-<nav id="tabs" hidden>
-<button data-t="inicio" class="on"><svg viewBox="0 0 24 24"><path d="M3.5 11 12 3.5 20.5 11V20a1 1 0 0 1-1 1H15v-6H9v6H4.5a1 1 0 0 1-1-1z"/></svg>Inicio<i class="bdg" hidden></i></button>
-<button data-t="mov"><svg viewBox="0 0 24 24"><path d="M7 3h7l5 5v13H7z"/><path d="M14 3v5h5M10 13h6M10 17h6"/></svg>Movimientos</button>
-<button data-t="lis"><svg viewBox="0 0 24 24"><path d="M3 4h2l2.4 11h10.2L20 7H6"/><circle cx="9" cy="19" r="1.4"/><circle cx="17" cy="19" r="1.4"/></svg>Compras</button>
-<button data-t="rep"><svg viewBox="0 0 24 24"><path d="M5 21v-8M11 21V6M17 21v-10M3 21h18"/></svg>Reportes</button>
-<button data-t="aju"><svg viewBox="0 0 24 24"><path d="M4 7h9M17 7h3M4 17h3M11 17h9"/><circle cx="15" cy="7" r="2"/><circle cx="9" cy="17" r="2"/></svg>Ajustes</button>
+<nav id="tabs" aria-label="Secciones" hidden>
+<button type="button" data-t="inicio" class="on"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M3.5 11 12 3.5 20.5 11V20a1 1 0 0 1-1 1H15v-6H9v6H4.5a1 1 0 0 1-1-1z"/></svg>Inicio<i class="bdg" hidden></i></button>
+<button type="button" data-t="mov"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M7 3h7l5 5v13H7z"/><path d="M14 3v5h5M10 13h6M10 17h6"/></svg>Movimientos</button>
+<button type="button" id="treg" aria-label="Registrar gasto" aria-haspopup="dialog" aria-expanded="false"><span class="mas" aria-hidden="true"><svg viewBox="0 0 24 24"><path d="M12 5v14M5 12h14"/></svg></span><span class="sr">Registrar</span></button>
+<button type="button" data-t="lis"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M3 4h2l2.4 11h10.2L20 7H6"/><circle cx="9" cy="19" r="1.4"/><circle cx="17" cy="19" r="1.4"/></svg>Compras</button>
+<button type="button" data-t="rep"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M5 21v-8M11 21V6M17 21v-10M3 21h18"/></svg>Reportes</button>
 </nav>
-<script src="compras-model.js?v=20261102-d1"></script>
+<script src="compras-model.js?v=20261102-d2"></script>
 <script>
 const $ = id => document.getElementById(id), L = localStorage;
 const MESES = ['Enero','Febrero','Marzo','Abril','Mayo','Junio','Julio','Agosto','Septiembre','Octubre','Noviembre','Diciembre'];
@@ -745,7 +865,8 @@ function apartaUndo() {
   const caja = el('div', 'stu-i' + (u.cls ? ' ' + u.cls : '')), b = el('button', 'ub', 'Deshacer'); b.type = 'button';
   caja.append(el('span', '', u.texto), b);
   b.onclick = () => { b.disabled = true; caja.remove(); u.undo(); };
-  $('stu').append(caja); setTimeout(() => caja.remove(), resta);
+  const p = $('stu'); while (p.children.length >= 2) p.firstElementChild.remove(); // N-3: la pila muestra como máximo 2 avisos
+  p.append(caja); setTimeout(() => caja.remove(), resta);
 }
 // Los mensajes de progreso ("…") se quedan hasta el siguiente; los demás se van solos
 function say(t) {
@@ -776,11 +897,82 @@ function hoja(n, abrir) {
   n.dataset.state = 'closed'; hojaT = setTimeout(() => { n.hidden = true; }, 320);
 }
 // Lleva al formulario manual (salida de la voz y de la IA cuando no se pueden usar)
-function irAMano() {
-  if (tab !== 'inicio') setTab('inicio');
-  $('form').scrollIntoView({ behavior: suave(), block: 'start' });
-  try { $('c').focus({ preventScroll: true }); } catch (e) {}
+function irAMano() { abreRegistro({ foco: 'c' }); } // la hoja de Registrar se abre sobre la pantalla actual
+
+// ---- Hoja de Registrar (Fase 2): sube desde abajo con transition sobre data-state y baja por el mismo camino ----
+// Cerrada queda invisible e inerte (no [hidden]): lo que hay dentro conserva su estado. body[data-reg] dice en qué va.
+let regEstado = 'cerrada', regT = 0, regTok = 0, regDe = null, cifraDiferida = null, guardoEnHoja = false;
+function setReg(s) { regEstado = s; document.body.dataset.reg = s; }
+function abreRegistro(opc) {
+  const n = $('reg'); clearTimeout(regT);
+  if (n.dataset.state !== 'open') {
+    regTok++; regDe = document.activeElement;
+    n.removeAttribute('inert'); n.setAttribute('aria-hidden', 'false'); n.dataset.state = 'open';
+    ['hd', 'tabs'].forEach(id => $(id).setAttribute('inert', '')); document.querySelector('main').setAttribute('inert', '');
+    document.body.classList.add('reg-abierta'); $('treg').setAttribute('aria-expanded', 'true');
+    pintaQuien(); pintaViaje(); if (!$('f').value) $('f').value = hoy(); $('f').max = hoy(); n.querySelector('.sh').scrollTop = 0;
+    if (regEstado !== 'guardando') { setReg('abierta'); ponGo(''); }
+  }
+  const foco = opc && opc.foco;
+  try { (foco ? $(foco) : $('regt')).focus({ preventScroll: true }); } catch (e) {}
 }
+function cierraRegistro() {
+  const n = $('reg'); if (n.dataset.state !== 'open') return;
+  regTok++; n.dataset.state = 'closed'; n.setAttribute('inert', ''); n.setAttribute('aria-hidden', 'true');
+  ['hd', 'tabs'].forEach(id => $(id).removeAttribute('inert')); document.querySelector('main').removeAttribute('inert');
+  document.body.classList.remove('reg-abierta'); $('treg').setAttribute('aria-expanded', 'false');
+  if (editando || borrId) cancelaEdicion(true);
+  limpiaAyudas(); setReg('cerrando'); clearTimeout(regT);
+  regT = setTimeout(() => { setReg('cerrada'); ponGo(''); trasCerrar(); }, 320);
+  try { (regDe && document.contains(regDe) && !regDe.closest('#reg') ? regDe : $('treg')).focus({ preventScroll: true }); } catch (e) {}
+}
+// La cifra de Inicio sube cuando ya se ve (§4) y solo si se guardó algo
+function trasCerrar() {
+  const v = cifraDiferida; cifraDiferida = null;
+  if (!guardoEnHoja) cifraPorAccion = false;
+  guardoEnHoja = false;
+  if (v != null) contar($('smt'), v);
+}
+// Botón Guardar: «Guardando…» (bloqueado) → «Guardado» con palomita, «Guardado en el teléfono» o «No se pudo» con qué hacer
+function ponGo(e, nota) {
+  const b = $('go'), r = $('rege');
+  b.dataset.estado = e || ''; b.disabled = !!e;
+  b.textContent = e === 'guardando' ? 'Guardando…' : e === 'ok' ? 'Guardado' : e === 'pend' ? 'Guardado en el teléfono' : e === 'mal' ? 'No se pudo' : editando ? 'Guardar cambios' : 'Guardar gasto';
+  r.hidden = !nota; r.textContent = nota || ''; r.classList.toggle('mal', e === 'mal');
+}
+// Categoría con 3 botones; el select #k (oculto) sigue siendo la fuente para el resto del código
+function ponCat(k) {
+  if (!CATS3.includes(k)) k = 'Esencial';
+  $('k').value = k; document.querySelectorAll('#kb button').forEach(b => b.setAttribute('aria-checked', String(b.dataset.cat === k)));
+}
+function pintaQuien() {
+  const v = L.yo || '', n = { K: 'Karla', J: 'Jonathan' }[v];
+  $('rq').textContent = v || '?';
+  $('rqt').textContent = v ? 'Quién: ' + (n || v) + '. Se guarda « · ' + v + '». Se cambia en Ajustes.' : 'Quién: este teléfono no tiene inicial. Elígela en Ajustes.';
+}
+// Validación al salir de cada campo; la regla se ve antes del error (C2)
+const AYUDA_M = 'Número mayor que 0. Acepta 45,50 o 1,234.50.';
+function ayuda(inp, p, texto, mal) { $(inp).setAttribute('aria-invalid', String(!!mal)); $(p).textContent = texto; $(p).hidden = !texto; $(p).classList.toggle('mal', !!mal); }
+function validaCampo(id) {
+  if (id === 'm') { const v = $('m').value.trim(), n = leeMonto(v), mal = !(n > 0); ayuda('m', 'mh', !v ? AYUDA_M : mal ? MSG_MONTO : 'Se guarda como ' + money(n) + (viajeActivo() && !editando && !borrId ? ' en dólares.' : '.'), !!v && mal); return !mal; }
+  if (id === 'c') { const mal = !$('c').value.trim(); ayuda('c', 'ch', mal ? 'Falta el concepto.' : '', mal); return !mal; }
+  if (id === 'f') { const f = $('f').value, futura = esFecha(f) && f > hoy(), mal = !esFecha(f) || futura; ayuda('f', 'fh', futura ? 'La fecha no puede ser futura.' : mal ? 'Falta la fecha.' : '', mal); return !mal; }
+  return true;
+}
+// B (PR #8, 2.ª revisión): decide solo el texto nuevo en concepto o monto; el guardado los deja vacíos, así que lo que haya se escribió después
+const escribiendoOtro = () => !!($('c').value.trim() || $('m').value.trim());
+// I-1 y C (PR #8): con el teclado abierto, la hoja se acomoda a lo que queda visible con visualViewport, igual en iPhone y Android.
+// No se usa interactive-widget=resizes-content: cambiaría el alto de toda la app y en Android subiría la barra inferior sobre el teclado.
+function ajustaTeclado() {
+  const vv = window.visualViewport; if (!vv) return;
+  const r = document.documentElement.style;
+  r.setProperty('--teclado', Math.max(0, Math.round(innerHeight - vv.height - vv.offsetTop)) + 'px'); r.setProperty('--alto-visible', Math.round(vv.height) + 'px');
+}
+if (window.visualViewport) { visualViewport.addEventListener('resize', ajustaTeclado); visualViewport.addEventListener('scroll', ajustaTeclado); }
+// A (PR #8, 2.ª revisión, WCAG 2.4.11): el pie fijo no tapa el campo con foco; scroll-padding-bottom usa su alto real (con la zona segura)
+function midePie() { const p = document.querySelector('#reg .pie'), sh = document.querySelector('#reg .sh'); if (p && sh) sh.style.setProperty('--alto-pie', Math.ceil(p.getBoundingClientRect().height) + 'px'); }
+if (window.ResizeObserver) new ResizeObserver(midePie).observe(document.querySelector('#reg .pie')); else midePie();
+function limpiaAyudas() { ayuda('m', 'mh', AYUDA_M, false); ayuda('c', 'ch', '', false); ayuda('f', 'fh', '', false); ['c', 'm', 'f'].forEach(id => { delete $(id).dataset.tocado; }); }
 // Aviso con botón "Registrar a mano"
 function avisoManual(t) {
   say(t);
@@ -803,6 +995,7 @@ function avisoGuardado(c, m, j, cat, opc) {
     }
   };
   aviso(base + (j.inusual ? 'Ojo: es mucho más de lo normal para "' + nom + '" (normal ≈ ' + money(j.inusual) + ').' : ''), deshacer, voz ? 8000 : 0);
+  if (opc && opc.otro) { const b2 = el('button', 'ub', 'Es otro: guardarlo'); b2.type = 'button'; b2.onclick = () => { b2.disabled = true; stUndo = null; opc.otro(); }; $('st').append(b2); }
 }
 // Aviso con un botón de acción propia (por ejemplo «Ver movimientos»)
 function avisoBoton(t, txt, fn) {
@@ -849,12 +1042,19 @@ const TITULOS = {
 };
 let tab = 'inicio', inT = null;
 const TABS = ['inicio', 'mov', 'lis', 'rep', 'aju'], vistas = new Set(); // pantallas ya abiertas en esta sesión
+// Barra inferior (Fase 2): Inicio, Movimientos, [Registrar], Compras, Reportes. Ajustes sale de la barra y se abre desde el encabezado de Inicio
+const POS_BARRA = { inicio: 0, mov: 1, lis: 3, rep: 4 };
+function saludo() {
+  const h = new Date().getHours(), s = h >= 5 && h < 12 ? 'Buenos días' : h >= 12 && h < 19 ? 'Buenas tardes' : 'Buenas noches';
+  let n = ''; try { n = { K: 'Karla', J: 'Jonathan' }[L.yo] || ''; } catch (e) {}
+  return s + (n ? ', ' + n : '') + '.';
+}
 function setTab(t) {
   tab = t;
   TABS.forEach(x => { $('p-' + x).hidden = x !== t; });
-  document.querySelectorAll('#tabs button').forEach(b => { const on = b.dataset.t === t; b.classList.toggle('on', on); if (on) b.setAttribute('aria-current', 'page'); else b.removeAttribute('aria-current'); });
-  $('tabs').style.setProperty('--tab-i', String(Math.max(0, TABS.indexOf(t)))); // solo el indicador se desliza (§4)
-  $('ht').textContent = TITULOS[t][0]; $('hs').textContent = TITULOS[t][1]; $('hd').classList.toggle('sm', t !== 'inicio');
+  document.querySelectorAll('#tabs button[data-t]').forEach(b => { const on = b.dataset.t === t; b.classList.toggle('on', on); if (on) b.setAttribute('aria-current', 'page'); else b.removeAttribute('aria-current'); });
+  const pos = POS_BARRA[t]; $('tabs').style.setProperty('--tab-i', String(pos == null ? 0 : pos)); $('tabs').classList.toggle('sin-ind', pos == null); // solo el indicador se desliza (§4)
+  $('ht').textContent = TITULOS[t][0]; $('hs').textContent = t === 'inicio' ? saludo() : TITULOS[t][1]; $('hd').classList.toggle('sm', t !== 'inicio'); $('hdaju').hidden = t !== 'inicio';
   window.scrollTo(0, 0);
   // El contenido cambia sin animación; las tarjetas entran escalonadas solo la primera vez en la sesión
   const pn = $('p-' + t);
@@ -895,7 +1095,7 @@ async function flush() {
       try {
         const j = await send(it);
         const n = q(), i = n.findIndex(x => x.id === it.id); if (i >= 0) { n.splice(i, 1); guardaQ(n); }
-        compraEstado(it.id, 'guardado'); enviados++; avisoGuardado(it.concepto, it.monto, j, it.cat);
+        compraEstado(it.id, 'guardado'); enviados++; avisoGuardado(it.concepto, it.monto, j, it.cat); avisaEnvio(it.id, { estado: 'ok', j });
         if (it.foto) verificaFoto(it);
       } catch (e) {
         if (e.lento) { // tiempo agotado: se cuenta; a la tercera seguida, la cola pasa al siguiente sin perderlo (I2)
@@ -904,7 +1104,7 @@ async function flush() {
         }
         if (!e.fatal || e.general) { detenida = e; break; } // red, tiempo, ocupado, no JSON, HTTP ≥ 500 o clave: nadie se marca (I1)
         // El servidor rechazó este gasto en concreto (B3): se marca y la cola sigue con los demás
-        fallos++; ultimo = { it, e }; marcaErrorQ(it.id, textoError(e)); compraEstado(it.id, 'error');
+        fallos++; ultimo = { it, e }; marcaErrorQ(it.id, textoError(e)); compraEstado(it.id, 'error'); avisaEnvio(it.id, { estado: 'error', e });
       }
     }
   } finally { busy = false; }
@@ -912,6 +1112,7 @@ async function flush() {
   else if (detenida) say(motivoCola(detenida));
   else if (saltados) say('Un gasto tarda demasiado en enviarse: sigue pendiente y se reintentará. Los demás ya se enviaron.');
   // El resumen se saltó mientras se enviaba (L891): se refresca también tras un tiempo límite o una pausa (I2)
+  q().forEach(x => avisaEnvio(x.id, { estado: 'pendiente', e: detenida || { lento: true, message: '' } })); // los que siguen en la cola
   if (enviados || fallos || detenida || saltados) refrescar();
   if (q().some(x => !x.err) && (detenida || saltados)) programaReintento(); else if (!detenida) reN = 0;
   pintaPend();
@@ -989,37 +1190,70 @@ function aplicaLocal(it) {
     try { L.mov = JSON.stringify(m); } catch (e) {}
     if (tab === 'mov' && !hayFiltro()) pintaMov(m);
   }
+  pintaUltimos();
 }
 // Guardado instantáneo: se anota en el teléfono, se confirma al momento y se envía en segundo plano
 function agregaGasto(it, opc) {
   if (viajeActivo() && !(opc && opc.mxn)) it.usd = true;
   if (!encola([it])) return false;
   aplicaLocal(it); aprende([[it.concepto, it.cat]]);
-  aviso('Guardado: ' + it.concepto + ' · ' + money(it.monto) + ' · ' + it.cat + '.' + (it.foto ? ' La foto va con el gasto; se confirma al enviarse.' : ''));
+  if (!(opc && opc.sinAviso)) aviso('Guardado: ' + it.concepto + ' · ' + money(it.monto) + ' · ' + it.cat + '.' + (it.foto ? ' La foto va con el gasto; se confirma al enviarse.' : ''));
   flush(); return true;
 }
+// Espera el resultado del envío de un gasto de la cola (lo avisa flush), con tiempo máximo
+const esperas = new Map(), ESPERA_MS = 1500;
+function esperaEnvio(id, ms) { return new Promise(ok => { const t = setTimeout(() => { esperas.delete(id); ok({ estado: 'tiempo' }); }, ms); esperas.set(id, r => { clearTimeout(t); ok(r); }); }); }
+function avisaEnvio(id, r) { const f = esperas.get(id); if (f) { esperas.delete(id); f(r); } }
 
 async function save() {
+  if ($('go').disabled) return;
   const monto = leeMonto($('m').value), concepto = $('c').value.trim(), fecha = $('f').value;
+  const okC = validaCampo('c'), okF = validaCampo('f'), okM = validaCampo('m');
   if (!fecha || !concepto) return say('Falta la fecha o el concepto.');
-  if (!(monto > 0)) return say(MSG_MONTO);
+  if (!(monto > 0)) { ayuda('m', 'mh', MSG_MONTO, true); return say(MSG_MONTO); }
+  if (!okF) return say('Revisa la fecha: no puede ser futura.');
+  if (!(okC && okM)) return;
+  const tok = regTok;
   if (editando) {
-    $('go').disabled = true; say('Guardando cambios…');
+    setReg('guardando'); ponGo('guardando');
     try {
       await call({ accion: 'editar', quien: editando.q, row: editando.row, antes: { c: editando.c, m: editando.m }, fecha, concepto, cat: $('k').value, monto });
-      aprende([[concepto, $('k').value]]);
-      cancelaEdicion(); say('Guardado: cambios aplicados.'); refrescar();
-    } catch (e) { say(errMsg(e)); }
-    finally { $('go').disabled = false; }
+      aprende([[concepto, $('k').value]]); guardoEnHoja = true; cifraPorAccion = true;
+      if (tok === regTok) { ponGo('ok'); setTimeout(() => { if (tok === regTok) cierraRegistro(); }, 900); }
+      say('Guardado: cambios aplicados.'); refrescar();
+    } catch (e) {
+      say(errMsg(e));
+      if (tok === regTok) { setReg('abierta'); ponGo('mal', textoError(e) + ' Revisa los datos y vuelve a intentar.'); setTimeout(() => { if (tok === regTok && $('go').dataset.estado === 'mal') ponGo(''); }, 2600); }
+    }
     return;
   }
   const item = { id: nuevoId(), fecha, concepto, cat: $('k').value, monto };
   if (fotoActual) item.foto = { data: fotoActual };
   if (borrId) item.borr = borrId;
-  if (!agregaGasto(item, borrId ? { mxn: true } : null)) return;
+  setReg('guardando'); ponGo('guardando');
+  const espera = esperaEnvio(item.id, ESPERA_MS);
+  if (!agregaGasto(item, borrId ? { mxn: true, sinAviso: true } : { sinAviso: true })) {
+    avisaEnvio(item.id, { estado: 'sinlugar' }); setReg('abierta');
+    ponGo('mal', 'No hay espacio en el teléfono para guardar el gasto. Conéctate o libera espacio e intenta de nuevo; tus datos siguen aquí.');
+    setTimeout(() => { if (tok === regTok && $('go').dataset.estado === 'mal') ponGo(''); }, 2600);
+    return;
+  }
+  guardoEnHoja = true;
   if (borrId) { guardaBor(leeBor().filter(x => x.id !== borrId)); borrId = ''; $('cn').hidden = true; }
   fotoActual = ''; pintaFoto(); partesPend = null; $('pt').hidden = true;
-  $('c').value = ''; $('m').value = ''; $('f').value = hoy();
+  $('c').value = ''; $('m').value = ''; $('f').value = hoy(); limpiaAyudas();
+  const r = await espera, nom = sinQuien(concepto);
+  if (tok !== regTok) return; // la persona cerró la hoja mientras se enviaba: el aviso flotante dirá el resultado
+  if (r.estado === 'ok') ponGo('ok', r.j && r.j.dup ? 'Ojo: ya había uno igual ese día.' : r.j && r.j.inusual ? 'Ojo: es mucho más de lo normal (normal ≈ ' + money(r.j.inusual) + ').' : '');
+  else if (r.estado === 'error') ponGo('mal', '«' + nom + '» no se guardó: ' + textoError(r.e) + ' Quedó en Pendientes, en Inicio, con Reintentar y Quitar.');
+  else ponGo('pend', r.estado === 'pendiente' ? motivoCola(r.e) : 'Se está enviando a tu hoja; te aviso cuando se confirme.');
+  const ms = r.estado === 'ok' ? (r.j && (r.j.dup || r.j.inusual) ? 2200 : 900) : r.estado === 'error' ? 3200 : 1800;
+  // m-4: si la persona ya empezó a escribir otro gasto, la hoja no se cierra sola y el botón vuelve a estar listo
+  setTimeout(() => {
+    if (tok !== regTok) return;
+    if (escribiendoOtro()) { setReg('abierta'); ponGo(''); return; }
+    cierraRegistro();
+  }, ms);
 }
 
 // ---- Foto del ticket a mano (B1): va a Drive con el gasto, aunque la IA esté apagada; nunca a la IA ----
@@ -1088,9 +1322,11 @@ async function ia(audio, opc) {
     // I-1: si una voz anterior quedó en duda y ese mismo gasto ya aparece guardado, no se guarda otra vez
     const ya = voz && directo ? yaGuardadoTrasDuda(loc) : null;
     $('ia').value = ''; delete $('ia').dataset.voz; syncEnviar();
-    if (ya) { vozDuda = null; avisoGuardado(ya.c, ya.m, { row: ya.row }, ya.k, { voz: true, ya: true }); return; }
-    if (directo) { agregaGasto({ id: nuevoId(), ...loc }); return; }
-    pintaPartes(null); $('f').value = loc.fecha; $('c').value = loc.concepto; $('m').value = loc.monto; $('k').value = loc.cat;
+    if (ya) { // N-1: el aviso ofrece «Es otro: guardarlo» por si de verdad fue otro gasto igual
+      vozDuda = null; avisoGuardado(ya.c, ya.m, { row: ya.row }, ya.k, { voz: true, ya: true, otro: () => { if (agregaGasto({ id: nuevoId(), ...loc })) guardoEnHoja = true; } }); cierraRegistro(); return;
+    }
+    if (directo) { if (agregaGasto({ id: nuevoId(), ...loc })) { guardoEnHoja = true; cierraRegistro(); } return; }
+    pintaPartes(null); $('f').value = loc.fecha; $('c').value = loc.concepto; $('m').value = loc.monto; ponCat(loc.cat);
     return say('Listo: revisa los datos y pulsa Guardar gasto.');
   }
   // Con la IA apagada solo la voz (si el servidor la encendió) puede ir al servidor
@@ -1109,12 +1345,12 @@ async function ia(audio, opc) {
     if (enCaja !== null && $('ia').value === enCaja) { $('ia').value = ''; delete $('ia').dataset.voz; }
     syncEnviar();
     // Guardado directo: aviso con Deshacer (borra ese renglón con «borrar» y el row que devolvió el servidor); dup e inusual se dicen
-    if (directo) { cifraPorAccion = true; avisoGuardado(g.concepto, g.monto, j, g.cat, { voz }); refrescar(); return; }
+    if (directo) { cifraPorAccion = true; guardoEnHoja = true; avisoGuardado(g.concepto, g.monto, j, g.cat, { voz }); cierraRegistro(); refrescar(); return; }
     if (esFoto) { fotoActual = audio.data; pintaFoto(); pintaPartes(g); } else pintaPartes(null);
     if (esFecha(g.fecha)) $('f').value = g.fecha;
     if (g.concepto) $('c').value = g.concepto;
     if (g.monto > 0) $('m').value = g.monto;
-    if (['Esencial', 'Mantener', 'Innecesario'].includes(g.cat)) $('k').value = g.cat;
+    if (['Esencial', 'Mantener', 'Innecesario'].includes(g.cat)) ponCat(g.cat);
     say(esFoto ? 'Listo: revisa los datos del ticket y pulsa Guardar gasto.' : 'Listo: revisa los datos y pulsa Guardar gasto.');
   } catch (e) {
     // Si la IA no pudo leer la foto, la foto no se pierde: queda adjunta para el registro manual
@@ -1123,7 +1359,7 @@ async function ia(audio, opc) {
       // I-1: «rapido» guarda en la misma llamada; si se perdió la respuesta, el gasto pudo quedar guardado. No se invita a repetir.
       vozDuda = { t: Date.now(), antes: filasAntes };
       if (!audio) { $('ia').dataset.voz = '1'; syncEnviar(); } // Android: el dictado queda en la caja
-      avisoBoton((e.lento ? 'Error: el servidor tardó más de ' + Math.round((audio ? 45000 : LIMITE_MS) / 1000) + ' s en responder' : e.red ? 'Error: no hay conexión' : 'Error: el servidor no respondió bien') + ' y no sé si se guardó. Revisa tus últimos movimientos antes de volver a dictarlo.', 'Ver movimientos', () => { filtroDia = ''; setTab('mov'); });
+      avisoBoton((e.lento ? 'Error: el servidor tardó más de ' + Math.round((audio ? 45000 : LIMITE_MS) / 1000) + ' s en responder' : e.red ? 'Error: no hay conexión' : 'Error: el servidor no respondió bien') + ' y no sé si se guardó. Revisa tus últimos movimientos antes de volver a dictarlo.', 'Ver movimientos', () => { cierraRegistro(); filtroDia = ''; setTab('mov'); });
       refrescar(); // pide «inicio» para que Inicio y los últimos movimientos digan lo que hay en la hoja
     }
     else if (voz || (e.codigo && CODIGOS[e.codigo])) { if (voz && !audio) { $('ia').dataset.voz = '1'; syncEnviar(); } avisoManual(errMsg(e)); } // Android: el dictado se queda en la caja para corregirlo y la flecha lo reenvía como voz (M-1)
@@ -1201,6 +1437,7 @@ function refrescar() { resumen(); if (tab === 'mov' && hayFiltro()) movCargar(tr
 // §4: la cifra del mes solo se anima cuando cambia por algo que hizo la persona (guardar o deshacer), no al abrir Inicio
 let cuentaT = 0, cifraPorAccion = false;
 function contar(n, v) { // el total del mes sube hasta su valor en 300 ms
+  if (n.id === 'smt' && regEstado !== 'cerrada') { cifraDiferida = v; return; } // con la hoja de Registrar abierta, sube al cerrarla
   const a = Number(n.dataset.v || 0), anima = cifraPorAccion; n.dataset.v = v;
   if (a !== v) cifraPorAccion = false;
   if (!anima || priv() || a === v || document.hidden || sinMov()) { cancelAnimationFrame(cuentaT); n.textContent = money(v); return; }
@@ -1216,14 +1453,33 @@ function pintaResumen(r) {
   contar($('smt'), valido ? r.mes.total : 0);
   $('sme').textContent = money(pc.Esencial || 0); $('smm').textContent = money(pc.Mantener || 0); $('smi').textContent = money(pc.Innecesario || 0);
   // M-5: con montos de 6 cifras por categoría, las tres columnas pasan a renglones; la cifra grande baja de tamaño desde 8 cifras
-  document.querySelector('.mes .cs').classList.toggle('largo', CATS3.some(k => money(pc[k] || 0).length > 10));
+  document.querySelector('.cats').classList.toggle('largo', CATS3.some(k => money(pc[k] || 0).length > 10)); // Fase 2: las 3 tarjetas pasan a renglones
   $('smt').classList.toggle('largo', money(valido ? r.mes.total : 0).length > 12);
   const T = topes(), al = CATS3.filter(k => Number(T[k]) > 0).map(k => ({ k, t: T[k], p: (pc[k] || 0) / T[k] * 100 })).filter(x => x.p >= 80).sort((x, y) => y.p - x.p);
-  $('sma').hidden = !al.length;
-  if (al.length) {
-    $('sma').textContent = al.map(x => x.p >= 100 ? 'Te pasaste del tope de ' + x.k + ' (' + money(x.t) + ').' : x.k + ' va en ' + Math.round(x.p) + '% de su tope.').join(' ');
-    $('sma').style.color = al[0].p >= 100 ? 'var(--c-destacada-peligro)' : 'var(--c-destacada-aviso)';
+  // Cifra principal contra lo planeado: la suma de los topes; sin topes, el ingreso; sin ninguno, no se inventa (P29)
+  const sumT = CATS3.reduce((a, k) => a + (Number(T[k]) > 0 ? Number(T[k]) : 0), 0), plan = sumT > 0 ? sumT : ingresoDe(r), tot0 = valido ? r.mes.total : 0, pPlan = plan > 0 ? tot0 / plan * 100 : 0;
+  { const mi = Number(h.slice(5, 7)), di = Number(h.slice(8, 10)), nd0 = new Date(Number(h.slice(0, 4)), mi, 0).getDate(); $('smd').textContent = 'Gastado en ' + MESES[mi - 1].toLowerCase() + ' · día ' + di + ' de ' + nd0; }
+  $('smcap').hidden = !(valido && plan > 0);
+  if (valido && plan > 0) {
+    const cb = $('smcb'); $('smcf').style.width = Math.min(100, pPlan) + '%';
+    cb.classList.toggle('cerca', pPlan >= 80 && pPlan < 100); cb.classList.toggle('paso', pPlan >= 100);
+    cb.setAttribute('aria-valuenow', String(Math.round(Math.min(100, pPlan)))); cb.setAttribute('aria-valuetext', Math.round(pPlan) + ' % de lo planeado; aviso al 80 %');
+    $('smct').textContent = 'de ' + money(plan) + (sumT > 0 ? ' planeados' : ' de ingreso') + ' · ' + (plan - tot0 >= 0 ? 'quedan ' + money(plan - tot0) : 'te pasaste por ' + money(tot0 - plan));
   }
+  const avisoPlan = valido && plan > 0 && pPlan >= 80 ? (pPlan >= 100 ? 'Ya pasaste lo planeado del mes.' : 'Vas en ' + Math.round(pPlan) + ' % de lo planeado del mes.') : '';
+  $('sma').hidden = !al.length && !avisoPlan;
+  if (al.length || avisoPlan) {
+    $('sma').textContent = [avisoPlan].concat(al.map(x => x.p >= 100 ? 'Te pasaste del tope de ' + x.k + ' (' + money(x.t) + ').' : x.k + ' va en ' + Math.round(x.p) + '% de su tope.')).filter(Boolean).join(' ');
+    $('sma').style.color = (al.length && al[0].p >= 100) || pPlan >= 100 ? 'var(--c-destacada-peligro)' : 'var(--c-destacada-aviso)';
+  }
+  // Tres tarjetas iguales: cada categoría contra su tope
+  const BARC = { Esencial: ['sbe', 'ste'], Mantener: ['sbm', 'stm'], Innecesario: ['sbi', 'sti'] };
+  CATS3.forEach(k => {
+    const v = pc[k] || 0, t = Number(T[k]) || 0, [bi, ti] = BARC[k], card = $(bi).closest('.catc'), p = t > 0 ? v / t * 100 : 0;
+    $(bi).parentNode.hidden = !(t > 0); $(bi).style.width = Math.min(100, p) + '%';
+    card.classList.toggle('cerca', t > 0 && p >= 80 && p < 100); card.classList.toggle('paso', t > 0 && p >= 100);
+    $(ti).textContent = t > 0 ? (p >= 80 ? '▲ ' + Math.round(p) + ' % del tope' : Math.round(p) + ' % de ' + money(t)) : 'Sin tope';
+  });
   const ing = ingresoDe(r), tot = valido ? r.mes.total : 0, pr = proyeccion(tot);
   $('sml').hidden = !(valido && ing > 0);
   if (valido && ing > 0) $('sml').textContent = ing - tot >= 0 ? 'Te quedan ' + money(ing - tot) + ' de tu ingreso de ' + money(ing) + '.' : 'Ya pasaste tu ingreso de ' + money(ing) + ' por ' + money(tot - ing) + '.';
@@ -1237,8 +1493,13 @@ function pintaResumen(r) {
   $('saa').hidden = !(ah >= 2000 && ah !== ay);
   if (ah >= 2000 && ah !== ay) $('saa').textContent = 'Tu hoja Resumen Mensual sigue en el año ' + ah + '. Cámbialo a ' + ay + ' en la celda B3 para que los totales del año sumen bien.';
   const ant = r && r.meses && r.meses[4], diaMes = Number(h.slice(8, 10));
-  $('scb').hidden = !(valido && diaMes <= 7 && ant && ant.total > 0);
-  if (valido && diaMes <= 7 && ant && ant.total > 0) $('scbt').textContent = 'Ya puedes ver el cierre de ' + MESES[(Number(h.slice(5, 7)) + 10) % 12].toLowerCase() + '.';
+  // Cierre del mes anterior: siempre que tenga datos (antes solo los primeros 7 días)
+  const ant2 = r && r.meses && r.meses[3];
+  $('scb').hidden = !(valido && ant && ant.total > 0);
+  if (valido && ant && ant.total > 0) {
+    $('scbh').textContent = 'Cierre de ' + MESES[(Number(h.slice(5, 7)) + 10) % 12].toLowerCase();
+    $('scbt').textContent = 'Cerró en ' + money(ant.total) + (ant2 && ant2.total > 0 ? ', ' + (ant.total <= ant2.total ? 'menos' : 'más') + ' que el mes anterior (' + money(ant2.total) + ').' : '.') + (diaMes <= 7 ? ' Ya puedes ver su cierre.' : '');
+  }
   pintaFrecuentes(r);
   const quedan = valido ? (r.capacidad ? r.capacidad.libres : r.limite - r.ultimaFila) : 999;
   const capacidadAviso = valido && (r.capacidad ? r.capacidad.porcentaje >= 80 : quedan <= (r.limite - 4) * .2);
@@ -1247,8 +1508,21 @@ function pintaResumen(r) {
     const rit = valido && diaMes >= 5 && r.mes.n > 0 ? r.mes.n / diaMes * 30 : 0;
     $('smwt').textContent = quedan > 0 ? 'Quedan ' + quedan + ' filas en el Registro' + (rit > 0 ? ' (a tu ritmo alcanzan para unos ' + Math.max(1, Math.floor(quedan / rit)) + ' mes(es))' : '') + '. Pronto hay que extenderlo.' : 'El Registro está lleno. Hay que extenderlo.';
   }
-  pintaIA();
+  pintaIA(); pintaUltimos();
   if (tab === 'rep') pintaReportes(r);
+}
+// Últimos movimientos en Inicio (lo último guardado en el teléfono, con lo pendiente marcado)
+function pintaUltimos() {
+  const m = leeMov(), box = $('ult'); box.textContent = '';
+  const l = m && Array.isArray(m.items) ? m.items.slice(0, 5) : null;
+  if (!l) { box.append(el('div', 'vacio', 'Cargando…')); return; }
+  if (!l.length) { box.append(el('div', 'vacio', 'Aún no hay gastos.')); return; }
+  l.forEach(x => {
+    const row = el('div', 'row'), izq = el('div', 'rl'), der = el('div', 'rr'), qn = quienDe(x.c), cuando = x.f === hoy() ? 'Hoy' : x.f === ayer() ? 'Ayer' : ddmm(x.f);
+    izq.append(el('div', 'rc1', sinQuien(x.c)), el('div', 'rc2', x.k + ' · ' + cuando + (x.pend ? ' · enviando…' : '')));
+    der.append(el('div', 'rm', money(x.m))); if (qn) { const b = el('span', 'qb', qn); b.setAttribute('aria-label', 'Registró: ' + qn); der.append(b); }
+    row.append(izq, der); box.append(row);
+  });
 }
 
 // ---- Estado de la IA que manda el servidor en inicio y resumen (B5) ----
@@ -1264,6 +1538,9 @@ function pintaIA() {
   $('vzd').checked = vozDirecta(); $('vzd').disabled = !s.voz;
   $('vzdx').textContent = !s.voz ? 'La voz está apagada; registra a mano.' : 'Lo que dictes se guarda al momento y puedes deshacerlo unos segundos. Apagado, primero lo revisas.';
   $('fb').hidden = off; if (off) { $('ts').hidden = true; delete $('ts').dataset.state; } // leer el ticket con IA solo si está encendida
+  $('iax').hidden = !off; $('iax').className = 'estado' + (s.voz ? ' voz' : ''); // aviso fijo y discreto en Inicio
+  $('iax').textContent = s.voz ? 'Voz lista · la IA para texto y fotos está apagada' : 'IA apagada por privacidad · registra a mano';
+  $('micl').textContent = s.voz ? 'Dictar gasto' : 'Voz apagada';
   $('ab').disabled = off; $('abx').hidden = !off;
   ['qi', 'qb', 'qmic'].forEach(id => { $(id).disabled = off; }); document.querySelectorAll('[data-q]').forEach(b => { b.disabled = off; }); $('qx').hidden = !off;
   $('crb').disabled = off; $('crx').hidden = !off;
@@ -1506,14 +1783,15 @@ function pintaViaje() {
   const on = viajeActivo();
   $('vj').hidden = !on || !!editando;
   const lb = document.querySelector('label[for=m]'); if (lb) lb.textContent = on && !editando ? 'Monto (USD)' : 'Monto';
+  $('vjr').checked = on; $('vjr').closest('label').hidden = !!editando || !!borrId;
 }
 function pintaFrecuentes(r) {
   const box = $('fq'); box.textContent = '';
   const l = (r && r.frecuentes) || [];
-  $('fqw').hidden = !l.length || !!editando;
+  $('fqw').hidden = !l.length;
   l.forEach(x => {
     const b = el('button', 'chip', x.c); b.type = 'button';
-    b.onclick = () => { $('f').value = hoy(); $('c').value = x.c; $('m').value = x.m; $('k').value = x.k; $('m').focus(); $('m').select(); say('Listo: ajusta el monto si cambió y pulsa Guardar gasto.'); };
+    b.onclick = () => { if (editando || borrId) cancelaEdicion(true); $('f').value = hoy(); $('c').value = x.c; $('m').value = x.m; ponCat(x.k); abreRegistro({ foco: 'm' }); try { $('m').select(); } catch (e) {} say('Listo: ajusta el monto si cambió y pulsa Guardar gasto.'); };
     box.append(b);
   });
 }
@@ -1522,15 +1800,14 @@ function pintaFrecuentes(r) {
 let editando = null;
 function editar(x) {
   editando = { row: x.row, c: x.c, m: x.m, q: quienDe(x.c) };
-  setTab('inicio');
-  $('f').value = esFecha(x.f) ? x.f : hoy(); $('c').value = sinQuien(x.c); $('m').value = x.m; $('k').value = x.k;
+  $('f').value = esFecha(x.f) ? x.f : hoy(); $('c').value = sinQuien(x.c); $('m').value = x.m; ponCat(x.k);
   quitaFoto(); $('fwrap').hidden = true; $('fest').hidden = true; // editar no cambia la foto: se ve con "Ver foto del ticket"
-  $('go').textContent = 'Guardar cambios'; $('cn').hidden = false; pintaViaje(); pintaFrecuentes(leeRes()); ticketCheck(x);
-  $('form').scrollIntoView({ behavior: suave(), block: 'start' }); say('Editando: cambia lo que necesites y pulsa Guardar cambios.');
+  $('regt').textContent = 'Editar gasto'; $('cn').hidden = false; pintaViaje(); ticketCheck(x);
+  abreRegistro({ foco: 'm' }); ponGo(''); say('Editando: cambia lo que necesites y pulsa Guardar cambios.');
 }
-function cancelaEdicion() {
-  editando = null; borrId = ''; $('go').textContent = 'Guardar gasto'; $('cn').hidden = true; $('tkb').hidden = true; tkData = null; $('fwrap').hidden = false; pintaViaje(); pintaFrecuentes(leeRes());
-  $('c').value = ''; $('m').value = ''; $('f').value = hoy(); say('');
+function cancelaEdicion(silencio) {
+  editando = null; borrId = ''; $('go').textContent = 'Guardar gasto'; $('regt').textContent = 'Registrar gasto'; $('cn').hidden = true; $('tkb').hidden = true; tkData = null; $('fwrap').hidden = false; pintaViaje();
+  $('c').value = ''; $('m').value = ''; $('f').value = hoy(); limpiaAyudas(); if (!silencio) say('');
 }
 async function borrar(x) {
   if (!confirm('¿Borrar "' + sinQuien(x.c) + '" por ' + moneyReal(x.m) + '?')) return;
@@ -1917,9 +2194,9 @@ async function descartaBor(b) {
   try { await call({ accion: 'borrador_descartar', id: b.id }); say('Descartado: ' + sinQuien(b.c) + '.'); } catch (e) { say(errMsg(e)); refrescar(); }
 }
 function editaBor(b) {
-  setTab('inicio'); borrId = b.id;
-  $('f').value = esFecha(b.f) ? b.f : hoy(); $('c').value = sinQuien(b.c); $('m').value = b.m; $('k').value = b.k; $('cn').hidden = false;
-  $('form').scrollIntoView({ behavior: suave(), block: 'start' }); say('Editando el aviso: ajusta y pulsa Guardar gasto.');
+  if (editando) cancelaEdicion(true); borrId = b.id;
+  $('f').value = esFecha(b.f) ? b.f : hoy(); $('c').value = sinQuien(b.c); $('m').value = b.m; ponCat(b.k); $('cn').hidden = false;
+  $('regt').textContent = 'Revisar aviso'; abreRegistro({ foco: 'c' }); say('Editando el aviso: ajusta y pulsa Guardar gasto.');
 }
 
 // ---- Aprobar todos ----
@@ -2306,10 +2583,10 @@ function togglePriv() {
   pintaPriv();
   $('f').value = hoy();
   $('go').onclick = save;
-  $('cn').onclick = cancelaEdicion;
+  $('cn').onclick = () => { cancelaEdicion(); cierraRegistro(); };
   $('ib').onclick = () => ia();
   $('ia').addEventListener('keydown', e => { if (e.key === 'Enter') { e.preventDefault(); ia(); } });
-  ['ia', 'qi'].forEach(i => $(i).addEventListener('input', () => { if (!$(i).value.trim()) delete $(i).dataset.voz; syncEnviar(); }));
+  ['ia', 'qi'].forEach(i => $(i).addEventListener('input', () => { delete $(i).dataset.voz; syncEnviar(); })); // N-2: si el dictado se edita a mano, deja de ser voz
   aplicarTema(); matchMedia('(prefers-color-scheme: dark)').addEventListener('change', () => { aplicarTema(); if (tab === 'rep') pintaReportes(leeRes()); });
   const deb = (f, ms) => { let t; return () => { clearTimeout(t); t = setTimeout(f, ms); }; };
   $('mq').addEventListener('input', deb(movCargar, 350)); $('mk').onchange = movCargar; $('mp').onchange = movCargar;
@@ -2341,7 +2618,7 @@ function togglePriv() {
   $('yo').onchange = () => { // solo K o J; la que ya estaba guardada se queda si no se elige otra
     const v = $('yo').value;
     if (!INICIALES.some(o => o[0] === v)) { pintaYo(); return; }
-    L.yo = v; pintaYo(); say('Guardado: tu inicial es ' + v + '.'); pintaPersonas();
+    L.yo = v; pintaYo(); pintaQuien(); say('Guardado: tu inicial es ' + v + '.'); pintaPersonas();
   };
   $('tc').onchange = () => {
     const t = $('tc').value.trim(), n = leeMonto(t, { dec: 4 });
@@ -2374,7 +2651,18 @@ function togglePriv() {
   $('qb').onclick = () => preguntar();
   $('qi').addEventListener('keydown', e => { if (e.key === 'Enter') { e.preventDefault(); preguntar(); } });
   document.querySelectorAll('[data-q]').forEach(b => b.onclick = () => { $('qi').value = b.dataset.q; preguntar(); });
-  document.querySelectorAll('#tabs button').forEach(b => b.onclick = () => { if (b.dataset.t === 'mov' && tab !== 'mov') filtroDia = ''; setTab(b.dataset.t); });
+  document.querySelectorAll('#tabs button[data-t]').forEach(b => b.onclick = () => { if (b.dataset.t === 'mov' && tab !== 'mov') filtroDia = ''; setTab(b.dataset.t); });
+  // Fase 2: botón central de Registrar, Ajustes desde el encabezado, hoja de Registrar
+  $('treg').onclick = () => abreRegistro(); $('regx').onclick = cierraRegistro; $('hdaju').onclick = () => setTab('aju');
+  $('reg').onclick = e => { if (e.target === $('reg')) cierraRegistro(); };
+  document.addEventListener('keydown', e => { if (e.key === 'Escape' && regEstado === 'abierta' && $('avz').hidden && $('ts').hidden && $('tkv').hidden) cierraRegistro(); });
+  $('ulv').onclick = () => { filtroDia = ''; setTab('mov'); };
+  document.querySelectorAll('#kb button').forEach(b => b.onclick = () => ponCat(b.dataset.cat)); ponCat($('k').value);
+  ['c', 'm'].forEach(id => { $(id).addEventListener('input', () => { $(id).dataset.tocado = '1'; if ($(id).getAttribute('aria-invalid') === 'true') validaCampo(id); }); $(id).addEventListener('blur', () => { if ($(id).dataset.tocado) validaCampo(id); }); });
+  $('f').addEventListener('change', () => validaCampo('f'));
+  $('c').addEventListener('keydown', e => { if (e.key === 'Enter') { e.preventDefault(); $('m').focus(); } });
+  $('vjr').onchange = () => { if ($('vjr').checked) L.viaje = '1'; else L.removeItem('viaje'); pintaViaje(); $('vjc').checked = L.viaje === '1'; if ($('m').value) validaCampo('m'); say($('vjr').checked ? 'Guardado: modo viaje activado.' : 'Guardado: modo viaje desactivado.'); };
+  setReg('cerrada');
   $('cal').onchange = e => { const f = e.target.value; e.target.value = ''; if (esFecha(f)) verDia(f); };
   $('mdia').onchange = e => { filtroDia = esFecha(e.target.value) ? e.target.value : ''; movCargar(); };
   document.querySelectorAll('[data-d]').forEach(b => b.onclick = () => { filtroDia = b.dataset.d === 'hoy' ? hoy() : b.dataset.d === 'ayer' ? ayer() : ''; if (b.dataset.d === 'todo') { $('mq').value = ''; $('mk').value = ''; $('mp').value = ''; } movCargar(); });
@@ -2392,6 +2680,7 @@ function togglePriv() {
   };
   // Foto a mano (B1): dos botones, miniatura y Quitar; no pasa por la IA
   $('fcam').onclick = () => { noBlq(); $('phm').click(); };
+  $('regfoto').onclick = () => { noBlq(); $('phm').click(); }; // entrada directa «Foto del ticket» (W44-AP25)
   $('fgal').onclick = () => { noBlq(); $('phg').click(); };
   $('phm').onchange = $('phg').onchange = e => { const f = e.target.files[0]; e.target.value = ''; adjuntaFoto(f); };
   $('fqx').onclick = () => { quitaFoto(); say('Listo: foto quitada.'); };
@@ -2425,9 +2714,11 @@ function togglePriv() {
       if (a === 'hoy') verDia(hoy());
       else {
         setTab('inicio');
-        if (a === 'voz' && !$('mic').hidden && !lkModo) setTimeout(() => $('mic').click(), 400);
-        else if (a === 'voz') $('ia').focus();
+        if (a === 'gasto') abreRegistro({ foco: 'c' }); // registrar a mano
+        else if (a === 'voz' && !$('mic').hidden && !lkModo) { abreRegistro(); setTimeout(() => $('mic').click(), 400); }
+        else if (a === 'voz') abreRegistro({ foco: 'ia' });
         else if (a === 'ticket') { // con IA: la hoja para leerlo; sin IA: el formulario manual con «Tomar foto» (el navegador exige un toque para abrir la cámara)
+          abreRegistro();
           if (iaDe().activa) hoja($('ts'), true);
           else { $('fwrap').scrollIntoView({ block: 'center' }); try { $('fcam').focus({ preventScroll: true }); } catch (e) {} say('Toca «Tomar foto» para fotografiar el ticket. Se guarda con el gasto, sin IA.'); }
         }
